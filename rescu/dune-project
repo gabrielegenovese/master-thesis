@@ -1,0 +1,41 @@
+(lang dune 3.4)
+
+(name rescu)
+
+(generate_opam_files true)
+
+(source
+ (uri git+https://src.koda.cnrs.fr/loic.germerie.guizouarn/rescu))
+
+(homepage https://src.koda.cnrs.fr/loic.germerie.guizouarn/rescu)
+
+(bug_reports https://src.koda.cnrs.fr/loic.germerie.guizouarn/rescu/-/issues)
+
+(authors "Loïc Germerie")
+
+(maintainers "Loïc Germerie")
+
+(license GPL-3.0-or-later)
+
+(documentation https://i3s.unice.fr/~lgermerie/rescu/rescu/index.html)
+
+(package
+ (name rescu)
+ (synopsis "Model-checking tool for RSC system of communicating automata")
+ (description "Model-checking tool for communicating automata relying on the properties of RSC systems: \
+ systems in which execution may be reordered so that all receptions immediatly follow there corresponding send action.")
+ (depends
+  (ocaml
+   (and (>= 4.13.1) (<= 5.0.0)))
+  dune
+  menhir
+  (ocaml-lsp-server :with-dev-setup) ; not working
+  (ocamlformat :with-dev-setup)
+  (odoc :with-doc)
+  ocamlgraph)
+ (tags
+  (model-checking rsc "communicating automata")))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
+
+(using menhir 2.1)

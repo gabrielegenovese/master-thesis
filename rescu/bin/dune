@@ -1,0 +1,4 @@
+(executable
+ (public_name rescu)
+ (name main)
+ (libraries SCM verify util verify_util comm_automata))

@@ -1,0 +1,29 @@
+(include_subdirs unqualified)
+
+(library
+ (name SCM)
+ (public_name rescu.SCM)
+ (modules print regexp scm_print scm_syn frontend scm_lex scm_yacc))
+
+(library
+ (name util)
+ (package rescu)
+ (modules arg_options))
+
+(library
+ (name comm_automata)
+ (public_name rescu.Comm_automata)
+ (libraries SCM util ocamlgraph)
+ (modules communication system buffer_util system_printer))
+
+(library
+ (name verify_util)
+ (package rescu)
+ (libraries SCM util comm_automata)
+ (modules automaton buffer_automaton builder search_space traces))
+
+(library
+ (name verify)
+ (public_name rescu.verify)
+ (libraries verify_util comm_automata ocamlgraph)
+ (modules model_checking_state model_checking membership_state membership))
