@@ -1,4 +1,4 @@
-(lang dune 3.4)
+(lang dune 3.5)
 
 (name rescu)
 
@@ -26,7 +26,7 @@
  systems in which execution may be reordered so that all receptions immediatly follow there corresponding send action.")
  (depends
   (ocaml
-   (and (>= 4.13.1) (<= 5.0.0)))
+   (and (>= 5.2.0) (<= 5.3.0)))
   dune
   menhir
   (ocaml-lsp-server :with-dev-setup) ; not working

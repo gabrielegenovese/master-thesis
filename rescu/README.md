@@ -9,9 +9,9 @@ Theoretical background behind this tool may be found in [this paper](https://doi
 1. install `opam`
 2. `git clone https://src.koda.cnrs.fr/loic.germerie.guizouarn/rescu` to retrieve the code
 3. `cd rescu`
-5. `make setup` to set up a local opam switch
-6. `make install` to install ReSCu in the local switch
-7. `rescu -isrsc -mc -counter examples/papers/client_server_database.scm` to confirm ReSCu is installed and working
+4. `make setup` to set up a local opam switch
+5. `make install` to install ReSCu in the local switch
+6. `rescu -isrsc -mc -counter examples/papers/client_server_database.scm` to confirm ReSCu is installed and working
 
 If after completing all the steps, you get an error `rescu: command not found`, make sure your working directory is the directory
 created at step 2., and run `eval $(opam env)` to set the `$PATH` variable according to opam's settings for your local switch.
@@ -54,11 +54,12 @@ Use `man man/scm.5` for some information about their syntax.
 When using the `-to_dot` command, a dot file representing the system will be written to `filename`.
 To render the dot file, you will need to have [graphviz installed on your system](https://graphviz.org/download/).
 Then, use `dot -T<type> -o<output_name> <filename>` where `type` might be `pdf`, `png`, `svg` and others.
-Read to the manpage of `dot` for an exhaustive list.
+Read to the man page of `dot` for an exhaustive list.
 
 ## Directories
+
 The source code for `rescu` is divided in the directories `bin/`
-for the executable, and  `lib/` for the different libraries it uses.
+for the executable, and `lib/` for the different libraries it uses.
 The directory `lib/SCM` contains code we reused from the [McScM project](https://svn.labri.fr/repos/acs/www/redmine/projects/mcscm.1.html).
 The OCaml documentation of the libraries is available [here](https://i3s.unice.fr/~lgermerie/rescu/rescu/index.html).
 
