@@ -1,13 +1,30 @@
-= Notes
+#import "@preview/rubber-article:0.1.0": *
 
-== A Partial Order View of Message-Passing Communication Models (POPL23)
+#show link: underline
+#show: article.with()
+
+#set text(
+  lang: "en"
+)
+
+#maketitle(
+  title: "Notes",
+  authors: (
+    "Gabriele Genovese",
+  ),
+  date: datetime.today().display("[day] [month repr:long] [year]"),
+)
+
+#outline()
+
+= A Partial Order View of Message-Passing Communication Models POPL23
 $bb(P)$ : set of processes/partecipants ($p,q,r,...$)
 
 $bb(M)$ : set of messags ($m 1,m 2 , m 3,...$)
 
 #image("img/contri.png", width: 80%)
 
-=== Definition of Message Sequence Chart (MSC)
+== Definition of Message Sequence Chart (MSC)
 An MSC over $bb(P)$ and $bb(M)$ is a tuple $M = (Epsilon, arrow, lt.tri, lambda)$ where $Epsilon$ is finite (possibly empty) set of events, $lambda: Epsilon arrow Sigma$ is a labelling function that associates an action to each event, and $arrow, lt.tri$ are binart relations on $Epsilon$ that satisfy the following three conditions. For $p in bb(P)$, let $Epsilon_p = \{e in Epsilon | lambda (e) in Sigma_p \}$ be the set of vents that are executed by $p$.
 
 1. The process relation $arrow subset.eq Epsilon times Epsilon$ relates an event to its immediate successor on the same process: $arrow = union.big_(p in bb(P)) arrow_p$ for some relations $arrow_p subset.eq Epsilon_p times Epsilon_p$ such that $arrow_p$ is the direct successor relation of a total order on $Epsilon_p$.
@@ -20,6 +37,8 @@ An MSC over $bb(P)$ and $bb(M)$ is a tuple $M = (Epsilon, arrow, lt.tri, lambda)
     2c. for all $e in Epsilon$ such that $lambda (f) = "send"(p, q, m)$, there is at most one $f in Epsilon$ such that $e lt.tri f$.
 
 3. The happens-before relation $lt.eq _"hb"$, defined by $(arrow union lt.tri)^*$, is a partial order on $Epsilon$.
+
+== MSC Classes
 
 === Fully async
 
@@ -43,23 +62,41 @@ An MSC $M = (E, →, lt.tri, λ)$ is causally ordered if, for any two send $s$ a
 Note that in a `co`-MSC we cannot have two send events $s$ and $s'$ addressed to the same process, such that $s$ is unmatched, $s'$ is matched, and $s ≤_"hb" s'$.
 
 === Mailbox
+In this model, any two messages sent to the same process, regardless of the sender, must be received in the same order as they are sent. If a process receives $m_1$ before $m_2$, then $m_1$ must have been sent before $m_2$. `mb` coordinates all the senders of a single receiver. This model is also called FIFO $n-1$.
+
+An MSC $M = (E, →, lt.tri, λ)$ is a `mb`-MSC if it has a linearization $arrow.r.long.squiggly$ where, for any two send events $s$ and $s'$, such that $lambda (s) in "send"(\_,q,\_), lambda (s') in "send"(\_,q,\_)$, and $s arrow.r.long.squiggly s'$
+- either $s,s' in "matched"(M)$ and $r arrow.r.long.squiggly r'$, where $s lt.tri r$ and $s' lt.tri r'$,
+- or $s' in "unmatched"(M)$.
 
 === FIFO 1-n
+This model is the dual of `mb`, it coordinates a sender with all the receivers. Any two messages sent by a process must be received in the same order as they are sent. These two messages might be received by different processes and the two receive events might be concurrent.
+
+An MSC $M = (E, →, lt.tri, λ)$ is a `onen`-MSC if it has a linearization $arrow.r.long.squiggly$ where, for any two send events $s$ and $s'$, such that $lambda (s) in "send"(p,\_,\_), lambda (s') in "send"(p,\_,\_)$ and $s arrow^+ s'$ (which implies $s arrow.r.long.squiggly s'$)
+- either $s,s' in "matched"(M)$ and $r arrow.r.long.squiggly r'$, with $r$ and $r'$ receive events such that $s lt.tri r$ and $s' lt.tri r'$,
+- or $s' in "unmatched"(M)$.
 
 === FIFO n-n
+In this model, messages are globally ordered and delivered according to their emission order. Any two messages must be received in the same order as they are sent. These two messages might be sent or receives by any process and the two send or receive events might be concurrent. The FIFO `n-n` coordinates all the senders with all the receivers.
+
+An MSC $M = (E, →, lt.tri, λ)$ is a `nn`-MSC if it has a linearization $arrow.r.long.squiggly$ where, for any two send events $s$ and $s'$, such that $s arrow.r.long.squiggly s'$
+- either $s, s' in "matched"(M)$ and $r arrow.r.long.squiggly r'$, with $r$ and $r'$ receive events such that $s lt.tri r$ and $s' lt.tri r'$,
+- or $s' in "unmatched"(M)$.
 
 === RSC
+This model imposes the existence of a scheduling such that any send event is immediately followed by its corresponding receive event.
 
-== Fossacs 2020 (Leatitia)
+An MSC $M = (E, →, lt.tri, λ)$ is an `rsc`-MSC if it has no unmatched send events and there is a linearization $arrow.r.long.squiggly$ where any matched send event is immediately followed by its respective receive event.
 
-=== Definition of conflict graph
+= Fossacs 2020 (Leatitia)
+
+== Definition of conflict graph
 Intuitively, we have a dependency whenever two messages have a process in common.
 
 The conflict graph `CG(e)` of a sequence of action $e = a_1...a_n$ is the labeled graph $(V, \{ arrow^(X Y) \}_(X,Y in \{R,S\}))$ where $V$ is the set of message exchanges of $e$, and for all $X,Y in \{S,R\}$, for all $v, v' in V$, there is a $X Y$ dependency edge $v arrow^(X Y) v'$ between $v$ and $v'$ if there are $i < j$ such that $\{a_i\} = v sect X, \{a_j\} = v' sect Y$, and $"proc"_X(v)="proc"_Y(v')$.
 
 #image("img/conflict.png", width: 80%)
 
-=== Definition of $k$-synchronous
+== Definition of $k$-synchronous
 $k$ denotes a given integer $k gt.eq 1$. A $k$-exchange denotes a sequence of action starting with at most $k$ sends and followed by at most $k$ receives matching some of the sends. An MSC is $k$-synchronous if there exists a linearisation that is breakable into a sequence of $k$-exchanges sucj that a message sent during a $k$-exchange cannot be received during a subsequent one: either it is received during the same $k$-exchange, or it remains orphan forever.
 
 An MSC `msc` is $k$-synchronous if:
@@ -72,15 +109,15 @@ An execution $e$ is $k$-synchronizable if $m(e)$ is $k$-synchronous.
 We write $s T r_k (frak(S))$ to denote the set $\{m(e) | e in a s E x (frak(S))$ and $m(e)$ is $k$-synchronous$\}$.
 
 
-== Loic thesis
+= Loic thesis
 
-=== Definition of borderline violation
+== Definition of borderline violation
 
 Let $and.big_(bb(P), bb(I), bb(V))$ be an alphabet of communications. A borderline violation is an execution $e= e' dot ι ?^p$v over $and.big_(bb(P), bb(I), bb(V))$ such that $e'$ is RSC, and $e$ is not causally equivalent to an RSC execution.
 
 
-== Random notes
+= Random notes
 
 bouajiani on the completness of verifying
 
-guardare prove di loic 
+guardare prove di loic
