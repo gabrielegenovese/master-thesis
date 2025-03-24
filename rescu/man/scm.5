@@ -1,0 +1,257 @@
+.\" $Id: scm.5 1264 2011-10-19 22:22:51Z gsutre $
+.
+.\"
+.\" Copyright (c) 2010, 2011 CNRS & Université Bordeaux 1.
+.\"
+.\" Author(s): Grégoire Sutre <gregoire.sutre@labri.fr>
+.\"            Alexander Heußner <alexander.heussner@ulb.ac.be>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd September 14, 2011
+.Dt SCM 5 LOCAL
+.Os
+.\" ****************************************************************************
+.Sh NAME
+.Nm scm
+.Nd scm language
+.\" ****************************************************************************
+.Sh DESCRIPTION
+The
+.Em scm
+textual language was introduced in the Ph.D. thesis of Tristan Le Gall.
+An
+.Em scm
+model contains the description of a system of communicating machines.
+This description is composed of two parts:
+.Bl -dash
+.It
+A
+.  Em header
+that specifies the set of fifo channels and the message alphabet.
+.It
+A list of
+.  Em automata ,
+each modeling a communicating machine.
+.El
+.Pp
+For model-checking purposes, the format also permits the specification of a set
+of
+.Em bad configurations .
+.\" ----------------------------------------------------------------------------
+.Ss Header
+.Bl -enum
+.It
+Start the description of a system of communicating machines and specify its
+name:
+.  Pp
+.  D1 Sy scm Ar ident Sy \&:
+.It
+Specify the number of channels:
+.  Pp
+.  D1 Sy nb_channels Sy \&= Ar integer Sy \&;
+.  Pp
+The set of channels is
+.  Brq 0, ..., Va n Ns -1
+where
+.  Va n
+is the number of channels.
+By default, all channels are perfect.
+.It
+Tag some channels as lossy (optional):
+.  Pp
+.  D1 Op Sy lossy \&: Ar integer Op Sy \&, Ar integer ...
+.It
+Declare the message alphabet as follows:
+.  Pp
+.  D1 Sy parameters \&: Op Bro Sy int No \(ba Sy real Brc Ar ident Oo Sy \&= Ar expr Oc Sy \&; Ar ...
+.  Pp
+The alphabet is the same for all channels.
+Each message holds a typed numerical value.
+.El
+.\" ----------------------------------------------------------------------------
+.Ss Automata
+.Bl -enum
+.It
+Start the description of an automaton and specify its name:
+.  Pp
+.  D1 Sy automaton Ar ident Sy \&:
+.It
+Declare the automaton's local variables (optional):
+.  Pp
+.  D1 Op Bro Sy int No \(ba Sy real Brc Ar ident Oo Sy \&= Ar expr Oc Sy \&; Ar ...
+.It
+Specify the automaton's initial states:
+.  Pp
+.  D1 Sy initial \&: Ar integer Op Sy \&, Ar integer ...
+.It
+Declare the automaton's states together with outgoing transitions:
+.  Pp
+.  D1 Sy state Ar integer Sy \&: Op Sy to Ar integer Sy \&: Ar command Sy \&; Ar ...
+.  Pp
+where
+.  Ar command
+is of the following form:
+.  Pp
+.  D1 Sy when Ar cond Oo Sy \&, Ar integer Bro Sy \&! No \(ba Sy \&? Brc Ar ident Oc Op Sy with Ar ident Sy \&= Ar expr Op Sy \&, Ar ident Sy \&= Ar expr ...
+.El
+.\" ----------------------------------------------------------------------------
+.Ss Semantics
+The operational semantics of a system of communicating machines is the usual
+one: the automata move asynchronously according to their local transitions, and
+they communicate exclusively through the channels.  Communication actions are
+.Sy \&!
+(send) and
+.Sy \&?
+(receive).  Channels are fifo, unbounded, and initially empty.  Note that
+channels need not be point-to-point, they are shared by all automata.
+.\" ----------------------------------------------------------------------------
+.Ss Bad Configurations
+The description of the system of communicating machines is, optionally,
+followed by the specification of a set of bad configurations:
+.Pp
+.D1 Sy bad_states Sy \&: Sy \&( automaton Ar ident Sy \&: Ar badlocal ... Oo Sy with Ar regexp Oc Sy \&) Ar ...
+.Pp
+where
+.Ar badlocal
+is of the following form:
+.Pp
+.D1 Sy in Ar integer Sy \&: Ar cond ...
+.Pp
+The local constraints in a
+.Ar badlocal
+specification are
+.Em disjuncted
+together.
+The
+.Ar badlocal
+specifications in a
+.Sy bad_states
+declaration are
+.Em conjuncted
+together.
+.Pp
+The queue contents are represented by a regular expression
+.Ar regexp
+as defined below.
+.\" ----------------------------------------------------------------------------
+.Ss Regular Expressions
+Queue contents for specifying bad states or displaying the current states
+of a system of communicating machines are represented by regular expressions
+of the following form:
+.Bl -column "reg" ":" "x" -offset indent
+.It Ar regexp Ta No \&::= Ta \ \& Sy \(ul No | Sy # No | Ar a No \ \&\ \& for Ar a No in the message alphabet
+.It Ta Ta No | Ar regexp Sy \&. Ar regexp No | Sy \&( Ar regexp Sy \(ba Ar regexp Sy \&)
+.It Ta Ta No | Ar regexp Sy ^* No | Ar regexp Sy ^+
+.El
+.Pp
+The operators on regular expressions are interpreted as usually:
+.Sy \&.
+stands for concatenation,
+.Sy \(ba
+for disjunction,
+.Sy ^*
+is the reflexive-transitive closure, and
+.Sy ^+
+the transitive closure.
+The empty word is denoted by
+.Sy \(ul
+.No \.
+.Pp
+The symbol
+.Sy \&#
+is interpreted as separator for channels in
+.Ar regexp .
+Each word matched by
+.Ar regexp
+must contain exactly
+.Va n Ns -1
+occurrences of
+.Sy \&#
+where
+.Va n
+is the number of channels.
+.\" ****************************************************************************
+.Sh EXAMPLE
+The following example is the classical connection/disconnection protocol.
+.Bd -literal -offset indent
+scm connection_disconnection :
+
+nb_channels = 2 ;
+parameters :
+   real o ;
+   real c ;
+   real d ;
+
+automaton sender :
+
+   initial : 0
+
+   state 0 :
+      to 1 : when true , 0 ! o ;
+
+   state 1 :
+      to 0 : when true , 0 ! c ;
+      to 0 : when true , 1 ? d ;
+
+automaton receiver :
+
+   initial : 0
+
+   state 0 :
+      to 1 : when true , 0 ? o ;
+
+   state 1 :
+      to 0 : when true , 0 ? c ;
+      to 0 : when true , 1 ! d ;
+
+bad_states:
+   (automaton receiver: in 0 : true with c.(o|c)^*.#.d^*)
+.Ed
+.Pp
+This
+.Em scm
+model has two channels, with message alphabet
+.Brq  Ar o , Ar c, Ar d .
+There are two automata, a sender and a receiver.
+Their states and transitions should be self-explanatory.
+Bad configurations are those where (a) the receiver is in local state 0,
+and (b) channel contents are in the regular expression detailed below.
+.Pp
+The regular expression
+.Ar c
+.Sy \.\&(
+.Ar o
+.Sy \(ba
+.Ar c
+.Sy )^*\.
+.Sy \&#
+.Sy \&.
+.Ar d
+.Sy ^*
+is interpreted as the set of contents of two channels:
+.Bl -dash
+.It
+The first containing any word over the alphabet
+.Brq  Ar o , Ar c
+that starts with a message
+.Ar c .
+.It
+The second containing an arbitrary sequence of
+.Ar d
+(which can be of zero length, i.e., empty).
+.El
+.\" ****************************************************************************
+.Sh SEE ALSO
+.Xr control 1 ,
+.Xr verify 1
