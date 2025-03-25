@@ -111,6 +111,9 @@ We write $s T r_k (frak(S))$ to denote the set $\{m(e) | e in a s E x (frak(S))$
 
 = Loic thesis
 
+== Definition of Action Graph
+Let $and.big_(PP, II, VV)$ be an alphabet of actions, and $e = a_1,..., a_n$ be an execution over this alphabet. The action graph of $e$, denoted `agraph`$(e)$, is the vertex-labelled directed graph ($\{1,...,n\}, prec_e, lambda $), where for all $i in \{1,...,n\}, lambda (i)=a_i$, and arcs follow from causal dependency: there is an arc between vertices $i$ and $j$ if $i prec_e j$.
+
 == Definition of borderline violation
 
 Let $and.big_(bb(P), bb(I), bb(V))$ be an alphabet of communications. A borderline violation is an execution $e= e' dot ι ?^p$v over $and.big_(bb(P), bb(I), bb(V))$ such that $e'$ is RSC, and $e$ is not causally equivalent to an RSC execution.
