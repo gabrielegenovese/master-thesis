@@ -1,5 +1,5 @@
 .vscode
-
+do_not_commit
 .DS_Store
 examples/.DS_Store
 examples/test/.DS_Store
