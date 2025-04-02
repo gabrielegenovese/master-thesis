@@ -3,9 +3,312 @@ In this section, we define the basic knowledge to understand the main contributi
 of this work.
 
 \subsection{Multiparty Session Types}
-MPST comes with three main ingredients:
-\begin{enumerate}
-    \item a simple syntax
-    \item processes
-    \item types
-\end{enumerate}
+
+Multiparty Session Types (MPST) provide a formal framework to specify and verify
+communication protocols among multiple participants. They ensure that communication
+follows a predefined structure, preventing errors such as deadlocks and message loss.
+Below, we present the fundamental definitions of MPST. The \textbf{global specification}  
+describes the overall communication protocol. From this, we derive the \textbf{local behaviors}  
+of each participant through a \textit{projection} operation. The system's \textbf{processes}  
+form the \textit{implementation}, defining how participants interact.  
+With the definition of a \textit{typing system} and the application of the \textit{type-checking rules},
+we ensure that the implementation conforms to the global specification, guaranteeing \textit{well-formedness}.
+
+\subsubsection{The Session Types}
+
+\paragraph{Basic Types}
+Basic types are defined as:
+\begin{equation}
+    T ::= nat \mid int \mid bool
+\end{equation}
+
+\paragraph{Global Types}
+A global type $G$ describes the overall communication protocol, specifying the
+sequence of message exchanges among participants. It defines the expected
+interactions at a high level and is formally with the following grammar:
+
+\begin{equation}
+G ::= p \to q : \{ l_i(T_i) \}_{i \in I} \mid \mu t. G \mid t \mid G;G \mid \text{end}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $p, q$ are participants in the communication,
+    \item $l_i$ are message labels representing different choices of interaction,
+    \item $T_i$ are the types of messages being exchanged,
+    \item $\mu t. G$ represents recursion, allowing repetitive behavior,
+    \item $t$ is a recursion variable,
+    \item $G;G$ denotes sequencing of interactions, meaning that the interactions
+    occur in a specified order.
+    \item \verb|end| denotes the termination of the communication; it can be omitted.
+\end{itemize}
+
+A well-formed global type ensures that all participants can complete their interactions
+without deadlocks or undefined behavior.
+
+\paragraph{Local Types}
+A local type $L$ represents the communication behavior of an individual participant,
+derived from the global type. It specifies the actions that a participant can perform
+within the session and is defined as:
+
+\begin{equation}
+L ::=  \&_{i \in I}p ? l_i(T_i) \mid \oplus_{i \in I}q ! l_i(T_i) \mid \mu t. L \mid t \mid L;L \mid \text{end}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $?\{l_i(T_i)\}$ denotes receiving a message labeled $l_i$ with type $T_i$,
+    \item $!\{l_i(T_i)\}$ denotes sending a message labeled $l_i$ with type $T_i$,
+    \item $\mu t. L$ represents recursion, allowing repetition of behavior,
+    \item $t$ is a recursion variable,
+    \item $L;L$ defines sequencing of interactions, ensuring messages are exchanged
+    in a specified order.
+    \item \verb|end| denotes the termination of the communication; it can be omitted.
+\end{itemize}
+
+Each participant's local type must be consistent with the global type to ensure
+correct communication. Recursion is always guarded.
+
+\paragraph{Projection}
+The projection of a global type onto a participant $r$ (where $r \in$
+\textit{participants}) is defined by recursion on $G$:
+\begin{itemize}
+    \item $end \upharpoonright r = end$;
+    \item $t \upharpoonright r = t$;
+    \item $(\mu t. G) \upharpoonright r = (\mu t. G\upharpoonright r)$;
+    \item $G_i;G_j \upharpoonright r = G_i \upharpoonright r \sqcap G_j \upharpoonright r$ where $i, j \in I$;
+    \item $p \to r : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = \&_{i \in I}p ? l_i(T_i)$;
+    \item $r \to q : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = \oplus_{i \in I}q ! l_i(T_i)$;
+    \item $p \to q : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = 0$;
+    \item undefined otherwise.
+\end{itemize}
+
+$\sqcap$ is the merging operator, that is a partial operation over session types defined as
+
+\begin{equation}
+    T1 \sqcap T2 = \begin{cases}
+        T1 & \text{if } T1 = T2\\
+        T3 & \text{if }\exists I, J:
+        \begin{cases}
+            T1 = \&_{i \in I} p ? l_i(T_i) & \text{and}\\
+            T2 = \&_{j \in J} p ? l_j(T_j)  & \text{and}  \\
+            T3 = \&_{k\in I\cup J} p ? l_k(T_k) 
+        \end{cases}
+        \\
+        \text{undefined otherwise}
+    \end{cases}
+\end{equation}
+
+
+\paragraph{Well-Formedness}
+
+\begin{theorem}[Subject Reduction]
+    Let \(\vdash \mathcal{M} : G\). For all \(\mathcal{M}'\), if \(\mathcal{M} \longrightarrow \mathcal{M}'\),
+    then \(\vdash \mathcal{M}' : G'\) for some \(G'\) such that \(G \Longrightarrow G'\).
+\end{theorem}
+
+\begin{theorem}[Progress]
+    If \(\vdash \mathcal{M} : G\), then either \(\mathcal{M} \equiv p \triangleleft \mathbf{0}\) 
+    or there is \(\mathcal{M}'\) such that \(\mathcal{M} \longrightarrow \mathcal{M}'\).
+\end{theorem}
+
+As a consequence of subject reduction and progress, we get the safety property stating that a typed multiparty session will never get stuck.
+
+\begin{theorem}[Type Safety]
+    If \(\vdash \mathcal{M} : G\), then it does not hold \(\text{stuck}(\mathcal{M})\).
+\end{theorem}
+
+These theorems establish the foundation for reasoning about safe and structured
+concurrent communications using MPST, ensuring that multi-party protocols
+are both reliable and verifiable.
+
+\subsubsection{The Calculus' Syntax}
+The process' implementation of the synchronous multiparty session calculus are defined with:
+
+\begin{equation}
+    P ::= p ! l \langle e \rangle \mid \sum_{i \in I} p ? l_i (x_i)
+    \mid \text{if } e \text{ then } P \text{ else } Q \mid P1;P2 \mid \mu X.P \mid X \mid 0
+\end{equation}
+
+\begin{itemize}
+    \item $p ! l \langle e \rangle$:  it sends a value of an expression $e$ with label $l$;
+    \item $\sum_{i \in I} p ? l_i (x_i)$ is the external choice: the process can receive
+    a message with label $l_i$ from process $p$, $x_i$ is the variable that binds the new value received;
+    \item $\text{if } e \text{ then } P \text{ else } Q$ represents the internal choice;
+    \item $P1;P2$: sequencing the process;
+    \item $\mu X.P$: it's a recursive process (we assume they are guarded);
+    \item $0$: termination, can be omitted.
+\end{itemize}
+
+We define a multiparty session as a parallel composition of pairs (denoted by
+$p \triangleleft P$) of participants and processes:
+
+\begin{equation}
+ M ::= p \triangleleft P \mid\mid M \mid M
+\end{equation}
+
+with the idea that process $P$ represents participant $p$ and interacts with other
+processes fulfilling different roles in $M$, a multiparty session is considered
+well-formed if all participants are distinct.
+
+\paragraph{Operational semantics}
+In the Table~\ref{tab:struc} and \ref{tab:redu}, the operational semantic for the syntax is showed.
+
+\begin{table}[h]
+    \centering
+    \begin{align*}
+        \text{[S-REC]} \quad & \mu X.P \equiv P\{\mu X.P/X\} \\
+        \text{[S-MULTI]} \quad & P \equiv Q \Rightarrow p \triangleleft P \mid M \equiv p \triangleleft Q \mid M \\
+        \text{[S-PAR 1]} \quad & p \triangleleft \mathbf{0} \mid M \equiv M \\
+        \text{[S-PAR 2]} \quad & M \mid M' \equiv M' \mid M \\
+        \text{[S-PAR 3]} \quad & (M \mid M') \mid M'' \equiv M \mid (M' \mid M'')
+    \end{align*}
+    \caption{Structural congruence.}
+    \label{tab:struc}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{align*}
+        \text{[R-COMM]} \quad & \frac{j \in I \quad e \downarrow v}{p \triangleleft \sum_{i \in I} q?l_i(x).P_i \mid q \triangleleft p!l_j\langle e \rangle.Q \mid M \longrightarrow p \triangleleft P_j\{v/x\} \mid q \triangleleft Q \mid M} \\[10pt]
+        \text{[T-CONDITIONAL]} \quad & \frac{e \downarrow \text{true}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft P \mid M} \\[10pt]
+        \text{[F-CONDITIONAL]} \quad & \frac{e \downarrow \text{false}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft Q \mid M} \\[10pt]
+        \text{[R-STRUCT]} \quad & \frac{M_1' \equiv M_1 \quad M_1 \longrightarrow M_2 \quad M_2 \equiv M_2'}{M_1' \longrightarrow M_2'}
+    \end{align*}
+    \caption{Reduction rules.}
+    \label{tab:redu}
+\end{table}
+
+\paragraph{Type system}
+We now introduce a type system for the multiparty session calculus presented. 
+We distinguish three kinds of typing judgments:
+\begin{itemize}
+    \item $\Gamma \vdash e : S$
+    \item $\Gamma \vdash P : S$
+    \item $ \vdash M : G$
+\end{itemize}
+where $\Gamma$ (called the context) is the \textit{typing environment}:
+\begin{equation}
+    \Gamma ::= \empty \mid\mid \Gamma, x : S \mid\mid \Gamma, X : T
+\end{equation}
+i.e., a mapping that associates expression variables with sorts, and process variables with session types.
+We say that a multiparty session M is well typed if there is a global type G such that ` M : G.
+We omit the rules for the expression because they are trivial. In Table~\ref{tab:typ}, there are
+the non-trivial rules.
+
+\begin{table}[h]
+    \centering
+    \begin{align*}
+        \text{[T-SUB]} \quad & \frac{\Gamma \vdash P : T \quad T \leq T'}{\Gamma \vdash P : T'} \\[10pt]
+        \text{[T-0]} \quad & \Gamma \vdash \mathbf{0} : \text{end} \\[10pt]
+        \text{[T-REC]} \quad & \frac{\Gamma, X : T \vdash P : T}{\Gamma \vdash \mu X.P : T} \\[10pt]
+        \text{[T-VAR]} \quad & \Gamma, X : T \vdash X : T \\[10pt]
+        \text{[T-INPUT-CHOICE]} \quad & 
+        \frac{\forall i \in I \quad \Gamma, x_i : S_i \vdash P_i : T_i}
+        {\Gamma \vdash \sum_{i \in I} q?l_i(x_i).P_i : \&_{i \in I} q?l_i(S_i).T_i} \\[10pt]
+        \text{[T-OUT]} \quad & 
+        \frac{\Gamma \vdash e : S \quad \Gamma \vdash P : T}
+        {\Gamma \vdash q!l\langle e \rangle.P : q!l(S).T} \\[10pt]
+        \text{[T-CHOICE]} \quad & 
+        \frac{\Gamma \vdash e : \text{bool} \quad \Gamma \vdash P_1 : T \quad \Gamma \vdash P_2 : T}
+        {\Gamma \vdash \text{if } e \text{ then } P_1 \text{ else } P_2 : T} \\[10pt]
+        \text{[T-SESS]} \quad & 
+        \frac{\forall i \in I \quad \vdash P_i : G[p_i] \quad pt\{G\} \subseteq \{p_i \mid i \in I\}}
+        {\vdash \prod_{i \in I} p_i \triangleleft P_i : G}
+    \end{align*}
+    \caption{Typing rules for processes and sessions.}
+    \label{tab:typ}
+\end{table}
+
+\subsubsection{Example}
+
+
+\paragraph{Global Specification}
+The global communication protocol is defined as:
+\begin{align*}
+    &\text{Customer} \to \text{Agency} : \text{details}(\mathbb{N}). \\
+    &\text{Agency} \to \text{Hotel} : \text{details}(\mathbb{N}). \\
+    &\text{Hotel} \to \text{Customer} : \text{ok}(\mathbb{B}). \text{end}
+\end{align*}
+
+\paragraph{Local Types}
+\begin{align*}
+    T_C &= \text{Agency}! \text{details}(\mathbb{N}). \text{Hotel}? \text{ok}(\mathbb{B}). \text{end} \\
+    T_A &= \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end} \\
+    T_H &= \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}
+\end{align*}
+
+\paragraph{Process Implementation}
+\begin{align*}
+    P_C &= \text{Agency}! \text{details}(42). \text{Hotel}? \text{ok}(b). \mathbf{0} \\
+    P_A &= \text{Customer}? \text{details}(d). \text{Hotel}! \text{details}(d). \mathbf{0} \\
+    P_H &= \text{Agency}? \text{details}(d). \text{Customer}! \text{ok}(\text{true}). \mathbf{0}
+\end{align*}
+
+\paragraph{Typing Proof}
+We prove that each process conforms to its local type.
+
+\begin{lemma}[Customer Typing]
+If \(\Gamma \vdash P_C : T_C\), then \(P_C\) follows \(T_C\).
+\begin{proof}
+By applying the \textbf{T-OUT} rule:
+\[
+\frac{\Gamma \vdash 42 : \mathbb{N} \quad \Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
+{\Gamma \vdash \text{Agency}! \text{details}(42). P_C' : \text{Agency}! \text{details}(\mathbb{N}). T_C'}
+\]
+where \(P_C' = \text{Hotel}? \text{ok}(b). \mathbf{0}\).
+
+Applying \textbf{T-INPUT-CHOICE}:
+\[
+\frac{\Gamma \vdash b : \mathbb{B} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+{\Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
+\]
+Thus, \(P_C\) is well-typed.
+\end{proof}
+\end{lemma}
+
+\begin{lemma}[Agency Typing]
+\begin{proof}
+Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
+\[
+\frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+{\Gamma \vdash P_A : \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end}}
+\]
+\end{proof}
+\end{lemma}
+
+\begin{lemma}[Hotel Typing]
+\begin{proof}
+Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
+\[
+\frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+{\Gamma \vdash P_H : \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}}
+\]
+\end{proof}
+\end{lemma}
+
+\begin{theorem}[Session Typing]
+\begin{proof}
+By \textbf{T-SESS}:
+\[
+\frac{\forall i \in \{C, A, H\}, \Gamma \vdash P_i : T_i}
+{\Gamma \vdash P_C \mid P_A \mid P_H : G}
+\]
+Since \(T_C, T_A, T_H\) are well-typed, the system follows \(G\).
+\end{proof}
+\end{theorem}
+
+\paragraph{Operational Semantics Execution}
+The execution follows the operational semantics rules:
+
+\begin{align*}
+    P_C \mid P_A \mid P_H &\to 
+    (\text{Agency}! \text{details}(42). P_C') \mid (\text{Customer}? \text{details}(d). P_A') \mid P_H \\
+    &\to P_C' \mid (\text{Hotel}! \text{details}(42). P_A') \mid P_H \quad \text{(Comm. between Customer, Agency)} \\
+    &\to P_C' \mid P_A' \mid (\text{Customer}! \text{ok}(\text{true}). P_H') \quad \text{(Comm. between Agency, Hotel)} \\
+    &\to P_C' \mid P_A' \mid P_H' \quad \text{(Comm. between Hotel, Customer)}
+\end{align*}
+
+At the end of the execution, all processes reach \(\mathbf{0}\), meaning communication terminates successfully.
+Thus, the protocol is correctly implemented and respects the MPST specifications.
+
