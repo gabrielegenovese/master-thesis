@@ -192,7 +192,7 @@ where $\Gamma$ (called the context) is the \textit{typing environment}:
     \Gamma ::= \empty \mid\mid \Gamma, x : S \mid\mid \Gamma, X : T
 \end{equation}
 i.e., a mapping that associates expression variables with sorts, and process variables with session types.
-We say that a multiparty session M is well typed if there is a global type G such that ` M : G.
+We say that a multiparty session M is well typed if there is a global type G such that | M : G.
 We omit the rules for the expression because they are trivial. In Table~\ref{tab:typ}, there are
 the non-trivial rules.
 
@@ -312,3 +312,151 @@ The execution follows the operational semantics rules:
 At the end of the execution, all processes reach \(\mathbf{0}\), meaning communication terminates successfully.
 Thus, the protocol is correctly implemented and respects the MPST specifications.
 
+\subsection{Message Sequence Charts}
+
+\begin{definition}{Communicating automaton}
+    A \textit{communicating automaton} \(\mathcal{A}\) is a tuple 
+    \[
+    (L, \mathbb{V}, \mathbb{I}^F, \mathbb{I}^B, \text{Act}, \delta, l_0)
+    \]
+    where:
+    \begin{itemize}
+        \item \( L \) is a finite set of control states,
+        \item \( \mathbb{V} \) is a finite set of messages,
+        \item \( \mathbb{I} = \mathbb{I}^F \cup \mathbb{I}^B \) with \( \mathbb{I}^B \cap \mathbb{I}^F = \emptyset \)
+        is a finite set of \textit{buffer identifiers}, where \( \mathbb{I}^B \) (respectively \( \mathbb{I}^F \)) 
+        is the subset of bag (respectively FIFO) buffer identifiers,
+        \item \( \text{Act} \subseteq L \times \{!, ?\} \times \mathbb{V} \) is a finite set of
+        \textit{communicating automaton actions},
+        \item \( \delta \subseteq L \times \text{Act} \times L \) is a finite set of \textit{transitions}, and
+        \item \( l_0 \) is the initial control state.
+    \end{itemize}
+\end{definition}
+
+A \textit{communicating automaton action} (denoted \( a_A \)) can be:
+\begin{itemize}
+    \item a send action: \( l!v \), meaning ‘send message \( v \) in buffer \( l \)’, or
+    \item a reception: \( l?v \), meaning ‘receive message \( v \) from buffer \( l \)’.
+\end{itemize}
+
+For \( a_A = l \circ v \) with \( \circ \in \{!, ?\} \), buffer \( \text{buf}(a_A) = l \) and message \( \text{msg}(a_A) = v \).
+
+We mostly consider \textit{deterministic} communicating automata, unless explicitly mentioned otherwise.
+
+Given an alphabet of actions \( \\Lambda \), an \textit{execution} is a word on \( \\Lambda \): it is a finite sequence of actions.  
+An execution is \textit{feasible} in a system if this system is able to exhibit this sequence of actions.
+
+\subsubsection{Feasible Execution}
+
+\begin{definition}{Feasible execution}
+An execution \( e = a_1 \cdot a_2 \cdot \dots \cdot a_n \) is \textit{feasible} in \( \mathfrak{S} \)  
+if there exists a sequence of configurations \( \gamma_1, \gamma_2, \dots, \gamma_n \) such that  
+for all \( i \in \{1, \dots, n\} \), we have:
+\[
+\gamma_{i-1} \xrightarrow{a_i}_{\mathfrak{S}} \gamma_i.
+\]
+\end{definition}
+
+The set of all feasible executions of \( \mathfrak{S} \) is denoted \( \text{executions}(\mathfrak{S}) \).  
+We write:
+\[
+\gamma_0 \xrightarrow{a_1}_{\mathfrak{S}} \gamma_1 \xrightarrow{a_2}_{\mathfrak{S}} \dots \xrightarrow{a_n}_{\mathfrak{S}} \gamma_n,
+\]
+and by abuse of notation, we write \( a \in e = a_0 \cdot \dots \cdot a_n \)  
+if there exists \( i \in \{1, \dots, n\} \) such that \( a = a_i \).  
+If an execution \( e \) is feasible in a system \( \mathfrak{S} \),  
+we also say that \( \mathfrak{S} \) \textit{admits} \( e \).
+
+\subsubsection{Communication models}
+
+\paragraph{Fully async}
+
+In the fully asynchronous communication model (\verb|asy|), messages can be received 
+at any time once they have been sent, and send events are non-blocking. It can 
+be modeled as a bag where all messages are stored and retrieved by processes 
+when necessary. It is also referred to as NON-FIFO. The definition is the same 
+as MSC.
+
+\paragraph{Peer-to}-peer 
+In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
+process to another are always received in the same order as they are sent. This 
+is usually implemented by processes pairwise connected with FIFO channels. 
+Alternative names are FIFO 1-1 or simply FIFO.
+
+A p2p-MSC is an MSC $M = (E, →, \lhd, \lambda)$ where, for any two send events $s$ 
+and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
+and $s \to^+ s'$, one of the following holds:
+- either $s, s' \in \text{matched}(M)$ with $s \lhd r$ and $s' \lhd r'$ and 
+$r \to^+ r'$,
+- or $s' \in \text{unmatched}(M)$.
+Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, 
+in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
+message $m 1$ excludes the reception of any later message.
+
+\paragraph{Causally ordered}
+In the causally ordered (\verb|co|) communication model, messages are delivered to
+a process according to the causality of their emissions. In other words, if there 
+are two messages $m 1$ and $m 2$ with the same recipient, such that there exists 
+a causal path from $m 1$ to $m 2$, then $m 1$ must be received before $m 2$. 
+Causal ordering was introduced by Lamport with the name "happened before" order.
+
+An MSC $M = (E, →, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
+$s'$, such that $\lambda(s) \in \text{send}(\_, q, \_), \lambda(s') \in \text{send}(\_, q, \_)$, and 
+$s \leq_{\text{hb}} s'$:
+- either $s, s' \in \text{matched}(M)$ and $r \to^* r'$, with $r$ and $r'$ receive 
+events such that $s \lhd r$ and $s' \lhd r'$.
+- or $s' \in \text{unmatched}(M)$.
+
+Note that in a \verb|co|-MSC we cannot have two send events $s$ and $s'$ addressed 
+to the same process, such that $s$ is unmatched, $s'$ is matched, and 
+$s \leq_{\text{hb}} s'$.
+
+\paragraph{Mailbox}
+In this model, any two messages sent to the same process, regardless of the sender, 
+must be received in the same order as they are sent. If a process receives $m_1$ 
+before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
+the senders of a single receiver. This model is also called FIFO $n-1$.
+
+An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
+$\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
+that $\lambda (s) \in \text{send}(\_,q,\_), \lambda (s') \in \text{send}(\_,q,\_)$, and 
+$s \rightsquigarrow s'$
+- either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, where 
+$s \lhd r$ and $s' \lhd r'$,
+- or $s' \in \text{unmatched}(M)$.
+
+\paragraph{FIFO 1-n}
+This model is the dual of \verb|mb|, it coordinates a sender with all the 
+receivers. Any two messages sent by a process must be received in the same 
+order as they are sent. These two messages might be received by different 
+processes and the two receive events might be concurrent.
+
+An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
+$\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
+that $\lambda (s) \in \text{send}(p,\_,\_), \lambda (s') \in \text{send}(p,\_,\_)$ and 
+$s \to^+ s'$ (which implies $s \rightsquigarrow s'$)
+- either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with 
+$r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
+- or $s' \in \text{unmatched}(M)$.
+
+\paragraph{FIFO n-n}
+In this model, messages are globally ordered and delivered according to 
+their emission order. Any two messages must be received in the same order 
+as they are sent. These two messages might be sent or receives by any process 
+and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
+coordinates all the senders with all the receivers.
+
+An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
+$\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
+that $s \rightsquigarrow s'$
+- either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
+and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
+- or $s' \in \text{unmatched}(M)$.
+
+\paragraph{RSC}
+This model imposes the existence of a scheduling such that any send event is 
+immediately followed by its corresponding receive event.
+
+An MSC $M = (E, →, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
+send events and there is a linearization $\rightsquigarrow$ where any 
+matched send event is immediately followed by its respective receive event.
