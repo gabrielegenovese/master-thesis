@@ -26,4 +26,4 @@
  (name verify)
  (public_name rescu.verify)
  (libraries verify_util comm_automata ocamlgraph)
- (modules model_checking_state model_checking membership_state membership))
+ (modules model_checking_state model_checking membership_state membership implementability))
