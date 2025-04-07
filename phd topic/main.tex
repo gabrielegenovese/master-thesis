@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{newlfont}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{stmaryrd}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{xcolor, colortbl}
+\usepackage{pgfgantt}
+\usepackage{graphicx}
+\usepackage{dirtree}
+\usepackage{todonotes}
+
+\usetikzlibrary{automata,arrows}
+\pgfmathtruncatemacro\distance{1}
+
+\definecolor{green}{rgb}{0,0.5,0}
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{yellow}{rgb}{0.5,0.5,0}
+\definecolor{codeashgrey}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{ashgrey}{rgb}{0.7, 0.75, 0.71}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codeashgrey},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}[section]
+
+\title{Failure handling for robust concurrent  systems}
+\author{Cinzia Di Giusto and Ivan Lanese}
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Verifying the communication structure of distributed systems is a well-studied and recognised challenge in modern software and cyber-physical systems. While the complexity of ensuring the correctness of interactions between distributed peers adds to the already undecidable task of verifying single sequential programs, much progress has been made in this area. The novelty of this proposal lies in its focus on robustness against communication failures, an aspect that remains less explored. We aim to address not only the correctness of these interactions but also the resilience of systems in the face of failures.
+Failures in communication can manifest in various ways, such as message loss, duplication, crash failures, or message corruption, all of which threaten the reliability of distributed systems. We aim at developing formal methods that enhance the resilience of systems against these failures. Specifically, we employ static verification techniques such as session types, contracts, and choreographies to ensure correct concurrent behaviour. These techniques, known for their efficiency, are augmented with fault-tolerance mechanisms to guarantee correctness up to a certain level of failure without requiring explicit system modifications. Additionally, we incorporate strategies for detecting and handling failures, such as state backtracking in distributed systems.
+ The outcome of the thesis will be a formal framework, integrating type checking with monitoring mechanisms and quantitative reasoning, for building reliable, failure-tolerant, and failure-handling distributed systems, providing a significant step forward in ensuring the robustness of modern distributed architectures.
+
+\end{abstract}
+
+\section{Introduction}
+The main objective of this thesis is to provide formal, machine-checked guarantees for distributed and concurrent systems, addressing the need for rigorous verification in the presence of failures such as node crashes, message losses, or unexpected disconnections. We aim at introducing new models and techniques for fault-tolerance and failure handling mainly building on existing formalisms such as multiparty session types (MPST) and automata-based models.
+
+Fault-tolerance and failure handling are closely related concepts in system reliability but differ in their focus and approach:
+\begin{itemize}
+\item Fault-tolerance is a proactive strategy which ensures that a system continues to function correctly despite the presence of faults. It involves designing systems with redundancy, recovery mechanisms, and alternative execution paths to maintain operation without service interruption. Techniques such as defaults, replication, and the use of majorities are common fault-tolerance mechanisms. The goal is to make the system resilient so that faults do not escalate into full failures.
+\item Failure handling, on the other hand, is a reactive process that deals with faults after they have caused a failure. It includes detecting failures, triggering compensatory actions, checkpointing, self-healing architectures, dynamic role reassignment, rolling back to a consistent state, or gracefully degrading functionality. It might involve alternative communication paths, exception handling mechanisms, or restarting failed sessions.
+\end{itemize}
+In essence, fault-tolerance aims at preventing failures from occurring or impacting the system, while failure handling focuses on responding to and recovering from failures after they happen. A robust concurrent system typically incorporates both—fault-tolerance to minimise disruptions and failure handling to recover when disruptions occur. Nonetheless, fault-tolerance and failure handling, while closely related, may have contrasting goals due to their different approaches to managing system failures. This can lead to conflicts: a highly fault-tolerant system might mask failures to maintain availability, potentially delaying their detection and resolution, while a failure-handling approach may prioritise identifying and addressing faults, even if it temporarily impacts system performance. Striking a balance between these two is crucial—overemphasising fault-tolerance can lead to silent failures that accumulate over time, while excessive failure handling can introduce unnecessary complexity or downtime in otherwise recoverable situations.
+
+\paragraph{Concrete Application Domains.} Failure handling and fault-tolerance are critical in numerous application domains. For instance, in aerospace and space systems, fault-tolerance is essential for spacecraft, satellites, and avionics to mitigate the effects of radiation, hardware malfunctions, and communication disruptions. Similarly, in cloud computing and distributed systems, failure handling ensures service availability and data consistency despite hardware crashes, network failures, or cyberattacks. Cyber-physical systems, such as autonomous vehicles, industrial automation, and robotics, require robust fault-tolerant mechanisms to prevent catastrophic failures due to sensor errors or software bugs. In finance and banking, systems must be resilient to transaction failures, network disruptions, or security breaches to maintain data integrity and operational continuity. Additionally, telecommunications networks implement fault-tolerance to maintain connectivity and performance despite hardware failures or high-traffic loads. All these domains may be modelled as distributed and concurrent systems, most of them concern communication protocols, motivating the choice of MPST to handle this kind of problems. Across all these domains, combining proactive fault-tolerance with reactive failure handling is essential to ensure reliability, safety, and efficiency in modern technological systems.
+
+\paragraph{Organisation.} Expected results include novel theoretical foundations, new algorithms for failure mitigation, and implementation of automated verification tools.
+The work will be structured into three stages. The first will focus on defining appropriate models and establishing requirements for both fault-tolerance and failure handling. For the second stage,  we build upon existing fault-tolerance methods and introduce new techniques to enhance the resilience of concurrent systems. For instance,  we extend the considered classes of faults to include duplication accommodating a wider range of fault-tolerant algorithms and systems. For the  failure handling side: based on prior works we use causality analysis to improve the detection and propagation of failures. This ensures consistent knowledge about a failure in a set of peers and improves the efficiency in that this knowledge is created. Note that a consistent knowledge about a failure among the peers of a network is a necessary foundation for distributed methods of failure handling and recovery.  Monitoring  plays a vital role in failure handling systems by enabling the detection, diagnosis, and mitigation of faults. Monitoring mechanisms (via the use of proper types) are integrated into the system to continuously analyse communication patterns and detect anomalies. This ensures that deviations from expected execution flows, such as message losses or duplicated transmissions, are promptly identified and addressed. Additionally, monitoring frameworks can employ checkpointing and logging techniques to maintain execution histories, allowing for failure recovery through state restoration or rollback mechanisms.
+Finally  adaptability ensures that failure detection is integrated with dynamic recovery strategies. Systems respond to unexpected failures updating their code without compromising correctness. As for the final stage we apply model checking techniques to enable further quantitative analysis, addressing questions that static analysis alone cannot resolve. A key advantage of this approach is that the initial static analysis significantly reduces the search space, making dynamic techniques more feasible. 
+
+\section{State of the art}
+ The field itself is not new and has been explored by many researchers. However, due to differing objectives, existing studies typically focus on either fault-tolerance or failure handling—rarely both. Our goal is to integrate these two aspects. In our analysis of existing work, we specifically concentrate on session type models (expressed both as process algebra and communicating automata). The following is a brief excursus of the (in our opinion) closest related works. It is not meant to be exhaustive.
+Fault-tolerance and failure handling in session types are crucial for ensuring robust communication protocols in distributed systems, maintaining global communication consistency despite (partial) failures. MPST \cite{Coppo2015,10.1007/978-3-642-28869-2_10} is a formal framework used to specify, verify, and enforce structured communication protocols in distributed systems. It is a type-theoretic approach to model complex interactions, enabling static verification of message flows and guaranteeing safety properties such as liveness and compliance in concurrent and distributed applications. Fault-tolerance mechanisms in these models focus on ensuring correct behaviour despite faults such as process crashes, message loss, and Byzantine faults.
+Extensions to MPST to cover fault-tolerance are not new. They include mechanisms such as failure-aware types and defaults \cite{DBLP:journals/lmcs/PetersNW23}, compensation actions \cite{DBLP:journals/mscs/CapecchiGY16}, and unreliable broadcast \cite{DBLP:journals/lmcs/KouzapasGVG24}. One approach is role rebinding, where failed participants can be dynamically replaced without disrupting the overall protocol \cite{10.1145/3485501}. Additionally, checkpointing and rollback mechanisms allow systems to restore previous states upon failure, ensuring continuity \cite{barwell_et_al:LIPIcs.CONCUR.2022.35}. 
+On the failure handling side there are approaches which incorporate exception handling \cite{10.1145/3290341} and alternative execution paths within communication protocols \cite{10.1007/s10703-014-0218-8}. Some extensions of MPST incorporate timeout primitives and error propagation models \cite{10.1007/978-3-031-35361-1_12}, enabling participants to detect and react to failures proactively. Other approaches extend MPST with choice types to allow participants to specify alternative behaviours upon failures, ensuring graceful degradation instead of abrupt termination \cite{10.1145/3033019.3033031}. The integration of recovery types, where failed interactions trigger compensatory actions \cite{harvey_et_al:LIPIcs.ECOOP.2021.10} to restore consistency, is inspired by exception handling in sequential programming. Recent research explores asynchronous MPST with failure detection and handling, enabling more resilient distributed protocols by allowing participants to proceed independently while responding to failures reactively \cite{harvey_et_al:LIPIcs.ECOOP.2021.10, DBLP:journals/scp/GiustoP15, DBLP:journals/fac/GiustoP16}.
+To complement extensions to the formalism, it is crucial to adapt and integrate verification techniques such as model checking \cite{DBLP:conf/ictac/PetersWN19, DBLP:journals/lmcs/PetersNW23} and behavioural equivalences, particularly bisimulation. These methods play a key role in proving properties like termination under system constraints (e.g., a bounded number of faulty peers) in fault-tolerance, as well as eventual consistency and guaranteed recovery in failure handling.
+Bisimulation, a fundamental concept in process algebra and formal verification, is used to compare system behaviours rigorously. In the context of fault-tolerance and failure handling, bisimulation ensures that a system remains functionally equivalent despite faults, facilitating precise modelling and analysis of failure recovery mechanisms \cite{FRANCALANZA200722}. 
+We plan to use  bisimulation techniques, particularly using timeouts and probabilities—both critical aspects when analysing systems with failures \cite{reghem_et_al:LIPIcs.CONCUR.2024.36,DBLP:journals/lmcs/Glabbeek21,LANOTTE2021104618}. Finally, we plan to get inspired by tools such as  STARK  (Software Tool for the Analysis of Robustness in the unKnown environment) \cite{CASTIGLIONI2024103134} which is a powerful software framework designed to assess the robustness of cyber-physical systems in uncertain environments. By integrating formal methods and process algebra, it provides insights into system resilience under perturbations, offering a valuable tool for evaluating fault-tolerant and failure handling mechanisms.
+
+
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\end{document}
