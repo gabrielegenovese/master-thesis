@@ -28,7 +28,7 @@ I’m eager to start this journey, to grow as a researcher, and to work
 in an environment where I can learn, ask questions, and collaborate
 with others who share the same curiosity.
 
-= Dissertation summary "On the implementability of global types"
+= Master dissertation summary titled "On the implementability of global types"
 
 The project builds on recent advances in behavioral types, particularly
 Multiparty Session Types (MPST), which model structured interactions
