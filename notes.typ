@@ -118,9 +118,5 @@ Let $and.big_(PP, II, VV)$ be an alphabet of actions, and $e = a_1,..., a_n$ be 
 
 Let $and.big_(bb(P), bb(I), bb(V))$ be an alphabet of communications. A borderline violation is an execution $e= e' dot ι ?^p$v over $and.big_(bb(P), bb(I), bb(V))$ such that $e'$ is RSC, and $e$ is not causally equivalent to an RSC execution.
 
+= Paper Alur (Realizability)
 
-= Random notes
-
-bouajiani on the completness of verifying
-
-guardare prove di loic
