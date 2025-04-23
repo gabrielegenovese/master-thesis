@@ -47,15 +47,15 @@ In the fully asynchronous communication model (`asy`), messages can be received 
 === Peer-to-peer 
 In the peer-to-peer (`p2p`) communication model, any two messages sent from one process to another are always received in the same order as they are sent. This is usually implemented by processes pairwise connected with FIFO channels. Alternative names are FIFO 1−1 or simply FIFO.
 
-A p2p-MSC is an MSC $M = (E, →, lt.tri, λ)$ where, for any two send events $s$ and $s'$ such that $λ(s) ∈ "send"(p, q, \_), λ(s') ∈ "send"(p, q, \_)$, and $s arrow^+ s'$, one of the following holds:
-- either $s, s' ∈ "matched"(M)$ with $s lt.tri r$ and $s' lt.tri r'$ and $r arrow^+ r'$,
-- or $s' ∈ "unmatched"(M)$.
+A p2p-MSC is an MSC $M = (E, →, lt.tri, λ)$ where, for any two send events $s$ and $s'$ such that $λ(s) in "send"(p, q, \_), λ(s') in "send"(p, q, \_)$, and $s arrow^+ s'$, one of the following holds:
+- either $s, s' in "matched"(M)$ with $s lt.tri r$ and $s' lt.tri r'$ and $r arrow^+ r'$,
+- or $s' in "unmatched"(M)$.
 Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched message $m 1$ excludes the reception of any later message.
 
 === Causally ordered
 In the causally ordered (`co`) communication model, messages are delivered to a process according to the causality of their emissions. In other words, if there are two messages $m 1$ and $m 2$ with the same recipient, such that there exists a causal path from $m 1$ to $m 2$, then $m 1$ must be received before $m 2$. Causal ordering was introduced by Lamport with the name "happened before" order.
 
-An MSC $M = (E, →, lt.tri, λ)$ is causally ordered if, for any two send $s$ and $s'$, such that $λ(s) ∈ "send"(\_, q, \_), λ(s') ∈ "send"(\_, q, \_)$, and $s lt.eq_"hb" s'$:
+An MSC $M = (E, →, lt.tri, λ)$ is causally ordered if, for any two send $s$ and $s'$, such that $λ(s) in "send"(\_, q, \_), λ(s') in "send"(\_, q, \_)$, and $s lt.eq_"hb" s'$:
 - either $s, s' ∈ "matched"(M)$ and $r arrow^* r'$, with $r$ and $r'$ receive events such that $s lt.tri r$ and $s' lt.tri r'$.
 - or $s' ∈ "unmatched"(M)$.
 
@@ -120,3 +120,23 @@ Let $and.big_(bb(P), bb(I), bb(V))$ be an alphabet of communications. A borderli
 
 = Paper Alur (Realizability)
 
+*Theorem 1*: Given a bounded MSC graph $G$, checking if $G$ is _weakly realizable_ is *undecidable*.
+*Proof*: The proof is a reduction from the post correspondence problem (PCP).
+
+*Lemma 2*: R(elaxed)PCP is undecidable.
+
+*Theorem 3*: Checking _safe realizability_ of a bounded MSC-graph is in `EXPSPACE`.
+
+*Theorem 4*: Checking _safe realizability_ of a bounded MSC-graph is `PSPACE`-hard.
+
+== Verification (probabilemente non mi serve)
+
+*Theorem 5*: Given an MSC-graph $G$ and an MSC $M$ over $k$ processes, there is an algorithm that decides in $O(|G| |M| k)$ time whether $M in L(G)$.
+
+*Theorem 6*: Given an MSC-graph $G$ and an MSC $M$, it is `NP`-complete to determine if $M in L(G)$, even when $G$ is a complete graph, or when $G$ is an acyclic graph.
+
+*Theorem 7*: Given an MSC-graph $G$ and an MSC $M$, there is an algorithm that in time $O(|G| |M|)$ determines whether $M in L^w (G)$.
+
+*Theorem 8*: There are local properties $phi_1$ and $phi_2$ such that for a finite MSC set $L$, it is `coNP`-complete to determine if every MSC in $L^w$ satisfies $phi_1 or phi_2$.
+
+*Theorem 9*: There is a boolean combination $phi$ of local properties, such that given a bounded MSC-graph $G$, it is undecidable to check if every MSC in $L^w (G)$ satisfies $phi$.
