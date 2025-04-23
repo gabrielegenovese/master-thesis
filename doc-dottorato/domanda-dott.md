@@ -23,27 +23,18 @@ why I believe this opportunity is a perfect fit for me.
     Papers to conferences or research days and publications
 2. Your areas of interest that are not related to the studies you have pursued.
 
-During my university years, I have always been fascinated by
-theoretical and formal computer science, particularly logic and
-programming language theory. At the same time, I was intrigued
-by distributed algorithms and systems.
-For my Bachelor's thesis, I developed a static analyzer capable
-of extracting choreographic automata - an abstract model for
-communication in distributed systems - from Erlang programs.
-It is an ambitious project, and I continued working on it
-throughout my Master’s studies. Currently, a scientific paper
-based on this work is under publication.
-I contributed intermittently to the project from April 2023 to
-January 2025 as the main developer of the tool, always under
-the guidance of Professor Ivan Lanese.
-In recent months, other researchers have joined the project,
-including Professor Cinzia Di Giusto.
-Since February 2025, I have been doing an internship at the
-I3S lab under the supervision of Professor Di Giusto, where I'm
-studying multiparty session types and their implementability
-property.
-Beyond academic work, I enjoy creating small personal programming projects,
-exploring different programming languages.
-With a few friends, I built and managed a small server cluster that provides
-various services (cloud, storage, messaging, etc...).
-All my projects follow an open-source and privacy-oriented philosophy.
+My scientific interests:
+- programming languages theory
+- distributed algorithms and systems
+- static analysis
+- formal methods
+- compilers and interpreters
+- software verification
+
+Research experiences:
+- From April 2023 to January 2025: worked on a project, lead by Prof Ivan Lanese, to create a new tool that could extract Choreography Automata from real code. Publications: a bachelor thesis on July 2023 and a scientific paper on June 2025. I was involved as the main programmer of the tool. I was also able to participate in the meetings with some researchers to discuss the theoretical aspects of the tool. In that occasion, I experienced how scientific discussion are made between peers.
+- Since February 2025, I am an intern at I3S, under the supervision of Prof Cinzia Di Giusto, where I'm studying multiparty session types and their implementability property. The project will include the enhancing of an existing model checking tool.
+
+Other activities:
+- Manager of a distributed cluster of server where I self-host some cloud and image storage services for my family and friends
+- Participation to various computer science related competition (Hackathon, Capture The Flag)
