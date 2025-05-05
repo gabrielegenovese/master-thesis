@@ -129,7 +129,7 @@ Let $and.big_(bb(P), bb(I), bb(V))$ be an alphabet of communications. A borderli
 
 *Theorem 4*: Checking _safe realizability_ of a bounded MSC-graph is `PSPACE`-hard.
 
-== Verification (probabilemente non mi serve)
+== Verification
 
 *Theorem 5*: Given an MSC-graph $G$ and an MSC $M$ over $k$ processes, there is an algorithm that decides in $O(|G| |M| k)$ time whether $M in L(G)$.
 
