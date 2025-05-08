@@ -1,0 +1,179 @@
+\section{State of the art}
+
+In this section realizability and implementability will be used as the same problem.
+Informally, an MSC can be defined realizable if a distributed 
+implementation exists that exactly reproduces the graph's behaviors.
+
+\subsection{The Implementability problem}
+
+In \cite{alur2005realizability}, they prove many interesting results within the scope of MSC graphs.
+They first examine the realizability of bounded MSC-graphs. Two types are considered: 
+\textit{weak} (allowing deadlocks) and \textit{safe} (deadlock-free). While weak realizability is \verb|coNP|-complete
+and safe realizability solvable in polynomial time for finite MSC sets, they show that for
+bounded MSC-graphs, weak realizability becomes undecidable, and safe realizability lies in 
+\verb|EXPSPACE|.
+
+\begin{definition}[Weakly-implies]
+A set $L$ of MSCs weakly implies an MSC $M$ iff for all $1\leq i \leq n$, there exists an MSC $M_i \in L$ such that $M|_i = M_i|_i$.
+\end{definition}
+
+\begin{theorem}
+Given a bounded MSC graph G, checking if G is weakly realizable is undecidable.
+\end{theorem}
+
+\begin{proof}
+The proof is a reduction from the post correspondence problem (PCP). In the paper \cite{alur2005realizability}
+they further reduce the problem to a relaxed version. First, they reduce PCP to OneSidedPCP and then to
+Relaxed PCP (RPCP). We skip this part as is not meaningful for the proof. We state the RPCP to be the following
+problem: given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
+such that $x_{i_1}...x_{i_n}=y_{i_1}...y_{i_m}$, where $x_{i_j}, y_{i_j} \in \{v_{i_j},w_{i_j}\}$, for some
+index $i_l \  x_{i_l}\neq y_{i_l}$, and for all $j\leq m,y_{i_1}...y_{i_j}$ is a prefix of $x_{i_1}...x_{i_j}$.
+The relaxed problem essential says that must have the left side of the equivalence that grows more than the right side,
+we must have also some tuple that are different, and that we can choose whatever side of tuple for the composition
+of the string. Now we reduce RPCP to weak realizability. 
+
+\newcommand{\syncmess}[3]{%
+  \mess{#1}{#2}{#3}%
+  \mess{}{#3}{#2}%
+  \nextlevel
+}
+
+\newcommand{\asyncmess}[3]{%
+  \mess{#1}{#2}{#3}%
+  \nextlevel
+}
+
+
+\begin{figure}[h]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+    \declinst{P1}{P1}{}
+    \declinst{P2}{P2}{}
+    \declinst{P3}{P3}{}
+    \declinst{P4}{P4}{}
+
+    \syncmess{$(i,0)$}{P1}{P2}
+    \asyncmess{$i$}{P1}{P4}
+    \syncmess{$(i,0)$}{P3}{P4}
+    \syncmess{$v_i^1$}{P2}{P3}
+    \syncmess{...}{P2}{P3}
+    \syncmess{$v_m$}{P2}{P3}
+\end{msc}
+\caption{The $M_i^0$ MSC}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+    \declinst{P1}{P1}{}
+    \declinst{P2}{P2}{}
+    \declinst{P3}{P3}{}
+    \declinst{P4}{P4}{}
+
+    \syncmess{$(i,1)$}{P1}{P2}
+    \asyncmess{$i$}{P1}{P4}
+    \syncmess{$(i,1)$}{P3}{P4}
+    \syncmess{$w_i^1$}{P2}{P3}
+    \syncmess{...}{P2}{P3}
+    \syncmess{$w_i^m$}{P2}{P3}
+\end{msc}
+\caption{The $M_i^1$ MSC}
+\end{figure}
+
+
+\textit{Encodig:} Given a finite set $L$ of
+MSCs, let $L^*$ denote the MSC graph that consists of the complete
+graph with $|L|$ vertices, one per MSC in the set $L$, dummy initial
+and terminal vertices $v_I$, $v_T$ with empty MSCs, and edges from
+$v_I$ to all vertices of $L$ and from those to $v_T$. Thus, an MSC of
+this graph is simply a concatenation of MSCs from the set $L$.
+
+In the sequel, we say that a process $p$ synchronously sends a
+message $m$ to process $q$, if $p$ sends $m$ to $q$ immediately
+followed by $q$ sending the message $m$ back to $p$. In figures,
+such messages will be depicted by double arrows.
+
+Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of
+RPCP, we build a set $L$ of MSCs over 4 processes as follows.
+
+For a string $u$, let $u_l$ denote the $l$’th character of the string.
+For each pair $(v_i, w_i)$ we build two MSCs $M^0_i$ and $M^1_i$,
+which are depicted in Fig.~3.
+
+Thus in $M^0_i$, process 1 sends synchronously $(i, 0)$ to process 2,
+then sends the index $i$ to process 4, and then process 4 sends
+synchronously $(i, 0)$ to process 3. After that, process 2
+synchronously sends the sequence of characters of $v_i$ to process 3 (note we assume $c$
+is the length of $v_i$ and $d$ the length of $w_i$ in the figure), $M^1_i$
+is similar. Observe that the communication graph of each of these
+MSCs is strongly connected and involves all the processes, and
+hence, the MSC graph $L^*$ is bounded.
+
+\textbf{Claim 1:} $\mathcal{B} \in \text{RPCP}$ iff $L^*$ is not weakly realizable.
+
+\textit{Proof.} For the ``only if" direction, suppose $R = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots,
+i_m, a_m, b_m)$ are the indices for a solution to $\mathcal{B}$, and the bits $a_j$ and $b_j$
+indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into the two (left and right)
+long strings.
+
+Consider the new MSCs $M$ and $M'$ obtained from the sequences
+$M = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M' = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
+Executions of both of these (sequences of) MSCs must exist in any
+realization of $L^*$. We then look at the projections $M|_1$, $M|_2$, $M|_3$,
+and $M|_4$ of $M$, and $M'|_1$, $M'|_2$, $M'|_3$, $M'|_4$ of $M'$ onto the
+4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
+$M|_3$, and $M|_4$. The claim is that the combined MSC $M''$ is weakly
+implied by $L^*$. By definition, the only thing to establish is that $M''$
+is indeed an MSC, in the sense that it is acyclic, well-formed, and complete.
+
+The only new situation in terms of communication in $M''$ is the
+communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+But the communication between $P_1$ and $P_4$ is consistent in
+$M'|_1$ and $M|_4$ (i.e., the sequence of messages sent from $P_1$ to
+$P_4$ in $M'|_1$ is equal to the sequence of messages received in $M|_4$),
+and the communication between $P_2$ and $P_3$ is consistent in
+$M'|_2$ and $M|_3$ because $R$ is a solution to the RPCP.
+
+Furthermore, the acyclicity of $M''$ follows from the property of the
+solution that the string formed by the first $j$ words on processes 1
+and 2 is always a prefix of the string formed by the first $j$ words
+on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
+is sent before it needs to be received.
+
+But note that $M''$ cannot itself be in $L^*$ because there must be
+some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
+after process 1 announces the index, what process 2 sends is not
+identical to what process 3 receives.
+
+Now, for the “if” direction, suppose there is some MSC $M@$ which
+exists in any realization of $L^*$, but is not in $L^*$ itself. We want
+to derive a solution to $\mathcal{B}$ from $M@$.
+
+First, it is clear that the projection $M@|_1$ must consist of a sequence
+of pairs of messages (the first of each pair acknowledged), sent from
+process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
+
+Likewise, it is clear that, in order for process 2 to receive those messages,
+$M@|_2$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
+each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
+$b = 0$ or $b = 1$, before the next index pair is received.
+
+Likewise, $M@|_4$ consists of a sequence of receipts of index $i$ from
+process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
+$M@|_3$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
+by receipt of $v_i$ or $w_i$, respectively.
+
+Now, since $M@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
+$w_i$ must differ on process 2 and process 3. (Note, we are assuming that
+the buffers between processes are FIFO.)
+
+Furthermore, because of the precedences, the prefix formed by the first
+$j$ words on process 2 must precede the $(j + 1)$-th message from
+process 1 to process 4, which in turn precedes the $(j + 1)$-th message
+from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
+string formed by the first $j$ words on process 2 is a prefix of the string
+formed by the first $j$ words on process 3. Therefore, we can readily
+build a solution for $\mathcal{B}$ from $M@$.
+
+
+\end{proof}

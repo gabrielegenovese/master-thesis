@@ -14,12 +14,12 @@ form the \textit{implementation}, defining how participants interact.
 With the definition of a \textit{typing system} and the application of the \textit{type-checking rules},
 we ensure that the implementation conforms to the global specification, guaranteeing \textit{well-formedness}.
 
-\subsubsection{The Session Types}
+\subsubsection{The Type System}
 
-\paragraph{Basic Types}
-Basic types are defined as:
+\paragraph{Sort Types}
+Sort types are defined as:
 \begin{equation}
-    T ::= nat \mid int \mid bool
+    S ::= nat \mid int \mid bool \mid ...
 \end{equation}
 
 \paragraph{Global Types}
@@ -28,18 +28,16 @@ sequence of message exchanges among participants. It defines the expected
 interactions at a high level and is formally with the following grammar:
 
 \begin{equation}
-G ::= p \to q : \{ l_i(T_i) \}_{i \in I} \mid \mu t. G \mid t \mid G;G \mid \text{end}
+G ::= p \to q : \langle S \rangle . G \mid p \to q : \langle l_i : G_i \rangle_{i \in I}  \mid \mu t. G \mid t \mid \text{end}
 \end{equation}
 
 where:
 \begin{itemize}
     \item $p, q$ are participants in the communication,
-    \item $l_i$ are message labels representing different choices of interaction,
-    \item $T_i$ are the types of messages being exchanged,
+    \item the communication with $S$ will send a value,
+    \item $l_i : G_i$ represents a branching of possible execution,
     \item $\mu t. G$ represents recursion, allowing repetitive behavior,
     \item $t$ is a recursion variable,
-    \item $G;G$ denotes sequencing of interactions, meaning that the interactions
-    occur in a specified order.
     \item \verb|end| denotes the termination of the communication; it can be omitted.
 \end{itemize}
 
@@ -52,17 +50,17 @@ derived from the global type. It specifies the actions that a participant can pe
 within the session and is defined as:
 
 \begin{equation}
-L ::=  \&_{i \in I}p ? l_i(T_i) \mid \oplus_{i \in I}q ! l_i(T_i) \mid \mu t. L \mid t \mid L;L \mid \text{end}
+L ::=  \! \langle p,S \rangle.T \mid ? (p,U).T \mid \&(p, \{ l_i: T_i \}_{i\in I}) \mid \oplus(p, \{ l_i: T_i \}_{i\in I}) \mid \mu t. L \mid t \mid \text{end}
 \end{equation}
 
 where:
 \begin{itemize}
-    \item $?\{l_i(T_i)\}$ denotes receiving a message labeled $l_i$ with type $T_i$,
-    \item $!\{l_i(T_i)\}$ denotes sending a message labeled $l_i$ with type $T_i$,
+    \item $!$ means the sending of a value,
+    \item $?$ means the receiving of a message,
+    \item $\&$ denotes the selection operation,
+    \item $\oplus$ represents the branching operator,
     \item $\mu t. L$ represents recursion, allowing repetition of behavior,
     \item $t$ is a recursion variable,
-    \item $L;L$ defines sequencing of interactions, ensuring messages are exchanged
-    in a specified order.
     \item \verb|end| denotes the termination of the communication; it can be omitted.
 \end{itemize}
 
@@ -70,35 +68,56 @@ Each participant's local type must be consistent with the global type to ensure
 correct communication. Recursion is always guarded.
 
 \paragraph{Projection}
-The projection of a global type onto a participant $r$ (where $r \in$
-\textit{participants}) is defined by recursion on $G$:
-\begin{itemize}
-    \item $end \upharpoonright r = end$;
-    \item $t \upharpoonright r = t$;
-    \item $(\mu t. G) \upharpoonright r = (\mu t. G\upharpoonright r)$;
-    \item $G_i;G_j \upharpoonright r = G_i \upharpoonright r \sqcap G_j \upharpoonright r$ where $i, j \in I$;
-    \item $p \to r : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = \&_{i \in I}p ? l_i(T_i)$;
-    \item $r \to q : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = \oplus_{i \in I}q ! l_i(T_i)$;
-    \item $p \to q : \{ l_i(T_i) \}_{i \in I} \upharpoonright r = 0$;
-    \item undefined otherwise.
-\end{itemize}
+The projection of a global type \( G \) onto a participant \( q \) 
+(\( G \upharpoonright q \)) is defined by induction on \( G \):
 
-$\sqcap$ is the merging operator, that is a partial operation over session types defined as
 
-\begin{equation}
-    T1 \sqcap T2 = \begin{cases}
-        T1 & \text{if } T1 = T2\\
-        T3 & \text{if }\exists I, J:
-        \begin{cases}
-            T1 = \&_{i \in I} p ? l_i(T_i) & \text{and}\\
-            T2 = \&_{j \in J} p ? l_j(T_j)  & \text{and}  \\
-            T3 = \&_{k\in I\cup J} p ? l_k(T_k) 
-        \end{cases}
-        \\
-        \text{undefined otherwise}
-    \end{cases}
-\end{equation}
+\[
+(p \rightarrow p' : \langle U \rangle . G') \upharpoonright q =
+\begin{cases}
+! \langle p', U \rangle . (G' \upharpoonright q) & \text{if } q = p \\
+? \langle p, U \rangle . (G' \upharpoonright q) & \text{if } q = p' \\
+G' \upharpoonright q & \text{otherwise}
+\end{cases}
+\]
 
+\[
+(p \rightarrow p' : \{ l_i : G_i \}_{i \in I}) \upharpoonright q =
+\begin{cases}
+\oplus \langle p', \{ l_i : T_i \}_{i \in I} \rangle & \text{if } q = p \\
+\& (p, \{ l_i : G_i \upharpoonright q \}_{i \in I}) & \text{if } q = p' \\
+G_{i_0} \upharpoonright q & \text{if } q \neq p, q \neq p',\ i_0 \in I \\
+& \quad \text{and } G_i \upharpoonright q = G_j \upharpoonright q\ \forall i,j \in I
+\end{cases}
+\]
+
+\[
+(\mu t . G) \upharpoonright q =
+\begin{cases}
+\mu t . (G \upharpoonright q) & \text{if } G \upharpoonright q \neq t \\
+\text{end} & \text{otherwise}
+\end{cases}
+\quad
+t \upharpoonright q = t \qquad \text{end} \upharpoonright q = \text{end}
+\]
+
+
+%% Ignoriamo il merging operator per ora
+% $\sqcap$ is the merging operator, that is a partial operation over session types defined as
+
+% \begin{equation}
+%     T1 \sqcap T2 = \begin{cases}
+%         T1 & \text{if } T1 = T2\\
+%         T3 & \text{if }\exists I, J:
+%         \begin{cases}
+%             T1 = \&_{i \in I} p ? l_i(T_i) & \text{and}\\
+%             T2 = \&_{j \in J} p ? l_j(T_j)  & \text{and}  \\
+%             T3 = \&_{k\in I\cup J} p ? l_k(T_k) 
+%         \end{cases}
+%         \\
+%         \text{undefined otherwise}
+%     \end{cases}
+% \end{equation}
 
 \paragraph{Well-Formedness}
 
@@ -125,20 +144,31 @@ are both reliable and verifiable.
 \subsubsection{The Calculus' Syntax}
 The process' implementation of the synchronous multiparty session calculus are defined with:
 
-\begin{equation}
-    P ::= p ! l \langle e \rangle \mid \sum_{i \in I} p ? l_i (x_i)
-    \mid \text{if } e \text{ then } P \text{ else } Q \mid P1;P2 \mid \mu X.P \mid X \mid 0
-\end{equation}
+\begin{center}
+\begin{tabular}{ l l l l }
+    $P ::= \overline{u}[p](y).P$      & Multicast request & $a, b$ & Service name \\
+    $\mid u[p](y).P$                  & Accept & $x$ & Value variable \\
+    $\mid c!\langle p,e \rangle.P$    & Value sending & s & Session name \\
+    $\mid c?(p,x).P$                  & Value reception & p, q & Participant number \\
+    $\mid c \oplus \langle p, l \rangle.P$ & Selection & X, Y & Process variable \\
+    $\mid c \& (p, \{ l_i : P_i \}_{i \in I})$ & Branching & l & Label \\
+    $\mid \text{if } e \text{ then } P \text{ else } Q$ & Conditional &  $u ::= x \mid a                  $& Identifier \\
+    $\mid P \mid Q$ & Parallel &  $v ::= a \mid \text{true} \mid \text{false} $& Value \\
+    $\mid 0       $ & Inaction & $e ::= v \mid x \mid e \text{ and } e' \mid \text{not } e \ldots $& Expression \\
+    $\mid (\nu a)P$ & Service name hiding &  $m ::= (q, p, v) \mid (q, p, s[p']) \mid (q, p, l) $& Message in transit \\
+    $\mid \text{def } D \text{ in } P$ & Recursion &  $h ::= h \cdot m \mid \emptyset  $& Queue \\
+    $\mid X\langle e, c \rangle      $& Process call &  $D ::= X(x, y) = P               $& Declaration \\
+    $\mid (\nu s)P$ & Session hiding &  \\
+    $\mid s : h   $ & Message queue &  \\
+\end{tabular}
+\vspace{1em}
+\textbf{Table 2.} Process syntax and naming conventions.
+\end{center}
 
-\begin{itemize}
-    \item $p ! l \langle e \rangle$:  it sends a value of an expression $e$ with label $l$;
-    \item $\sum_{i \in I} p ? l_i (x_i)$ is the external choice: the process can receive
-    a message with label $l_i$ from process $p$, $x_i$ is the variable that binds the new value received;
-    \item $\text{if } e \text{ then } P \text{ else } Q$ represents the internal choice;
-    \item $P1;P2$: sequencing the process;
-    \item $\mu X.P$: it's a recursive process (we assume they are guarded);
-    \item $0$: termination, can be omitted.
-\end{itemize}
+The evaluation contexts are processes with some holes, and we denote them with:
+\begin{center}
+    $\mathcal{E} ::= [\ ]\  \|\  P\ \| \  (\nu a)\mathcal{E}\ \|\ (\nu s)\mathcal{E}\ \|\ \text{def } D \text{ in } \mathcal{E}\ \|\ \mathcal{E} | \mathcal{E}$
+\end{center}
 
 We define a multiparty session as a parallel composition of pairs (denoted by
 $p \triangleleft P$) of participants and processes:
@@ -151,170 +181,169 @@ with the idea that process $P$ represents participant $p$ and interacts with oth
 processes fulfilling different roles in $M$, a multiparty session is considered
 well-formed if all participants are distinct.
 
-\paragraph{Operational semantics}
-In the Table~\ref{tab:struc} and \ref{tab:redu}, the operational semantic for the syntax is showed.
+% \paragraph{Operational semantics}
+% In the Table~\ref{tab:struc} and \ref{tab:redu}, the operational semantic for the syntax is showed.
 
-\begin{table}[h]
-    \centering
-    \begin{align*}
-        \text{[S-REC]} \quad & \mu X.P \equiv P\{\mu X.P/X\} \\
-        \text{[S-MULTI]} \quad & P \equiv Q \Rightarrow p \triangleleft P \mid M \equiv p \triangleleft Q \mid M \\
-        \text{[S-PAR 1]} \quad & p \triangleleft \mathbf{0} \mid M \equiv M \\
-        \text{[S-PAR 2]} \quad & M \mid M' \equiv M' \mid M \\
-        \text{[S-PAR 3]} \quad & (M \mid M') \mid M'' \equiv M \mid (M' \mid M'')
-    \end{align*}
-    \caption{Structural congruence.}
-    \label{tab:struc}
-\end{table}
+% \begin{table}[h]
+%     \centering
+%     \begin{align*}
+%         \text{[S-REC]} \quad & \mu X.P \equiv P\{\mu X.P/X\} \\
+%         \text{[S-MULTI]} \quad & P \equiv Q \Rightarrow p \triangleleft P \mid M \equiv p \triangleleft Q \mid M \\
+%         \text{[S-PAR 1]} \quad & p \triangleleft \mathbf{0} \mid M \equiv M \\
+%         \text{[S-PAR 2]} \quad & M \mid M' \equiv M' \mid M \\
+%         \text{[S-PAR 3]} \quad & (M \mid M') \mid M'' \equiv M \mid (M' \mid M'')
+%     \end{align*}
+%     \caption{Structural congruence.}
+%     \label{tab:struc}
+% \end{table}
 
-\begin{table}[h]
-    \centering
-    \begin{align*}
-        \text{[R-COMM]} \quad & \frac{j \in I \quad e \downarrow v}{p \triangleleft \sum_{i \in I} q?l_i(x).P_i \mid q \triangleleft p!l_j\langle e \rangle.Q \mid M \longrightarrow p \triangleleft P_j\{v/x\} \mid q \triangleleft Q \mid M} \\[10pt]
-        \text{[T-CONDITIONAL]} \quad & \frac{e \downarrow \text{true}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft P \mid M} \\[10pt]
-        \text{[F-CONDITIONAL]} \quad & \frac{e \downarrow \text{false}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft Q \mid M} \\[10pt]
-        \text{[R-STRUCT]} \quad & \frac{M_1' \equiv M_1 \quad M_1 \longrightarrow M_2 \quad M_2 \equiv M_2'}{M_1' \longrightarrow M_2'}
-    \end{align*}
-    \caption{Reduction rules.}
-    \label{tab:redu}
-\end{table}
+% \begin{table}[h]
+%     \centering
+%     \begin{align*}
+%         \text{[R-COMM]} \quad & \frac{j \in I \quad e \downarrow v}{p \triangleleft \sum_{i \in I} q?l_i(x).P_i \mid q \triangleleft p!l_j\langle e \rangle.Q \mid M \longrightarrow p \triangleleft P_j\{v/x\} \mid q \triangleleft Q \mid M} \\[10pt]
+%         \text{[T-CONDITIONAL]} \quad & \frac{e \downarrow \text{true}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft P \mid M} \\[10pt]
+%         \text{[F-CONDITIONAL]} \quad & \frac{e \downarrow \text{false}}{p \triangleleft \text{if } e \text{ then } P \text{ else } Q \mid M \longrightarrow p \triangleleft Q \mid M} \\[10pt]
+%         \text{[R-STRUCT]} \quad & \frac{M_1' \equiv M_1 \quad M_1 \longrightarrow M_2 \quad M_2 \equiv M_2'}{M_1' \longrightarrow M_2'}
+%     \end{align*}
+%     \caption{Reduction rules.}
+%     \label{tab:redu}
+% \end{table}
 
-\paragraph{Type system}
-We now introduce a type system for the multiparty session calculus presented. 
-We distinguish three kinds of typing judgments:
-\begin{itemize}
-    \item $\Gamma \vdash e : S$
-    \item $\Gamma \vdash P : S$
-    \item $ \vdash M : G$
-\end{itemize}
-where $\Gamma$ (called the context) is the \textit{typing environment}:
-\begin{equation}
-    \Gamma ::= \empty \mid\mid \Gamma, x : S \mid\mid \Gamma, X : T
-\end{equation}
-i.e., a mapping that associates expression variables with sorts, and process variables with session types.
-We say that a multiparty session M is well typed if there is a global type G such that | M : G.
-We omit the rules for the expression because they are trivial. In Table~\ref{tab:typ}, there are
-the non-trivial rules.
+% \paragraph{Type system}
+% We now introduce a type system for the multiparty session calculus presented. 
+% We distinguish three kinds of typing judgments:
+% \begin{itemize}
+%     \item $\Gamma \vdash e : S$
+%     \item $\Gamma \vdash P : S$
+%     \item $ \vdash M : G$
+% \end{itemize}
+% where $\Gamma$ (called the context) is the \textit{typing environment}:
+% \begin{equation}
+%     \Gamma ::= \empty \mid\mid \Gamma, x : S \mid\mid \Gamma, X : T
+% \end{equation}
+% i.e., a mapping that associates expression variables with sorts, and process variables with session types.
+% We say that a multiparty session M is well typed if there is a global type G such that | M : G.
+% We omit the rules for the expression because they are trivial. In Table~\ref{tab:typ}, there are
+% the non-trivial rules.
 
-\begin{table}[h]
-    \centering
-    \begin{align*}
-        \text{[T-SUB]} \quad & \frac{\Gamma \vdash P : T \quad T \leq T'}{\Gamma \vdash P : T'} \\[10pt]
-        \text{[T-0]} \quad & \Gamma \vdash \mathbf{0} : \text{end} \\[10pt]
-        \text{[T-REC]} \quad & \frac{\Gamma, X : T \vdash P : T}{\Gamma \vdash \mu X.P : T} \\[10pt]
-        \text{[T-VAR]} \quad & \Gamma, X : T \vdash X : T \\[10pt]
-        \text{[T-INPUT-CHOICE]} \quad & 
-        \frac{\forall i \in I \quad \Gamma, x_i : S_i \vdash P_i : T_i}
-        {\Gamma \vdash \sum_{i \in I} q?l_i(x_i).P_i : \&_{i \in I} q?l_i(S_i).T_i} \\[10pt]
-        \text{[T-OUT]} \quad & 
-        \frac{\Gamma \vdash e : S \quad \Gamma \vdash P : T}
-        {\Gamma \vdash q!l\langle e \rangle.P : q!l(S).T} \\[10pt]
-        \text{[T-CHOICE]} \quad & 
-        \frac{\Gamma \vdash e : \text{bool} \quad \Gamma \vdash P_1 : T \quad \Gamma \vdash P_2 : T}
-        {\Gamma \vdash \text{if } e \text{ then } P_1 \text{ else } P_2 : T} \\[10pt]
-        \text{[T-SESS]} \quad & 
-        \frac{\forall i \in I \quad \vdash P_i : G[p_i] \quad pt\{G\} \subseteq \{p_i \mid i \in I\}}
-        {\vdash \prod_{i \in I} p_i \triangleleft P_i : G}
-    \end{align*}
-    \caption{Typing rules for processes and sessions.}
-    \label{tab:typ}
-\end{table}
+% \begin{table}[h]
+%     \centering
+%     \begin{align*}
+%         \text{[T-SUB]} \quad & \frac{\Gamma \vdash P : T \quad T \leq T'}{\Gamma \vdash P : T'} \\[10pt]
+%         \text{[T-0]} \quad & \Gamma \vdash \mathbf{0} : \text{end} \\[10pt]
+%         \text{[T-REC]} \quad & \frac{\Gamma, X : T \vdash P : T}{\Gamma \vdash \mu X.P : T} \\[10pt]
+%         \text{[T-VAR]} \quad & \Gamma, X : T \vdash X : T \\[10pt]
+%         \text{[T-INPUT-CHOICE]} \quad & 
+%         \frac{\forall i \in I \quad \Gamma, x_i : S_i \vdash P_i : T_i}
+%         {\Gamma \vdash \sum_{i \in I} q?l_i(x_i).P_i : \&_{i \in I} q?l_i(S_i).T_i} \\[10pt]
+%         \text{[T-OUT]} \quad & 
+%         \frac{\Gamma \vdash e : S \quad \Gamma \vdash P : T}
+%         {\Gamma \vdash q!l\langle e \rangle.P : q!l(S).T} \\[10pt]
+%         \text{[T-CHOICE]} \quad & 
+%         \frac{\Gamma \vdash e : \text{bool} \quad \Gamma \vdash P_1 : T \quad \Gamma \vdash P_2 : T}
+%         {\Gamma \vdash \text{if } e \text{ then } P_1 \text{ else } P_2 : T} \\[10pt]
+%         \text{[T-SESS]} \quad & 
+%         \frac{\forall i \in I \quad \vdash P_i : G[p_i] \quad pt\{G\} \subseteq \{p_i \mid i \in I\}}
+%         {\vdash \prod_{i \in I} p_i \triangleleft P_i : G}
+%     \end{align*}
+%     \caption{Typing rules for processes and sessions.}
+%     \label{tab:typ}
+% \end{table}
 
-\subsubsection{Example}
+% \subsubsection{Example}
 
+% \paragraph{Global Specification}
+% The global communication protocol is defined as:
+% \begin{align*}
+%     &\text{Customer} \to \text{Agency} : \text{details}(\mathbb{N}). \\
+%     &\text{Agency} \to \text{Hotel} : \text{details}(\mathbb{N}). \\
+%     &\text{Hotel} \to \text{Customer} : \text{ok}(\mathbb{B}). \text{end}
+% \end{align*}
 
-\paragraph{Global Specification}
-The global communication protocol is defined as:
-\begin{align*}
-    &\text{Customer} \to \text{Agency} : \text{details}(\mathbb{N}). \\
-    &\text{Agency} \to \text{Hotel} : \text{details}(\mathbb{N}). \\
-    &\text{Hotel} \to \text{Customer} : \text{ok}(\mathbb{B}). \text{end}
-\end{align*}
+% \paragraph{Local Types}
+% \begin{align*}
+%     T_C &= \text{Agency}! \text{details}(\mathbb{N}). \text{Hotel}? \text{ok}(\mathbb{B}). \text{end} \\
+%     T_A &= \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end} \\
+%     T_H &= \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}
+% \end{align*}
 
-\paragraph{Local Types}
-\begin{align*}
-    T_C &= \text{Agency}! \text{details}(\mathbb{N}). \text{Hotel}? \text{ok}(\mathbb{B}). \text{end} \\
-    T_A &= \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end} \\
-    T_H &= \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}
-\end{align*}
+% \paragraph{Process Implementation}
+% \begin{align*}
+%     P_C &= \text{Agency}! \text{details}(42). \text{Hotel}? \text{ok}(b). \mathbf{0} \\
+%     P_A &= \text{Customer}? \text{details}(d). \text{Hotel}! \text{details}(d). \mathbf{0} \\
+%     P_H &= \text{Agency}? \text{details}(d). \text{Customer}! \text{ok}(\text{true}). \mathbf{0}
+% \end{align*}
 
-\paragraph{Process Implementation}
-\begin{align*}
-    P_C &= \text{Agency}! \text{details}(42). \text{Hotel}? \text{ok}(b). \mathbf{0} \\
-    P_A &= \text{Customer}? \text{details}(d). \text{Hotel}! \text{details}(d). \mathbf{0} \\
-    P_H &= \text{Agency}? \text{details}(d). \text{Customer}! \text{ok}(\text{true}). \mathbf{0}
-\end{align*}
+% \paragraph{Typing Proof}
+% We prove that each process conforms to its local type.
 
-\paragraph{Typing Proof}
-We prove that each process conforms to its local type.
+% \begin{lemma}[Customer Typing]
+% If \(\Gamma \vdash P_C : T_C\), then \(P_C\) follows \(T_C\).
+% \begin{proof}
+% By applying the \textbf{T-OUT} rule:
+% \[
+% \frac{\Gamma \vdash 42 : \mathbb{N} \quad \Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
+% {\Gamma \vdash \text{Agency}! \text{details}(42). P_C' : \text{Agency}! \text{details}(\mathbb{N}). T_C'}
+% \]
+% where \(P_C' = \text{Hotel}? \text{ok}(b). \mathbf{0}\).
 
-\begin{lemma}[Customer Typing]
-If \(\Gamma \vdash P_C : T_C\), then \(P_C\) follows \(T_C\).
-\begin{proof}
-By applying the \textbf{T-OUT} rule:
-\[
-\frac{\Gamma \vdash 42 : \mathbb{N} \quad \Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
-{\Gamma \vdash \text{Agency}! \text{details}(42). P_C' : \text{Agency}! \text{details}(\mathbb{N}). T_C'}
-\]
-where \(P_C' = \text{Hotel}? \text{ok}(b). \mathbf{0}\).
+% Applying \textbf{T-INPUT-CHOICE}:
+% \[
+% \frac{\Gamma \vdash b : \mathbb{B} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+% {\Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
+% \]
+% Thus, \(P_C\) is well-typed.
+% \end{proof}
+% \end{lemma}
 
-Applying \textbf{T-INPUT-CHOICE}:
-\[
-\frac{\Gamma \vdash b : \mathbb{B} \quad \Gamma \vdash \mathbf{0} : \text{end}}
-{\Gamma \vdash P_C' : \text{Hotel}? \text{ok}(\mathbb{B}). \text{end}}
-\]
-Thus, \(P_C\) is well-typed.
-\end{proof}
-\end{lemma}
+% \begin{lemma}[Agency Typing]
+% \begin{proof}
+% Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
+% \[
+% \frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+% {\Gamma \vdash P_A : \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end}}
+% \]
+% \end{proof}
+% \end{lemma}
 
-\begin{lemma}[Agency Typing]
-\begin{proof}
-Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
-\[
-\frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
-{\Gamma \vdash P_A : \text{Customer}? \text{details}(\mathbb{N}). \text{Hotel}! \text{details}(\mathbb{N}). \text{end}}
-\]
-\end{proof}
-\end{lemma}
+% \begin{lemma}[Hotel Typing]
+% \begin{proof}
+% Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
+% \[
+% \frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
+% {\Gamma \vdash P_H : \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}}
+% \]
+% \end{proof}
+% \end{lemma}
 
-\begin{lemma}[Hotel Typing]
-\begin{proof}
-Applying \textbf{T-INPUT-CHOICE} and \textbf{T-OUT}:
-\[
-\frac{\Gamma \vdash d : \mathbb{N} \quad \Gamma \vdash \mathbf{0} : \text{end}}
-{\Gamma \vdash P_H : \text{Agency}? \text{details}(\mathbb{N}). \text{Customer}! \text{ok}(\mathbb{B}). \text{end}}
-\]
-\end{proof}
-\end{lemma}
+% \begin{theorem}[Session Typing]
+% \begin{proof}
+% By \textbf{T-SESS}:
+% \[
+% \frac{\forall i \in \{C, A, H\}, \Gamma \vdash P_i : T_i}
+% {\Gamma \vdash P_C \mid P_A \mid P_H : G}
+% \]
+% Since \(T_C, T_A, T_H\) are well-typed, the system follows \(G\).
+% \end{proof}
+% \end{theorem}
 
-\begin{theorem}[Session Typing]
-\begin{proof}
-By \textbf{T-SESS}:
-\[
-\frac{\forall i \in \{C, A, H\}, \Gamma \vdash P_i : T_i}
-{\Gamma \vdash P_C \mid P_A \mid P_H : G}
-\]
-Since \(T_C, T_A, T_H\) are well-typed, the system follows \(G\).
-\end{proof}
-\end{theorem}
+% \paragraph{Operational Semantics Execution}
+% The execution follows the operational semantics rules:
 
-\paragraph{Operational Semantics Execution}
-The execution follows the operational semantics rules:
+% \begin{align*}
+%     P_C \mid P_A \mid P_H &\to 
+%     (\text{Agency}! \text{details}(42). P_C') \mid (\text{Customer}? \text{details}(d). P_A') \mid P_H \\
+%     &\to P_C' \mid (\text{Hotel}! \text{details}(42). P_A') \mid P_H \quad \text{(Comm. between Customer, Agency)} \\
+%     &\to P_C' \mid P_A' \mid (\text{Customer}! \text{ok}(\text{true}). P_H') \quad \text{(Comm. between Agency, Hotel)} \\
+%     &\to P_C' \mid P_A' \mid P_H' \quad \text{(Comm. between Hotel, Customer)}
+% \end{align*}
 
-\begin{align*}
-    P_C \mid P_A \mid P_H &\to 
-    (\text{Agency}! \text{details}(42). P_C') \mid (\text{Customer}? \text{details}(d). P_A') \mid P_H \\
-    &\to P_C' \mid (\text{Hotel}! \text{details}(42). P_A') \mid P_H \quad \text{(Comm. between Customer, Agency)} \\
-    &\to P_C' \mid P_A' \mid (\text{Customer}! \text{ok}(\text{true}). P_H') \quad \text{(Comm. between Agency, Hotel)} \\
-    &\to P_C' \mid P_A' \mid P_H' \quad \text{(Comm. between Hotel, Customer)}
-\end{align*}
-
-At the end of the execution, all processes reach \(\mathbf{0}\), meaning communication terminates successfully.
-Thus, the protocol is correctly implemented and respects the MPST specifications.
+% At the end of the execution, all processes reach \(\mathbf{0}\), meaning communication terminates successfully.
+% Thus, the protocol is correctly implemented and respects the MPST specifications.
 
 \subsection{Message Sequence Charts}
 
-\begin{definition}{Communicating automaton}
+\begin{definition}[Communicating automaton]
     A \textit{communicating automaton} \(\mathcal{A}\) is a tuple 
     \[
     (L, \mathbb{V}, \mathbb{I}^F, \mathbb{I}^B, \text{Act}, \delta, l_0)
@@ -343,12 +372,11 @@ For \( a_A = l \circ v \) with \( \circ \in \{!, ?\} \), buffer \( \text{buf}(a_
 
 We mostly consider \textit{deterministic} communicating automata, unless explicitly mentioned otherwise.
 
-Given an alphabet of actions \( \\Lambda \), an \textit{execution} is a word on \( \\Lambda \): it is a finite sequence of actions.  
+Given an alphabet of actions $\Lambda$, an \textit{execution} is a word on $\Lambda$: it is a finite sequence of actions.  
 An execution is \textit{feasible} in a system if this system is able to exhibit this sequence of actions.
 
-\subsubsection{Feasible Execution}
 
-\begin{definition}{Feasible execution}
+\begin{definition}[Feasible execution]
 An execution \( e = a_1 \cdot a_2 \cdot \dots \cdot a_n \) is \textit{feasible} in \( \mathfrak{S} \)  
 if there exists a sequence of configurations \( \gamma_1, \gamma_2, \dots, \gamma_n \) such that  
 for all \( i \in \{1, \dots, n\} \), we have:
@@ -367,7 +395,39 @@ if there exists \( i \in \{1, \dots, n\} \) such that \( a = a_i \).
 If an execution \( e \) is feasible in a system \( \mathfrak{S} \),  
 we also say that \( \mathfrak{S} \) \textit{admits} \( e \).
 
+
+
 \subsubsection{Communication models}
+
+%% Presa da letitia
+\begin{definition}[Message Sequence Chart]
+An MSC over $ \mathbb{P} \land \mathbb{M} $ is a tuple $ M = (\epsilon, \vec, \vartriangleleft, \lambda)$
+where $ \epsilon $ is a finite (possibly empty) set of events, $ \lambda: \epsilon \to \Sigma $ is a
+labelling function that associates an action to each event, and $ \vec, \vartriangleleft $ are binary
+relations on $ \epsilon $ that satisfy the following three conditions. For $ p \in \mathbb{P} $, let
+$\epsilon_p = { e \in \epsilon \mid \lambda(e) \in \Sigma_p } $ be the set of events that are executed by $ p $.
+
+\begin{itemize}
+    \item The process relation $ \vec \subseteq \epsilon \times \epsilon $ relates an event to its immediate
+    successor on the same process: $ \vec = \bigcup_{p \in \mathbb{P}} \to_p $ for some relations 
+    $ \to_p \subseteq \epsilon_p \times \epsilon_p $ such that $ \to_p $ is the direct successor
+    relation of a total order on $ \epsilon_p $.
+    \item The message relation $ \vartriangleleft \subseteq \epsilon \times \epsilon $ relates pairs 
+    of matching send/receive events:
+    \begin{itemize}
+    \item For every pair $(e, f) \in \vartriangleleft$, there are two processes $ p, q $ and a message 
+    $ m $ such that $ \lambda(e) = \text{send}(p, q, m) $ and $ \lambda(f) = \text{rec}(p, q, m) $.
+    \item For all $ f \in \epsilon $ with $ \lambda(f) = \text{rec}(p, q, m) $, there is exactly one
+     $ e \in \epsilon $ such that $ e \vartriangleleft f $.
+    \item For all $ e \in \epsilon $ such that $ \lambda(e) = \text{send}(p, q, m) $, there is at 
+    most one $ f \in \epsilon $ such that $ e \vartriangleleft f $.
+    \end{itemize}
+    \item The happens-before relation $ \le_\text{hb} $, defined by $(\vec \cup \vartriangleleft)^* $,
+    is a partial order on $ \epsilon $. 
+\end{itemize}
+\end{definition}
+
+The projection of a MSC $M$ over a process $i$ is denoted with $M|_i$.
 
 \paragraph{Fully async}
 
@@ -377,13 +437,13 @@ be modeled as a bag where all messages are stored and retrieved by processes
 when necessary. It is also referred to as NON-FIFO. The definition is the same 
 as MSC.
 
-\paragraph{Peer-to}-peer 
+\paragraph{Peer-to-peer} 
 In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
 process to another are always received in the same order as they are sent. This 
 is usually implemented by processes pairwise connected with FIFO channels. 
 Alternative names are FIFO 1-1 or simply FIFO.
 
-A p2p-MSC is an MSC $M = (E, →, \lhd, \lambda)$ where, for any two send events $s$ 
+A p2p-MSC is an MSC $M = (E,\to, \lhd, \lambda)$ where, for any two send events $s$ 
 and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
 and $s \to^+ s'$, one of the following holds:
 - either $s, s' \in \text{matched}(M)$ with $s \lhd r$ and $s' \lhd r'$ and 
@@ -400,7 +460,7 @@ are two messages $m 1$ and $m 2$ with the same recipient, such that there exists
 a causal path from $m 1$ to $m 2$, then $m 1$ must be received before $m 2$. 
 Causal ordering was introduced by Lamport with the name "happened before" order.
 
-An MSC $M = (E, →, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
+An MSC $M = (E, \to, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
 $s'$, such that $\lambda(s) \in \text{send}(\_, q, \_), \lambda(s') \in \text{send}(\_, q, \_)$, and 
 $s \leq_{\text{hb}} s'$:
 - either $s, s' \in \text{matched}(M)$ and $r \to^* r'$, with $r$ and $r'$ receive 
@@ -417,7 +477,7 @@ must be received in the same order as they are sent. If a process receives $m_1$
 before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
 the senders of a single receiver. This model is also called FIFO $n-1$.
 
-An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
+An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
 $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
 that $\lambda (s) \in \text{send}(\_,q,\_), \lambda (s') \in \text{send}(\_,q,\_)$, and 
 $s \rightsquigarrow s'$
@@ -431,7 +491,7 @@ receivers. Any two messages sent by a process must be received in the same
 order as they are sent. These two messages might be received by different 
 processes and the two receive events might be concurrent.
 
-An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
+An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
 $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
 that $\lambda (s) \in \text{send}(p,\_,\_), \lambda (s') \in \text{send}(p,\_,\_)$ and 
 $s \to^+ s'$ (which implies $s \rightsquigarrow s'$)
@@ -446,7 +506,7 @@ as they are sent. These two messages might be sent or receives by any process
 and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
 coordinates all the senders with all the receivers.
 
-An MSC $M = (E, →, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
+An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
 $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
 that $s \rightsquigarrow s'$
 - either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
@@ -457,6 +517,6 @@ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
 This model imposes the existence of a scheduling such that any send event is 
 immediately followed by its corresponding receive event.
 
-An MSC $M = (E, →, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
+An MSC $M = (E, \to, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
 send events and there is a linearization $\rightsquigarrow$ where any 
 matched send event is immediately followed by its respective receive event.
