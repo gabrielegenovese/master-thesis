@@ -4,7 +4,34 @@ In this section realizability and implementability will be used as the same prob
 Informally, an MSC can be defined realizable if a distributed 
 implementation exists that exactly reproduces the graph's behaviors.
 
-\subsection{The Implementability problem}
+\subsection{Realizability by Alur}
+
+\subsubsection{Definitions}
+
+\begin{definition}[Weakly-implies]
+A set $L$ of MSCs weakly implies an MSC $M$ iff for all $1\leq i \leq n$, 
+there exists an MSC $M_i \in L$ such that $M|_i = M_i|_i$.
+\end{definition}
+
+\begin{definition}{Weakly realizable}
+The weak closure $L^w$ of a set $L$ of MSCs contains all the MSCs $L$ weakly implies.
+The set $L$ is weakly realizable iff $L=L^w$. The MSC-graph $G$ is said to be weakly
+realizable if the set $L(G)$ of MSCs is. Thus, a weakly realizable graph already contains
+all the implied scenarios.
+\end{definition}
+
+\begin{definition}[Deadlock-free]
+Consider a set $A_i$ of concurrent automata and the product $A =\prod_i A_i$
+A state $q$ of the product $A$ is said to be a deadlock state if no accepting state of $A$ is reachable from $q$.
+The product $A$ is said to be deadlock-free if no state reachable from its initial state is a deadlock state.
+\end{definition}
+
+\begin{definition}[Safely realizable]
+A set $L$ of MSCs is said to be safely realizable if $L=L\prod A_i$ for some $\langle A_i | 1\leq i \leq n \rangle$
+such that $\prod A_i$ is deadlock-free.
+\end{definition}
+
+\subsubsection{Realizability problem}
 
 In \cite{alur2005realizability}, they prove many interesting results within the scope of MSC graphs.
 They first examine the realizability of bounded MSC-graphs. Two types are considered: 
@@ -13,10 +40,6 @@ and safe realizability solvable in polynomial time for finite MSC sets, they sho
 bounded MSC-graphs, weak realizability becomes undecidable, and safe realizability lies in 
 \verb|EXPSPACE|.
 
-\begin{definition}[Weakly-implies]
-A set $L$ of MSCs weakly implies an MSC $M$ iff for all $1\leq i \leq n$, there exists an MSC $M_i \in L$ such that $M|_i = M_i|_i$.
-\end{definition}
-
 \begin{theorem}
 Given a bounded MSC graph G, checking if G is weakly realizable is undecidable.
 \end{theorem}
@@ -24,7 +47,7 @@ Given a bounded MSC graph G, checking if G is weakly realizable is undecidable.
 \begin{proof}
 The proof is a reduction from the post correspondence problem (PCP). In the paper \cite{alur2005realizability}
 they further reduce the problem to a relaxed version. First, they reduce PCP to OneSidedPCP and then to
-Relaxed PCP (RPCP). We skip this part as is not meaningful for the proof. We state the RPCP to be the following
+Relaxed PCP (RPCP). We skip this part as is not meaningful for the proof. We can state the RPCP to be the following
 problem: given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
 such that $x_{i_1}...x_{i_n}=y_{i_1}...y_{i_m}$, where $x_{i_j}, y_{i_j} \in \{v_{i_j},w_{i_j}\}$, for some
 index $i_l \  x_{i_l}\neq y_{i_l}$, and for all $j\leq m,y_{i_1}...y_{i_j}$ is a prefix of $x_{i_1}...x_{i_j}$.
@@ -43,7 +66,6 @@ of the string. Now we reduce RPCP to weak realizability.
   \nextlevel
 }
 
-
 \begin{figure}[h]
 \centering
 \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
@@ -57,9 +79,9 @@ of the string. Now we reduce RPCP to weak realizability.
     \syncmess{$(i,0)$}{P3}{P4}
     \syncmess{$v_i^1$}{P2}{P3}
     \syncmess{...}{P2}{P3}
-    \syncmess{$v_m$}{P2}{P3}
+    \syncmess{$v_i^c$}{P2}{P3}
 \end{msc}
-\caption{The $M_i^0$ MSC}
+\caption{The $M_i^0$ MSC. For a string $u$, let $u_l$ denote the $l$’th character of the string.}
 \end{figure}
 
 \begin{figure}[h]
@@ -75,9 +97,9 @@ of the string. Now we reduce RPCP to weak realizability.
     \syncmess{$(i,1)$}{P3}{P4}
     \syncmess{$w_i^1$}{P2}{P3}
     \syncmess{...}{P2}{P3}
-    \syncmess{$w_i^m$}{P2}{P3}
+    \syncmess{$w_i^d$}{P2}{P3}
 \end{msc}
-\caption{The $M_i^1$ MSC}
+\caption{The $M_i^1$ MSC. For a string $u$, let $u_l$ denote the $l$’th character of the string.}
 \end{figure}
 
 
@@ -95,11 +117,8 @@ such messages will be depicted by double arrows.
 
 Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of
 RPCP, we build a set $L$ of MSCs over 4 processes as follows.
-
-For a string $u$, let $u_l$ denote the $l$’th character of the string.
 For each pair $(v_i, w_i)$ we build two MSCs $M^0_i$ and $M^1_i$,
 which are depicted in Fig.~3.
-
 Thus in $M^0_i$, process 1 sends synchronously $(i, 0)$ to process 2,
 then sends the index $i$ to process 4, and then process 4 sends
 synchronously $(i, 0)$ to process 3. After that, process 2
@@ -109,7 +128,7 @@ is similar. Observe that the communication graph of each of these
 MSCs is strongly connected and involves all the processes, and
 hence, the MSC graph $L^*$ is bounded.
 
-\textbf{Claim 1:} $\mathcal{B} \in \text{RPCP}$ iff $L^*$ is not weakly realizable.
+\textbf{Claim 1:} $\Delta \in \text{RPCP}$ iff $L^*$ is not weakly realizable.
 
 \textit{Proof.} For the ``only if" direction, suppose $R = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots,
 i_m, a_m, b_m)$ are the indices for a solution to $\mathcal{B}$, and the bits $a_j$ and $b_j$
@@ -145,25 +164,25 @@ some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
 after process 1 announces the index, what process 2 sends is not
 identical to what process 3 receives.
 
-Now, for the “if” direction, suppose there is some MSC $M@$ which
+Now, for the “if” direction, suppose there is some MSC $M^@$ which
 exists in any realization of $L^*$, but is not in $L^*$ itself. We want
-to derive a solution to $\mathcal{B}$ from $M@$.
+to derive a solution to $\mathcal{B}$ from $M^@$.
 
-First, it is clear that the projection $M@|_1$ must consist of a sequence
+First, it is clear that the projection $M^@|_1$ must consist of a sequence
 of pairs of messages (the first of each pair acknowledged), sent from
 process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
 
 Likewise, it is clear that, in order for process 2 to receive those messages,
-$M@|_2$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
+$M^@|_2$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
 each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
 $b = 0$ or $b = 1$, before the next index pair is received.
 
-Likewise, $M@|_4$ consists of a sequence of receipts of index $i$ from
+Likewise, $M^@|_4$ consists of a sequence of receipts of index $i$ from
 process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
-$M@|_3$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
+$M^@|_3$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
 by receipt of $v_i$ or $w_i$, respectively.
 
-Now, since $M@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
+Now, since $M^@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
 $w_i$ must differ on process 2 and process 3. (Note, we are assuming that
 the buffers between processes are FIFO.)
 
@@ -173,7 +192,68 @@ process 1 to process 4, which in turn precedes the $(j + 1)$-th message
 from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
 string formed by the first $j$ words on process 2 is a prefix of the string
 formed by the first $j$ words on process 3. Therefore, we can readily
-build a solution for $\mathcal{B}$ from $M@$.
+build a solution for $\mathcal{B}$ from $M^@$.
 
+\subsection{Implementability by Stutz}
+
+Part taken from \cite{stutz2024implementability}.
+To start with, let $P$ be a finite set of participants and $V$ be a finite set of messages
+and $\Gamma$ the set of all send and receive events. $\Gamma_p$ is the set of all send and receive events
+regarding a participant $p\in P$.
+
+\subsubsection{Definitions}
+
+\newcommand{\send}[3]{%
+  #1\rhd #2 ! #3
+}
+
+\newcommand{\recv}[3]{%
+  #1\lhd #2 ? #3
+}
+
+\newcommand{\Epsilon}[0]{%
+  \mathcal{E}
+}
+
+\newcommand{\doublebrace}[1]{%
+  \{\!\!\{#1\}\!\!\}
+}
+
+\begin{definition}{CSM}
+A \textit{communicating state machine} (CSM) is $\mathsf{A} = \doublebrace{A_p}_{p\in P}$
+over $P$ and $V$ if $A_p$ is a finite state machine over $\Gamma_p$ for every $p \in P$,
+denoted by $(Q_p,\Gamma_p,\delta_p,q_{0,p}, F_p)$. Let $\prod_{p\in P} Q_p$ denote
+the set of global states and \verb|Chan| $=\{(p,q)| p,q \in P,p\neq q\}$ denote the set
+of channels. A configuration of $A$ is a pair $(\overrightarrow{q}, \Epsilon)$, where $\overrightarrow{q}$ is a vector
+of sates, one for each participant, and $\Epsilon:\text{Chan}\to V^*$ is a mapping from 
+each channel to a sequence of messages. We may write $\Epsilon(p, q)$ for $\Epsilon((p, q))$.
+We use $\overrightarrow{q}_p$ to denote the state of $p$ in $\overrightarrow{q}$. The
+relation, denoted $\to$, is defined as follows:
+\begin{itemize}
+  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\send{p}{q}{m}} (\overrightarrow{q}', \Epsilon')$
+  if $(\overrightarrow{q_p},\send{p}{q}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
+  for every participant $r\neq p$, $\Epsilon'((p,q)) = \Epsilon((p,q))\cdot m$ and $\Epsilon'(c) = \Epsilon(c)$
+  for every other channel $c \in $ Chan.
+  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\recv{q}{p}{m}} (\overrightarrow{q}', \Epsilon')$
+  if $(\overrightarrow{q_p},\recv{q}{p}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
+  for every participant $r\neq p$, $\Epsilon((p,q)) = m\cdot\Epsilon'((p,q))$ and $\Epsilon'(c) = \Epsilon(c)$
+  for every other channel $c \in $ Chan.
+  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\epsilon} (\overrightarrow{q}', \Epsilon)$ if 
+  $(\overrightarrow{q_p},\epsilon,\overrightarrow{q_p}') \in \delta_p$ for some participant $p$, and
+  $\overrightarrow{q_q} =\overrightarrow{q_q}'$ for every participant $q\neq p$.
+\end{itemize}
+\end{definition}
+
+Informally, a configuration $(\overrightarrow{q}, \Epsilon)$ is a deadlock if it is not final and has no outgoing 
+transitions while it is reachable if it occurs on some run of A. A CSM is deadlock-free if no reachable
+configuration is a deadlock. $\Gamma^\omega$ denotes the infinite set of events.
+
+\begin{definition}[Implementability problem]
+A language $L \subseteq \Gamma^\omega$ is said to be implementable if there exists a CSM $\doublebrace{A_p}_{p\in P}$ such that
+\begin{itemize}
+  \item deadlock freedom: $\doublebrace{A_p}_{p\in P}$ is deadlock-free, and
+  \item protocol fidelity: $L$ is the language of $\doublebrace{A_p}_{p\in P}$.
+\end{itemize}
+\end{definition}
 
 \end{proof}
