@@ -1,0 +1,29 @@
+stutz capire le due definizioni di sender driven
+e le due 11
+
+attenzioni ai tipo di global type
+quali sono le nozioni di deadlock free, come definisci
+sembra solo progress, altre "puoi sempre raggiugnere uno stato finale"
+deadlock free di alur e stutz, comparazione
+
+-----------------
+
+LEGGERE realyzability of pomsets di emilio
+
+confronti fra le principali def:
+- deadlock (orphan free)
+- realyzability/impletability
+- sender driven (in stutz) che viene ritrovata da noi non so dove
+
+22 23 24 maggio no cinzia
+
+----------------- riunione etien
+
+se sei p2p hai tutte le esecuzioni che corrispondono all'MSC
+invece già dal mailbox si può trovare un esempio di una linearizzazione non realizzabile
+
+prova di marcus lohrey
+
+aggiungere la trasizione di sincronia per i
+M'' deve essere sincrono (da dimostrare)
+
