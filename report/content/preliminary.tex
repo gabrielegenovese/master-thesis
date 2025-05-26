@@ -16,29 +16,55 @@ we ensure that the implementation conforms to the global specification, guarante
 
 \subsubsection{The Type System}
 
-\paragraph{Sort Types}
-Sort types are defined as:
-\begin{equation}
-    S ::= nat \mid int \mid bool \mid ...
-\end{equation}
-
 \paragraph{Global Types}
 A global type $G$ describes the overall communication protocol, specifying the
 sequence of message exchanges among participants. It defines the expected
-interactions at a high level and is formally with the following grammar:
+interactions at a high level.
+We give the syntax of global types following work by Honda et al. \cite{honda2008multiparty}.
+The focus is on the core message passing aspects of asynchronous MPSTs 
+and do not include features such as delegation or sub-sessions.
+Let $\mathbb{P}$ be a set of roles and $\mathbb{V}$ be a set of messages.
+Global types are defined formally with the following grammar:
 
 \begin{equation}
-G ::= p \to q : \langle S \rangle . G \mid p \to q : \langle l_i : G_i \rangle_{i \in I}  \mid \mu t. G \mid t \mid \text{end}
+G ::= \sum_{i\in I} p_i \to q_i : m_i . G_i \mid \mu t. G \mid t \mid 0
 \end{equation}
 
-where:
+The terms $p_i \to q_i : m_i$ denote an exchange of a message  
+$m_i \in \mathbb{M}$ between two participants $p_i, q_i \in \mathbb{P}$.  
+The sum operator denotes the choice between some branches.  
+If the branch is just one, we can omit it.  
+The operators $\mu t$ and $t$ are used for recursion, and $0$ denotes  
+termination.  
+We require that recursion must be guarded; more specifically,  
+there must be an interaction between the recursion definition $\mu t$  
+and the call of the recursion variable $t$.
+Some important restriction are need for the sum operator.
+A common one is to require that a sender is the same on all sub-brances:
+$\forall i,j \in I. p_i=p_j$ for every sub-term in $\sum_{i\in I}p_i \to q_i: m_i.G_i$.
+In the work~\cite{honda2008multiparty}, they define MPSTs' sum operator with the
+\textit{directed-choice} restriction: upon branching, the sender of the message should 
+be the same and also the receiver, allowing a difference only in the content of 
+the message (additional condition: $\forall i,j \in I. q_i=q_j$). This restriction allow 
+some undesired behavior when we observe the system from an implementability point of view.
+Therefore, we need a new restriction that can better suits this problem. 
+Instead, in the thesis~\cite{stutz2024implementability}, there's the  
+definition of \textit{sender-driven choice}: upon branching, the sender  
+can only send different messages to different receivers.
+Without any restriction, they are called \textit{non-deterministic}
+global types.
+
+We can have different level of restriction:
 \begin{itemize}
-    \item $p, q$ are participants in the communication,
-    \item the communication with $S$ will send a value,
-    \item $l_i : G_i$ represents a branching of possible execution,
-    \item $\mu t. G$ represents recursion, allowing repetitive behavior,
-    \item $t$ is a recursion variable,
-    \item \verb|end| denotes the termination of the communication; it can be omitted.
+    \item Non-deterministic: no restriction
+    \item Sender-driven choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
+    it holds $\forall i,j \in I, i= j \implies p_i = p_j \lor q_i\neq q_j$.
+    \item Directed-choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
+    it holds $\forall i,j \in I, i = j \implies p_i = p_j \lor q_i = q_j$.
+    This allows to distinguish communication only by the message difference.
+    \item Mixed-choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
+    it holds $\forall i,j \in I, i\neq j \implies p_i\neq p_j \lor q_i\neq q_j \lor m_i \neq m_j$.
+    This condition allows to distinguish all transitions because no sender or receiver or message is equal.
 \end{itemize}
 
 A well-formed global type ensures that all participants can complete their interactions

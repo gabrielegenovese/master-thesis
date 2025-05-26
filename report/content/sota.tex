@@ -51,9 +51,9 @@ Relaxed PCP (RPCP). We skip this part as is not meaningful for the proof. We can
 problem: given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
 such that $x_{i_1}...x_{i_n}=y_{i_1}...y_{i_m}$, where $x_{i_j}, y_{i_j} \in \{v_{i_j},w_{i_j}\}$, for some
 index $i_l \  x_{i_l}\neq y_{i_l}$, and for all $j\leq m,y_{i_1}...y_{i_j}$ is a prefix of $x_{i_1}...x_{i_j}$.
-The relaxed problem essential says that must have the left side of the equivalence that grows more than the right side,
+The relaxed problem essentially says that must have the left side of the equivalence that grows more than the right side,
 we must have also some tuple that are different, and that we can choose whatever side of tuple for the composition
-of the string. Now we reduce RPCP to weak realizability. 
+of the string. Now we reduce RPCP to weak realizability.
 
 \newcommand{\syncmess}[3]{%
   \mess{#1}{#2}{#3}%
@@ -104,7 +104,7 @@ of the string. Now we reduce RPCP to weak realizability.
 
 
 \textit{Encodig:} Given a finite set $L$ of
-MSCs, let $L^*$ denote the MSC graph that consists of the complete
+MSCs, let $L^*$ denote the MSC graph that consists of the \textit{complete}
 graph with $|L|$ vertices, one per MSC in the set $L$, dummy initial
 and terminal vertices $v_I$, $v_T$ with empty MSCs, and edges from
 $v_I$ to all vertices of $L$ and from those to $v_T$. Thus, an MSC of
@@ -119,7 +119,7 @@ Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of
 RPCP, we build a set $L$ of MSCs over 4 processes as follows.
 For each pair $(v_i, w_i)$ we build two MSCs $M^0_i$ and $M^1_i$,
 which are depicted in Fig.~3.
-Thus in $M^0_i$, process 1 sends synchronously $(i, 0)$ to process 2,
+Thus, in $M^0_i$, process 1 sends synchronously $(i, 0)$ to process 2,
 then sends the index $i$ to process 4, and then process 4 sends
 synchronously $(i, 0)$ to process 3. After that, process 2
 synchronously sends the sequence of characters of $v_i$ to process 3 (note we assume $c$

@@ -977,11 +977,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.28996109"
-     inkscape:cx="1465.7139"
-     inkscape:cy="2593.4514"
+     inkscape:zoom="0.29410341"
+     inkscape:cx="1914.2927"
+     inkscape:cy="3536.1712"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="svg2"
      showgrid="true"
      units="mm"
      inkscape:window-width="1910"
@@ -1631,7 +1631,7 @@
                style="font-weight:bold;fill:#000000;stroke:none"
                id="tspan105">Repository</tspan></tspan></text></g></g><g
        id="g244-2"
-       transform="translate(3374.3846,862.87719)"
+       transform="translate(3374.3846,835.51392)"
        style="display:inline"><path
          style="display:inline;fill:none;fill-rule:evenodd;stroke:#008075;stroke-width:5.13882;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4335-4-3-8-0)"
          d="m -1542.4169,1019.4886 815.6739,-2.5597"
@@ -1712,7 +1712,7 @@
              style="font-size:42.6667px;font-family:Arial;-inkscape-font-specification:Arial;text-align:justify"
              id="tspan128">simultaneously.</tspan></tspan></text></g><g
        id="g244-2-6"
-       transform="translate(3374.3846,1730.9611)"
+       transform="translate(3374.3846,1676.2346)"
        style="display:inline"><path
          style="display:inline;fill:none;fill-rule:evenodd;stroke:#008075;stroke-width:5.13882;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4335-4-3-8-0-6)"
          d="m -1542.4169,1019.4886 815.6739,-2.5597"
@@ -1794,7 +1794,7 @@
        xml:space="preserve"
        transform="scale(0.93749998)"
        id="text60"
-       style="fill:#00b2a3;text-orientation:auto;font-size:34.66666667px;stroke-width:5.66929134;stroke-linejoin:round;stroke-linecap:round;-inkscape-font-specification:'CaskaydiaCove NF';font-family:'CaskaydiaCove NF';line-height:100.4%;text-align:justify;writing-mode:lr-tb;direction:ltr;stroke:#00b2a3;stroke-opacity:1;stroke-dasharray:none;stroke-miterlimit:3.7;fill-opacity:1;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;white-space:pre;shape-inside:url(#rect60)" /></g><g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:34.6667px;line-height:100.4%;font-family:'CaskaydiaCove NF';-inkscape-font-specification:'CaskaydiaCove NF';text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect60);display:inline;fill:#00b2a3;fill-opacity:1;stroke:#00b2a3;stroke-width:5.66929;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.7;stroke-dasharray:none;stroke-opacity:1" /></g><g
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Pipeline contents"
@@ -1835,7 +1835,7 @@
        x="1821.0907"
        y="638.44464" /></text><g
      id="g42"
-     transform="translate(0,33.508629)"><circle
+     transform="translate(0,6.145359)"><circle
        style="display:inline;fill:#00b2a3;fill-opacity:1;stroke:#008075;stroke-width:2.42796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path72274-5-8-7-5"
        cx="467.62482"
@@ -2033,7 +2033,7 @@
            style="font-style:italic;fill:#ffffff"
            id="tspan301">Pseudocode </tspan></tspan></text></g><g
      id="g100"
-     transform="matrix(0.92381936,0,0,0.92381936,723.8443,-539.31156)"><g
+     transform="matrix(0.92381936,0,0,0.92381936,723.8443,-566.67483)"><g
        id="g52"
        transform="matrix(0.52461908,0,0,0.52461908,243.36588,1513.9519)"><path
          style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:6.29519;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#ConcaveTriangle);filter:url(#filter4335-4-3-1)"
@@ -2268,7 +2268,7 @@
            x="-1410.308"
            y="1574.7252">philo0→fork{0,1}:release</tspan></text></g></g><g
      id="g43"
-     transform="translate(0,20.187966)"><circle
+     transform="translate(0,6.5063839)"><circle
        style="display:inline;fill:#00b2a3;fill-opacity:1;stroke:#008075;stroke-width:2.42796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path72274-5-8-7-5-3"
        cx="467.62448"
@@ -2445,7 +2445,7 @@
      id="text253"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:42.6667px;line-height:100.4%;font-family:Arial;-inkscape-font-specification:Arial;text-align:justify;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect253);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" /><g
      id="g60"
-     transform="translate(1.9347903e-6,0.51047366)"><text
+     transform="translate(1.9347903e-6,-13.171108)"><text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.75px;font-family:'CaskaydiaCove NF';-inkscape-font-specification:'CaskaydiaCove NF';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:4.64246;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        x="963.51874"
