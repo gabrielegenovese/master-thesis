@@ -45,22 +45,20 @@ $\forall i,j \in I. p_i=p_j$ for every sub-term in $\sum_{i\in I}p_i \to q_i: m_
 In the work~\cite{honda2008multiparty}, they define MPSTs' sum operator with the
 \textit{directed-choice} restriction: upon branching, the sender of the message should 
 be the same and also the receiver, allowing a difference only in the content of 
-the message (additional condition: $\forall i,j \in I. q_i=q_j$). This restriction allow 
-some undesired behavior when we observe the system from an implementability point of view.
+the message. This restriction allow some undesired behavior when we observe the
+system from an implementability point of view.
 Therefore, we need a new restriction that can better suits this problem. 
 Instead, in the thesis~\cite{stutz2024implementability}, there's the  
 definition of \textit{sender-driven choice}: upon branching, the sender  
 can only send different messages to different receivers.
 Without any restriction, they are called \textit{non-deterministic}
-global types.
-
-We can have different level of restriction:
+global types. We formally define the mentioned restriction:
 \begin{itemize}
     \item Non-deterministic: no restriction
     \item Sender-driven choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
-    it holds $\forall i,j \in I, i= j \implies p_i = p_j \lor q_i\neq q_j$.
+    it holds $\forall i,j \in I, i\neq j \implies p_i = p_j \land (q_i\neq q_j\lor m_i\neq m_j)$.
     \item Directed-choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
-    it holds $\forall i,j \in I, i = j \implies p_i = p_j \lor q_i = q_j$.
+    it holds $\forall i,j \in I, i\neq j \implies p_i = p_j \land q_i = q_j \land m_i\neq m_j$.
     This allows to distinguish communication only by the message difference.
     \item Mixed-choice: for every subterm of $\sum_{i\in I}p_i \to q_i: m_i.G_i$,
     it holds $\forall i,j \in I, i\neq j \implies p_i\neq p_j \lor q_i\neq q_j \lor m_i \neq m_j$.
@@ -76,56 +74,48 @@ derived from the global type. It specifies the actions that a participant can pe
 within the session and is defined as:
 
 \begin{equation}
-L ::=  \! \langle p,S \rangle.T \mid ? (p,U).T \mid \&(p, \{ l_i: T_i \}_{i\in I}) \mid \oplus(p, \{ l_i: T_i \}_{i\in I}) \mid \mu t. L \mid t \mid \text{end}
+L ::= \&_{i\in I} q_i?m_i.L_i \mid \oplus_{i\in I} q_i!m_i.L_i \mid \mu t. L \mid t \mid 0
 \end{equation}
 
-where:
-\begin{itemize}
-    \item $!$ means the sending of a value,
-    \item $?$ means the receiving of a message,
-    \item $\&$ denotes the selection operation,
-    \item $\oplus$ represents the branching operator,
-    \item $\mu t. L$ represents recursion, allowing repetition of behavior,
-    \item $t$ is a recursion variable,
-    \item \verb|end| denotes the termination of the communication; it can be omitted.
-\end{itemize}
+The $\oplus$ operator is called \textit{internal-choice} and $\&$ is instead the
+\textit{external-choice}. For both, we apply some restriction like in the global
+type case: the choice must be unique, i.e. $\forall i,j\in I. i \neq j \implies
+q_i\neq q_j \lor m_i \neq m_j$. These operators are omitted in case there is just one
+choice. Each participant's local type must be consistent with the global type to ensure
+correct communication. Recursion is always guarded, like for global types.
 
-Each participant's local type must be consistent with the global type to ensure
-correct communication. Recursion is always guarded.
+% \paragraph{Projection}
+% The projection of a global type \( G \) onto a participant \( q \) 
+% (\( G \upharpoonright q \)) is defined by induction on \( G \):
 
-\paragraph{Projection}
-The projection of a global type \( G \) onto a participant \( q \) 
-(\( G \upharpoonright q \)) is defined by induction on \( G \):
+% \[
+% (p \rightarrow p' : \langle U \rangle . G') \upharpoonright q =
+% \begin{cases}
+% ! \langle p', U \rangle . (G' \upharpoonright q) & \text{if } q = p \\
+% ? \langle p, U \rangle . (G' \upharpoonright q) & \text{if } q = p' \\
+% G' \upharpoonright q & \text{otherwise}
+% \end{cases}
+% \]
 
+% \[
+% (p \rightarrow p' : \{ l_i : G_i \}_{i \in I}) \upharpoonright q =
+% \begin{cases}
+% \oplus \langle p', \{ l_i : T_i \}_{i \in I} \rangle & \text{if } q = p \\
+% \& (p, \{ l_i : G_i \upharpoonright q \}_{i \in I}) & \text{if } q = p' \\
+% G_{i_0} \upharpoonright q & \text{if } q \neq p, q \neq p',\ i_0 \in I \\
+% & \quad \text{and } G_i \upharpoonright q = G_j \upharpoonright q\ \forall i,j \in I
+% \end{cases}
+% \]
 
-\[
-(p \rightarrow p' : \langle U \rangle . G') \upharpoonright q =
-\begin{cases}
-! \langle p', U \rangle . (G' \upharpoonright q) & \text{if } q = p \\
-? \langle p, U \rangle . (G' \upharpoonright q) & \text{if } q = p' \\
-G' \upharpoonright q & \text{otherwise}
-\end{cases}
-\]
-
-\[
-(p \rightarrow p' : \{ l_i : G_i \}_{i \in I}) \upharpoonright q =
-\begin{cases}
-\oplus \langle p', \{ l_i : T_i \}_{i \in I} \rangle & \text{if } q = p \\
-\& (p, \{ l_i : G_i \upharpoonright q \}_{i \in I}) & \text{if } q = p' \\
-G_{i_0} \upharpoonright q & \text{if } q \neq p, q \neq p',\ i_0 \in I \\
-& \quad \text{and } G_i \upharpoonright q = G_j \upharpoonright q\ \forall i,j \in I
-\end{cases}
-\]
-
-\[
-(\mu t . G) \upharpoonright q =
-\begin{cases}
-\mu t . (G \upharpoonright q) & \text{if } G \upharpoonright q \neq t \\
-\text{end} & \text{otherwise}
-\end{cases}
-\quad
-t \upharpoonright q = t \qquad \text{end} \upharpoonright q = \text{end}
-\]
+% \[
+% (\mu t . G) \upharpoonright q =
+% \begin{cases}
+% \mu t . (G \upharpoonright q) & \text{if } G \upharpoonright q \neq t \\
+% \text{end} & \text{otherwise}
+% \end{cases}
+% \quad
+% t \upharpoonright q = t \qquad \text{end} \upharpoonright q = \text{end}
+% \]
 
 
 %% Ignoriamo il merging operator per ora
