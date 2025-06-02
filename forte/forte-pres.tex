@@ -1,0 +1,80 @@
+\documentclass{beamer}
+\usetheme{boxes}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{listings}
+
+\title{Choreographies for Program Understanding}
+\author{Gabriele Genovese et al.}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+% \begin{frame}{Overview}
+% \tableofcontents
+% \end{frame}
+
+
+\begin{frame}{Motivation}
+\begin{itemize}
+  \item Distributed systems use message-passing for coordination.
+  \item Understanding communication behavior is challenging.
+  \item Existing choreography-based approaches focus on top-down development.
+  \item This paper promotes bottom-up extraction of choreographies for program understanding.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Goals and Vision}
+\begin{itemize}
+  \item Automatically extract global views from existing code.
+  \item Help understand interaction patterns and detect bugs.
+  \item Support debugging through graphical, analyzable global views.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Requirements}
+\begin{itemize}
+  \item Push-button extraction from real code (e.g., Erlang, Go).
+  \item Capture both correct and faulty behaviors.
+  \item Highlight misbehaviors like deadlocks and races.
+  \item Provide readable and precise graphical representations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Challenges}
+\begin{itemize}
+  \item \textbf{Undecidability:} Complete extraction is impossible in general.
+  \item \textbf{Scalability:} Large programs lead to complex choreographies.
+  \item \textbf{Approximation:} Over- and under-approximations may introduce noise.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{itemize}
+  \item \textbf{Dining Philosophers:} Detects potential deadlock.
+  \item \textbf{Bank Account:} Reveals potential race in balance updates.
+\end{itemize}
+\vspace{0.5em}
+Both examples are processed with the prototype tool \texttt{Chorer}.
+\end{frame}
+
+\begin{frame}{Tool Support: Chorer}
+\begin{itemize}
+  \item Parses Erlang programs and extracts local/global automata.
+  \item Uses static analysis and Graphviz DOT for output.
+  \item Detects deadlocks; supports heuristics to manage complexity.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+  \item Choreographies can aid in understanding real-world message-passing code.
+  \item Bottom-up extraction complements traditional top-down design.
+  \item Future work includes better support for loops, recursion, and dynamic actors.
+\end{itemize}
+\end{frame}
+
+\end{document}
