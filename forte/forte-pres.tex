@@ -1,0 +1,232 @@
+\documentclass{beamer}
+\usetheme{boxes}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage{listings}
+\usetikzlibrary{automata,positioning,shapes,snakes}
+\usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
+\pgfmathtruncatemacro\distance{1}
+
+
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\green}[1]{{\color{green} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand{\brown}[1]{{\color{brown} #1}}
+\newcommand{\purple}[1]{{\color{purple} #1}}
+\newcommand{\gray}[1]{{\color{gray} #1}}
+
+
+\lstset{language=erlang, basicstyle=\sffamily\footnotesize,
+  keywordstyle=\color{blue}, numberstyle=\tiny, numbers=none,
+  showspaces=false, showstringspaces=false, frame=tL, mathescape=true,
+  backgroundcolor=\color{black!5}, morekeywords={send, to, from} }
+
+
+\title{Choreographies for Program Understanding}
+\author{Gabriele Genovese et al.}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+% \begin{frame}{Overview}
+% \tableofcontents
+% \end{frame}
+
+\begin{frame}{Motivation}
+	\begin{itemize}
+		\item Distributed systems use message-passing for coordination.
+		\item Understanding communication behavior is challenging.
+		\item Existing choreography-based approaches focus on top-down development.
+		\item This paper promotes bottom-up extraction of choreographies for program understanding.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Goals and Vision}
+	\begin{itemize}
+		\item Automatically extract global views from existing code.
+		\item Help understand interaction patterns and detect bugs.
+		\item Support debugging through graphical, analyzable global views.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Requirements}
+	\begin{itemize}
+		\item Push-button extraction from real code (e.g., Erlang, Go).
+		\item Capture both correct and faulty behaviors.
+		\item Highlight misbehaviors like deadlocks and races.
+		\item Provide readable and precise graphical representations.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Challenges}
+	\begin{itemize}
+		\item \textbf{Undecidability:} Complete extraction is impossible in general.
+		\item \textbf{Scalability:} Large programs lead to complex choreographies.
+		\item \textbf{Approximation:} Over- and under-approximations may introduce noise.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Examples}
+	\begin{itemize}
+		\item \textbf{Dining Philosophers:} Detects potential deadlock.
+		\item \textbf{Bank Account:} Reveals potential race in balance updates.
+	\end{itemize}
+	\vspace{0.5em}
+	Both examples are processed with the prototype tool \texttt{Chorer}.
+\end{frame}
+
+
+\begin{frame}[fragile]{Dining philosophers example}
+\begin{lstlisting}
+philosopher(Fork1, Fork2) $\to$
+  send req to Fork1,
+  receive ack from Fork1,
+  send req to Fork2,
+  receive ack from Fork2,
+  eat(),
+  send release to Fork1,
+  send release to Fork2,
+  philosopher(Fork1, Fork2).
+
+fork() $\to$
+  receive req from Phil,
+  send ack to Phil,
+  receive release from Phil,
+  fork().
+\end{lstlisting}
+\end{frame}
+
+
+\tikzset{
+  state/.style={
+	 inner sep=1pt,
+	 minimum size = 4pt,
+	 draw,
+	 circle,
+	 font=\scriptsize,
+	 transform shape
+  },
+  mylabel/.style={
+	 font=\tiny,
+	 sloped,
+	 above
+  }
+}
+\begin{frame}[fragile]{Dining Philosophers global-view}
+\begin{figure}[t]
+  \centering
+	 \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+        \node[state] (n_1) {1};
+        \node[state] (n_5) [below of=n_1, yshift=1cm, fill=red] {5};
+        \node[state] (n_2) [right of=n_5] {2};
+        \node[state] (n_3) [left of=n_5] {3};
+        \node[state] (n_4) [right of=n_2] {4};
+        \node[state] (n_6) [left of=n_3] {6};
+        
+        \draw[->] (n_1) edge[bend left=5] node[mylabel] {philo0→fork0:req} (n_2);
+        \draw[->] (n_1) edge[bend right=5]  node[mylabel] {philo1→fork1:req} (n_3);
+        \draw[->] (n_2) -- node[mylabel] {philo1→fork1:req} (n_5);
+        \draw[->] (n_3) -- node[mylabel] {philo0→fork0:req} (n_5);
+        \draw[->] (n_2) -- node[mylabel] {philo0→fork1:req} (n_4);
+        \draw[->] (n_4) edge[bend right=20] node[mylabel] {philo0→fork\{0,1\}:release} (n_1);
+        \draw[->] (n_3) -- node[mylabel] {philo1→fork0:req} (n_6);
+        \draw[->] (n_6) edge[bend left=20] node[mylabel] {philo1→fork\{0,1\}:release} (n_1);
+      \end{tikzpicture}
+  \caption{Global view of the dining philosophers example.}
+  \label{graph:philosophers}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Bank account example}
+\begin{lstlisting}
+account(Value) $\to$
+  receive
+    read from Client $\to$
+	send Value to Client,
+	account(Value);
+    NewValue from Client $\to$
+      account(NewValue).
+
+client() $\to$
+  send read to Acc,
+  receive Value from Acc,
+  % operations on Value
+  send NewValue to Acc.
+\end{lstlisting}
+\end{frame}
+
+\newcommand\dummy{C}
+\begin{frame}[fragile]{Bank account global-view}
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}[node distance={27mm}, scale = .6, transform shape, thick, main/.style = {draw, circle}]
+		\node (n_1) [state] {\phantom{11}};
+		\node (n_2) [state, below left of=n_1] {\phantom{11}};
+		\node (n_3) [state, below right of=n_1] {\phantom{11}};
+		\node (n_4) [state, left= 3.5cm of n_2] {4};
+		\node (n_5) [state, below=3cm of n_1] {\phantom{11}};
+		\node (n_6) [state, right= 3.5cm of n_3] {6};
+		\node (n_7) [state, below of=n_4] {7};
+		\node (n_8) [state, below left of=n_5] {\phantom{11}};
+		\node (n_9) [state, below right of=n_5] {\phantom{11}};
+		\node (n_10) [state, below of=n_6] {10};
+		\node (n_11) [state, accepting, below= of n_7] {11};
+		\node (n_12) [state, accepting, below=1.5cm of n_8] {\phantom{12}};
+		\node (n_13) [state, accepting, below= 1.5cm of n_9] {\phantom{13}};
+		\node (n_14) [state, accepting, below=2.5cm of n_10] {14};
+
+		\draw[->] (n_1) -- node[midway, above left] {acc→\dummy1:Value} (n_2);
+		\draw[->] (n_2) -- node[midway, below left] {acc→\dummy2:Value} (n_5);
+		\draw[->] (n_5) -- node[midway, above left=-2mm] {\dummy1→acc:NewValue} (n_8);
+		\draw[->] (n_8) -- node[midway, below left] {\dummy2→acc:NewValue} (n_12);
+
+		\draw[->] (n_1) -- node[midway, above right] {acc→\dummy2:Value} (n_3);
+		\draw[->] (n_3) -- node[midway, below right] {acc→\dummy1:Value} (n_5);
+		\draw[->] (n_5) -- node[midway, above right=-2mm] {\dummy2→acc:NewValue} (n_9);
+		\draw[->] (n_9) -- node[midway, below right] {\dummy1→acc:NewValue} (n_13);
+
+% 		\draw[hpath] ($(n_1.center) + (-5pt,-5pt)$) -- (n_2.center) -- (n_5.north west) -- ($(n_5.center)+(-5pt,0)$) -- (n_5.south west) -- (n_8.center) -- ($(n_12.center) + (0pt,5pt)$);
+% 		\draw[hpath] ($(n_1.center) + (5pt,-5pt)$) -- (n_3.center) -- (n_5.north east)  -- ($(n_5.center)+(5pt,0)$) -- (n_5.south east)  -- (n_9.center) -- ($(n_13.center) + (0pt,5pt)$);
+
+		\foreach \n in {1,2,3,5,8,9,12,13}{
+				\node at (n_\n) {\n};
+			}
+
+		\draw[->] (n_2) -- node[midway, above=3mm] {C1→acc:NewValue} (n_4);
+		\draw[->] (n_4) -- node[midway, above left] {acc→C2:Value} (n_7);
+		\draw[->] (n_7) -- node[midway, above left] {C2→acc:NewValue} (n_11);
+
+		\draw[->] (n_3) -- node[midway, above=3mm] {C2→acc:NewValue} (n_6);
+		\draw[->] (n_6) -- node[midway, above right] {acc→C1:Value} (n_10);
+		\draw[->] (n_10) -- node[midway, above right] {C1→acc:NewValue} (n_14);
+	\end{tikzpicture}
+	\caption{Global view of the bank account example}
+	\label{fig:account}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Tool Support: Chorer}
+	\begin{itemize}
+		\item Parses Erlang programs and extracts local/global automata.
+		\item Uses static analysis and Graphviz DOT for output.
+		\item Detects deadlocks; supports heuristics to manage complexity.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+	\begin{itemize}
+		\item Choreographies can aid in understanding real-world message-passing code.
+		\item Bottom-up extraction complements traditional top-down design.
+		\item Future work includes better support for loops, recursion, and dynamic actors.
+	\end{itemize}
+\end{frame}
+
+\end{document}

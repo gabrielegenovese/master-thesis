@@ -1,23 +1,35 @@
+#import "@preview/rubber-article:0.1.0": *
 
+#show link: underline
+#show: article.with()
 
-= Motivational Letter
+#set text(
+  lang: "en"
+)
+
+#maketitle(
+  title: "Motivational Letter",
+  authors: (
+    "",
+  ),
+)
 
 I became interested in theoretical computer science during my first
 logic and programming language courses at university. Over time, this
 interest grew into a strong motivation to understand how distributed
 systems work and how we can reason about them in a precise way.
 
-What draws me to this PhD project is the chance to study how failures
-can be modeled and handled in distributed systems using Multiparty
-Session Types. I find this topic particularly relevant and challenging,
-as communication failures are a central issue in real-world systems,
-and formal tools can provide both clarity and practical benefits.
-
 I’m motivated by the idea of working on problems that are both
 theoretically interesting and practically meaningful. I see this PhD as
 an opportunity to deepen my understanding of formal methods and
 distributed computing, while contributing to a field that has
 important real-world applications.
+
+What draws me to this PhD project is the chance to study how failures
+can be modeled and handled in distributed systems using Multiparty
+Session Types. I find this topic particularly relevant and challenging,
+as communication failures are a central issue in real-world systems,
+and formal tools can provide both clarity and practical benefits.
 
 My previous research experience and my current internship at the i3s
 laboratory have introduced me to the MPST framework and its potential.
@@ -28,7 +40,17 @@ I’m eager to start this journey, to grow as a researcher, and to work
 in an environment where I can learn, ask questions, and collaborate
 with others who share the same curiosity.
 
-= Master dissertation summary titled "On the implementability of global types"
+#set align(right)
+Nice, 25/04/2025
+#set align(left)
+
+#pagebreak()
+
+#set align(center)
+#set text(18pt)
+*Master dissertation summary titled "On the implementability of global types"*
+#set text(10pt)
+#set align(left)
 
 The project builds on recent advances in behavioral types, particularly
 Multiparty Session Types (MPST), which model structured interactions
