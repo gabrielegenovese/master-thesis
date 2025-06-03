@@ -16,6 +16,7 @@ images/.DS_Store
 *.snm
 *.toc
 *.vrb
+*.synctex(busy)
 indent.log
 semantics/paper.aux
 semantics/paper.bbl
