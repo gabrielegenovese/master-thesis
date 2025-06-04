@@ -1,5 +1,5 @@
 \documentclass{beamer}
-\usetheme{boxes}
+\usetheme[numbering=fraction]{Madrid}
 
 \usepackage{graphicx}
 \usepackage{adjustbox}
@@ -11,14 +11,6 @@
 \usetikzlibrary{automata,positioning,shapes,snakes}
 \usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
 \pgfmathtruncatemacro\distance{1}
-
-
-\newcommand{\red}[1]{{\color{red} #1}}
-\newcommand{\green}[1]{{\color{green} #1}}
-\newcommand{\blue}[1]{{\color{blue} #1}}
-\newcommand{\brown}[1]{{\color{brown} #1}}
-\newcommand{\purple}[1]{{\color{purple} #1}}
-\newcommand{\gray}[1]{{\color{gray} #1}}
 
 
 \lstset{language=erlang, basicstyle=\sffamily\footnotesize,
@@ -68,8 +60,8 @@
 \begin{frame}{Challenges}
 	\begin{itemize}
 		\item \textbf{Undecidability:} Complete extraction is impossible in general.
-		\item \textbf{Scalability:} Large programs lead to complex choreographies.
 		\item \textbf{Approximation:} Over- and under-approximations may introduce noise.
+		\item \textbf{Scalability:} Large programs lead to complex choreographies.
 	\end{itemize}
 \end{frame}
 
@@ -163,6 +155,16 @@ client() $\to$
 \end{frame}
 
 \newcommand\dummy{C}
+\tikzset{
+	hpath/.style={
+			very thick,
+			line cap = round,
+			line join = round,
+			line width=0.1cm,
+			opacity=.70,
+			color = teal!30
+		}
+}
 \begin{frame}[fragile]{Bank account global-view}
 \begin{figure}[h!]
 	\centering
@@ -192,8 +194,8 @@ client() $\to$
 		\draw[->] (n_5) -- node[midway, above right=-2mm] {\dummy2→acc:NewValue} (n_9);
 		\draw[->] (n_9) -- node[midway, below right] {\dummy1→acc:NewValue} (n_13);
 
-% 		\draw[hpath] ($(n_1.center) + (-5pt,-5pt)$) -- (n_2.center) -- (n_5.north west) -- ($(n_5.center)+(-5pt,0)$) -- (n_5.south west) -- (n_8.center) -- ($(n_12.center) + (0pt,5pt)$);
-% 		\draw[hpath] ($(n_1.center) + (5pt,-5pt)$) -- (n_3.center) -- (n_5.north east)  -- ($(n_5.center)+(5pt,0)$) -- (n_5.south east)  -- (n_9.center) -- ($(n_13.center) + (0pt,5pt)$);
+		\draw[hpath] ($(n_1.center) + (-5pt,-5pt)$) -- (n_2.center) -- (n_5.north west) -- ($(n_5.center)+(-5pt,0)$) -- (n_5.south west) -- (n_8.center) -- ($(n_12.center) + (0pt,5pt)$);
+		\draw[hpath] ($(n_1.center) + (5pt,-5pt)$) -- (n_3.center) -- (n_5.north east)  -- ($(n_5.center)+(5pt,0)$) -- (n_5.south east)  -- (n_9.center) -- ($(n_13.center) + (0pt,5pt)$);
 
 		\foreach \n in {1,2,3,5,8,9,12,13}{
 				\node at (n_\n) {\n};
