@@ -1,0 +1,46 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+Observe that not all communication models are causally closed. It is the case for $\ppmodel$,  but it is immediate  to see that the property is not valid  for $\synchmodel$. Take for instance  MSC $M$ in Fig.~\ref{fig:rsc_ex},  its linearisation 
+$!m_1!m_2?m_1?m_2!m_3?m_3$ 
+  does not belong to $\linearisationsof{M_c}{\synchmodel}$.  To show that $\ppmodel$ is causally closed, 
+notice that $<$ can be replaced with $\porderof{M}$ in  Definition~\ref{def:queue-based-communication-model}.
+\begin{lemma}\label{lem:reformulation-of-ppmodel-def}
+    Let $e$ be an execution and  $M=\mscof{e}$.
+    Then $e$ is an execution of $\ppmodel$ if and only if
+    for any two send events $s_1=\send{p}{q}{\msg_1}$ and $s_2=\send{p}{q}{\msg_2}$ in $\sendeventsof{e}$, with $s_1 \porderof{M} s_2$,
+        one of the two holds:
+        \begin{itemize}
+            \item $s_2$ is unmatched, or
+            \item there exists $r_1,r_2$ such that $r_1 \porderof{M} r_2$, $\source(r_1)=s_1$, and $\source(r_2)=s_2$.
+        \end{itemize}
+\end{lemma}
+\begin{proof}
+    Assume that $e$ is a $\ppmodel$ execution.
+    Let $s_1=\send{p}{q}{\msg_1}$ and $s_2=\send{p}{q}{\msg_2}$ be two send events in $\sendeventsof{e}$ such that $s_1 \porderof{M} s_2$.
+    Then $s_1<s_2$ in $e$, because $<$ is a linearisation of $\porderof{M}$.
+    By  definition of $\ppmodel$, $s_2$ is unmatched or there exists $r_1,r_2$ such that $r_1 < r_2$, $\source(r_1)=s_1$, and $\source(r_2)=s_2$.
+    In the second case, $r_1 < r_2$ implies that
+    $r_1 \porderof{M} r_2$, because both $r_1$ and $r_2$ occur on the same process $q$.
+    Conversely, assume that $e$ and $M$ satisfy the above reformulation of the definition of $\ppmodel$. 
+    Let $s_1=\send{p}{q}{\msg_1}$ and $s_2=\send{p}{q}{\msg_2}$ be two send events in $\sendeventsof{e}$ such that $s_1 < s_2$.
+    Then $s_1 \porderof{M} s_2$
+    because $s_1$ and $s_2$ occur on the same process $p$.
+    By the reformulation of the definition of $\ppmodel$, $s_2$ is unmatched or there exists $r_1,r_2$ such that $r_1 \porderof{M} r_2$, $\source(r_1)=s_1$, and $\source(r_2)=s_2$.
+    In the second case, $r_1 \porderof{M} r_2$
+    implies that $r_1 < r_2$ because $<$ is a  linearisation of $\porderof{M}$.
+\end{proof}
+
+\begin{restatable}[]{lemma}{lemppiscasuallyclosed}\label{lem:pp-is-causally-closed}
+	$\executionsofmodel{\ppmodel}$ is causally-closed.
+\end{restatable}
+\begin{proof}
+    Let $M\in\mscsetofmodel{\ppmodel}$ 
+    and  $e$ be a linearisation of $M$.
+    We want to show that $e\in\executionsofmodel{\ppmodel}$.
+    By definition of $\mscsetofmodel{\ppmodel}$, 
+    there is an execution 
+    $e'\in\executionsofmodel{\ppmodel}$
+    such that $\mscof{e'}=M$.
+    By Lemma~\ref{lem:reformulation-of-ppmodel-def},
+    $e$ is also a $\ppmodel$ execution.
+\end{proof}

@@ -1,0 +1,55 @@
+\begin{tikzpicture}
+
+    \node[state, initial, initial text={}] (0) at (0,0) {$q_0$};
+    \node[state, accepting, color=blue] (1) at (2,4) {$q_1$};
+    \node[state, accepting, color=teal] (2) at (2,-2) {$q_2$};
+    \node[state, accepting, color=brown] (3) at (2,0) {$q_3$};
+    \node[state, accepting, color=red] (4) at (4,2) {$q_4$};
+    \node[state, accepting, color=red] (5) at (5,1) {$q_5$};
+    \node[state, accepting, color=blue] (6) at (8,4) {$q_6$};
+    \node[state] (7) at (6,4) {$q_7$};
+    \node[state, accepting, color=blue] (8) at (10,4) {$q_8$};
+    \node[state] (9) at (8,2) {$q_9$};
+    \node[state, accepting, color=red] (10) at (10,2) {$q_{10}$};
+    \node[state] (11) at (8,0) {$q_{11}$};
+    \node[state, accepting, color=brown] (12) at (10,0) {$q_{12}$};
+    \node[state] (13) at (6,-2) {$q_{13}$};
+    \node[state, accepting, color=teal] (14) at (8,-2) {$q_{14}$};
+    \node[state, accepting, color=teal] (15) at (10,-2) {$q_{15}$};
+
+    \draw[->] (0) edge node [sloped,above] {$m_1$} (1);
+    \draw[->] (0) edge node [sloped,below]{$m_2$} (2);
+    \draw[->] (0) edge node [above] {$m_3$} (3);
+    \draw[->, loop above] (1) edge node {$m_1$} (1);
+    \draw[->, loop below] (2) edge node {$m_2$} (2);
+    \draw[->, loop below] (3) edge node {$m_3$} (3);
+    \draw[->] (1) edge node [left] {$m_3$} (3);
+    \draw[->] (1) edge node [sloped, above] {$m_2$} (4);
+    \draw[->] (4) edge node [sloped, above] {$m_2$} (5);
+    \draw[->, loop right] (5) edge node [right] {$m_2$} (5);
+    \draw[->] (4) edge node [below] {$m_3$} (9);
+    \draw[->, bend right=20] (4) edge node [sloped, above] {$m_1$} (6);
+    \draw[->, bend left] (6) edge node [sloped, below] {$m_2$} (7);
+    \draw[->, bend left] (7) edge node [sloped, above] {$m_1$} (6);
+    \draw[->] (6) edge node [above] {$m_3$} (8);
+    \draw[->, loop right] (8) edge node [right] {$m_3$} (8);
+    \draw[->, bend left] (9) edge node [above] {$m_2$} (10);
+    \draw[->, bend left] (10) edge node [above] {$m_3$} (9);
+    \draw[->, loop right] (10) edge node [right] {$m_2$} (10);
+    \draw[->] (3) edge node [above] {$m_2$} (11);
+    \draw[->, bend left] (11) edge node [above] {$m_3$} (12);
+    \draw[->, bend left] (12) edge node [below] {$m_2$} (11);
+    \draw[->] (2) edge node [above] {$m_1$} (13);
+    \draw[->, bend left] (13) edge node [above] {$m_2$} (14);
+    \draw[->, bend left] (14) edge node [below] {$m_1$} (13);
+    \draw[->] (14) edge node [above] {$m_3$} (15);
+    \draw[->, loop right] (15) edge node [right] {$m_3$} (15);
+
+    % on ajoute des accolades
+    \draw [decorate,decoration={brace,amplitude=5pt}, color=blue] (12,4.5) -- node [midway, right=1em] {$k_1>k_2$} (12,3.5) ;
+    \draw [decorate,decoration={brace,amplitude=5pt}, color=red] (12,2.5) -- node [midway, right=1em] {$k_2>k_3$} (12,0.7) ;
+    \draw [decorate,decoration={brace,amplitude=5pt}, color=brown] (12,0.6) -- node [midway, right=1em] {$k_3>k_2$} (12,-.6) ;
+    \draw [decorate,decoration={brace,amplitude=5pt}, color=teal] (12,-1.5) -- node [midway, right=1em] {$k_2>k_1$} (12,-2.5) ;
+
+
+\end{tikzpicture}

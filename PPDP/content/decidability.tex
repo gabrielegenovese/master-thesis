@@ -1,0 +1,85 @@
+
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+In this section, we show that the realisability problem for complementable global types,
+given with an explicit complement, is decidable in both the synchronous and the p2p model.
+We first show the result for the synchronous model, which is simpler,
+and then extend it to the p2p model using a characterisation of implementability in the p2p model.
+
+\subsection{Realisability in the synchronous model}
+
+\begin{theorem}
+    \label{thm:decidability-of-implementability-in-synch}
+    Given a global type $\gt$ and its complement $\gt'$, it is decidable in PSPACE complexity whether  $\gt$ is deadlock-free realisable in $\synchmodel$.    
+%  The  problem is in PSPACE:
+  %  \begin{itemize}
+    %    \item Input: a global type $\gt$ and a complement $\gt'$ of $\gt$.
+      %  \item Question: is ?
+    %\end{itemize}
+\end{theorem}
+
+\begin{proof}(Sketch)
+    Condition~1 of Definition~\ref{def:realisability}
+    is equivalent to $$\msclanguageofcc{\productof{\projectionof{\gt}}} \cap \existentialmsclanguageof{\gt'} = \emptyset,$$
+    which reduces to checking the emptiness of $$\languageofnfa{\productof{\projectionof{\gt}}\otimes\gt'},$$
+    where $\otimes$ is the standard product of NFAs mimicking intersection. This equivalence holds 
+    because $\productof{\projectionof{\gt}}$ is commutation-closed. This condition
+    can be checked in non-deterministic logarithmic space in the size of the product NFA,
+    which yields a PSPACE algorithm if the exponential size NFA  $\preproductof{\projectionof{\gt}}$
+    is lazily constructed (note that it is not necessary to determinise the NFA, as we only need to check emptiness). 
+    Assuming that Condition~1 of Definition~\ref{def:realisability} holds,
+    the second condition of Definition~\ref{def:realisability}  is 
+    equivalent to whether all control states 
+    of $\preproductof{\projectionof{\gt}}$ that are reachable from the initial state
+    can reach a final state, which again can be checked in PSPACE.
+\end{proof}
+
+\subsection{Realisability in the $\ppmodel$ model}
+
+%When moving to $\ppmodel$ the proof is significantly more involved and we need to resort  to  an equivalent  characterisation of deadlock-free realisability in the $\ppmodel$ model.
+
+\input{proofs/thm-main-theorem-implementability.tex}    
+    
+A system $\system$ such that 
+$\msclanguageof{\system}{\ppmodel}\subseteq
+\prefixclosureof{\mscsetofmodel{\synchmodel}}$
+is called \emph{realisable with synchronous communications} (RSC) 
+in~\cite{germerie-phd}. Germerie~\emph{et al.}~\cite{germerie-phd}
+showed that the RSC property is decidable in PSPACE and that
+whether a RSC system may reach a regular set of configurations is
+also in PSPACE. As a consequence, conditions~1 and 2 of
+Theorem~\ref{thm:main-theorem-realisability} can be checked in PSPACE.
+Assuming that $\projectionof{\gt}$ is RSC, 
+$\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}$ can be coded as an effective regular set of
+executions, as well as $\prefixclosureof{\mscsofcfsms{\projectionof}{\ppmodel}}$,
+and Condition~3 of Theorem~\ref{thm:main-theorem-realisability} reduces to checking the inclusion of
+two exponential size NFA, which can be checked in PSPACE using a lazy construction of the NFAs.
+
+
+% It remains to show that the third condition of
+% Theorem~\ref{thm:main-theorem-implementability}
+% is decidable in PSPACE. 
+% This relies on the following lemma that states that 
+% condition~3 of Theorem~\ref{thm:main-theorem-realisability} is equivalent to
+% being dead-lock free in the sense of Definition~\ref{def:orphan-deadlock-free}.
+
+% \begin{restatable}{lemma}{eventualterminationonmsc}\label{lem:eventual-termination-can-be-checked-on-mscs-for-p2p}
+%     $\executionsof{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}=\prefixclosureof{\executionsof{\projectionof{\gt}}{\ppmodel}}$ is equivalent to
+%     is equivalent to $\gt$ being deadlock-free in $\ppmodel$.
+% \end{restatable}
+% \input{proofs/lem-eventual-termination-can-be-checked-on-mscs-for-p2p.tex}
+
+From these results we can conclude that it can be decided in PSPACE that a given $\gt$,
+together with a complement hint, is deadlock-free realisable in the $\ppmodel$ model.
+ \begin{theorem}\label{thm:decidability-of-implementability-in-p2p}
+   
+   Given a complementable global type $\gt$ and its complement $\gt'$,     it is decidable in PSPACE complexity whether $\gt$ is deadlock-free realisable in $\ppmodel$.
+   
+%       The following problem is in PSPACE:
+ %\begin{itemize}
+  %      \item Input: a complementable global type $\gt$ and a complement $\gt'$ of $\gt$.
+    %    \item Question: is $\gt$ deadlock-free realisable in $\ppmodel$?
+    %\end{itemize}
+\end{theorem}
+

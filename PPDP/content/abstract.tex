@@ -1,0 +1,23 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+
+%TITLE: Realisability and Complementability of Multiparty Session Types 
+
+
+%Multiparty session types (MPST) are a type-based approach for specifying message-passing distributed systems.
+%MPST rely on the notion of global type specifying the global behaviour and local types which are the projections of the global behaviour onto each local participant. An essential property of global types is implementability, i.e., whether the composition of the local behaviours conforms to those specified by the global type. 
+%MPST have been studied extensively but almost solely for peer-to-peer communications. 
+%In this paper, we generalise the implementability problem to any communication model.
+%First, we show that if a global type is implementable in an arbitrary communication model,
+%then it is implementable in the synchronous model. Second, we show that if a global type is implementable in the synchronous model, then it is complementable, in the sense that there exists a global type that describes the complementary behaviour of the original global type.
+%Third, we give an algorithm to decide whether a complementable global type, given with an explicit complement, is 
+%implementable in a communication model. The algorithm is PSPACE in the size of the global type and its complement, when the communication model is fixed. Finally, we propose a complementation construction for global types with sender driven choice with a linear blowup in the size of the global type.
+
+
+Multiparty session types (MPST) are a type-based approach for specifying message-passing distributed systems.
+They rely on the notion of global type specifying the global behaviour and local types which are the projections of the global behaviour onto each local participant. An essential property of global types is realisability, i.e., whether the composition of the local behaviours conforms to those specified by the global type.
+We explore how realisability of MPST relates to their complementability, i.e., whether there exists a global type that describes the complementary behaviour of the original global type.
+First, we show that if a global type is realisable with p2p communications, then it is realisable with synchronous communications. Second, we show that if a global type is realisable in the synchronous model, then it is complementable, in the sense that there exists a global type that describes the complementary behaviour of the original global type.
+Third, we give an algorithm to decide whether a complementable global type, given with an explicit complement, is 
+realisable in p2p. The algorithm is PSPACE in the size of the global type and its complement. As a side contribution, we propose a complementation construction for global types with sender-driven choice with a linear blowup in the size of the global type.

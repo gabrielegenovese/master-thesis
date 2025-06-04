@@ -1,0 +1,88 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+\begin{proof}
+    We show each implication separately.
+    \begin{description}
+        \item[$\Rightarrow$:]
+        if $\cfsms$ is deadlock-free: $\executionsof{\acceptcompletion{\cfsms}}{\acommunicationmodel}\subseteq\prefixclosureof{\executionsof{\cfsms}{\acommunicationmodel}}$, 
+        then 
+        $\msclanguageof{\acceptcompletion{\cfsms}}{\acommunicationmodel}\subseteq
+        \prefixclosureof{\msclanguageof{\cfsms}{\acommunicationmodel}}$.
+        For this implication, $\acommunicationmodel$ can be any communication model.
+        Let $\msc\in\msclanguageof{\acceptcompletion{\cfsms}}{\acommunicationmodel}$, 
+       we show that $\msc\in\prefixclosureof{\msclanguageof{\cfsms}{\acommunicationmodel}}$.
+        By definition, there is an execution $e\in\executionsof{\acceptcompletion{\cfsms}}{\acommunicationmodel}$ such that $\msc=\mscof{e}$.
+        By hypothesis, there is a completion $e' \in\executionsof{\cfsms}{\acommunicationmodel}$ of $e$.
+        By definition, $\mscof{e'}\in\msclanguageof{\acceptcompletion{\cfsms}}{\acommunicationmodel}$,
+        so $\msc\in\prefixclosureof{\msclanguageof{\cfsms}{\acommunicationmodel}}$.
+
+        \item[$\Leftarrow$:] for  $\acommunicationmodel=\ppmodel$:
+        if  
+        $\msclanguageof{\acceptcompletion{\cfsms}}{\acommunicationmodel}\subseteq
+        \prefixclosureof{\msclanguageof{\cfsms}{\acommunicationmodel}}$,
+        then $\cfsms$ is deadlock-free.
+        Let $e\in\executionsof{\acceptcompletion{\cfsms}}{\acommunicationmodel}$ be an execution,
+        wez show that $e$ has a completion in $\executionsof{\cfsms}{\acommunicationmodel}$.
+        By definition, $\mscof{e}\in\msclanguageof{\acceptcompletion{\cfsms}}{\acommunicationmodel}$.
+        By hypothesis, there is a MSC $\msc'\in\msclanguageof{\cfsms}{\acommunicationmodel}$
+        such that $\mscof{e}\prefixordermsc\msc'$. By definition of $\prefixordermsc$ on MSCs,
+        there are two executions $e_1,e'$ such that 
+        $e_1\prefixorder e'$, $\mscof{e'}=\msc'$, 
+        and $\mscof{e_1}=\mscof{e}$.
+        Let $<$ be the binary relation on $\eventsof{M'}$ 
+        defined as $< \eqdef \torderstrictof{e}\cup <_1\cup <_2$, where:
+        \begin{itemize}
+            \item $\event <_1<\event'$ if $\event\not\in\eventsof{M}$,
+            $\event'\not\in\eventsof{M}$ and $\event <_{e'} \event'$;
+            \item $\event <_2\event'$ if $\event\in\eventsof{M}$ and $\event'\not\in\eventsof{M}$.
+        \end{itemize}
+        Note that $<_1$ and $<_2$ are transitive. We claim that $<$
+        is also transitive. Indeed, 
+        $$
+        \begin{array}{rcl}
+           \torderof{e}\cdot <_1 & = & <_1\\
+            <_1\cdot <_2 & = & <_1 \\
+            \torderof{e}\cdot<_2 & = & \emptyset \\
+            (<_1\cup <_2)\cdot \torderof{e} & = & \emptyset \\
+            (\torderof{e}\cup <_2)\cdot <_1 & = & \emptyset \\
+        \end{array}
+        $$
+        Moreover, $<$ is irreflexive, because $\torderof{e}$ is irreflexive and $<_1$ and $<_2$ are irreflexive.
+        Let $\leq$ denote the reflexive closure of $<$.
+        Then this is a partial order on $\eventsof{M'}$.
+        By construction, $\leq$ is actually a total order on $\eventsof{M'}$.       
+        Finally, we claim that $\leq$ is a linearisation of $M'$, i.e., $\porderof{M'}\subseteq \leq$.
+        Indeed, assume that $\event\porderstrictof{M'}\event'$, we show that $\event< \event'$:
+        \begin{itemize}
+            \item if $\event\in\eventsof{M}$ and $\event'\in\eventsof{M}$,
+            then $\event\porderstrictof{M} \event'$ (as $M$ is a prefix of $M'$), hence $\event\torderof{e} \event'$ 
+            (because $e$ is a linearisation of $M$),
+            and finally $\event < \event'$ by definition of $<$.
+            
+            \item if $\event\not\in\eventsof{M}$ and $\event'\not\in\eventsof{M}$,
+            then $\event\torderof{e'} \event'$ (because $e'$ is a linearisation of $M'$), 
+            therefore $\event <_1 \event'$ by definition of $<_1$, and finally $\event < \event'$ by definition of $<$.
+
+            \item if $\event\in\eventsof{M}$ and $\event'\not\in\eventsof{M'}$,
+            then $\event<_2 \event'$ by definition of $<_2$, therefore $\event < \event'$ by definition of $<$.
+        \end{itemize}
+        Therefore, $\leq$ is a linearisation of $M'$. Let $e''$ be the execution associated to $\leq$.
+        Then
+        \begin{itemize}
+            \item $e\prefixorder e''$ by definition of $\leq$;
+            \item $\mscof{e''}=M'$ as $\leq$ is a linearisation of $M'$;
+            \item $e''\in\executionsof{\cfsms}{\acommunicationmodel}$ because $e''$ is a linearisation of $M'$, $M'\in\msclanguageof{\cfsms}{\acommunicationmodel}$,
+            and $\ppmodel$ is causally closed (Lemma~\ref{lem:pp-is-causally-closed}).
+        \end{itemize}
+        Altogether, we have shown that $e$ has a completion in $\executionsof{\cfsms}{\acommunicationmodel}$, which ends the proof of 
+        the reverse implication.
+
+        \item[$\Leftarrow$:]   for $\acommunicationmodel=\synchmodel$:
+            the proof is similar to previous case. We define the linearisation $\leq$ of $M'$ 
+            in the exactly  same way, but we cannot use the fact that $\acommunicationmodel$ is causally closed.
+            Instead, we use the fact that both $<_e$ and  $<_1$ are synchronous linearisations,
+            and therefore $<$ is a synchronous linearisation as the concatenation of two synchronous linearisations.
+
+    \end{description}
+\end{proof}

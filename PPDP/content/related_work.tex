@@ -1,0 +1,90 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+In this paper, we investigated the realisability and complementability of MPSTs across two canonical communication models: synchronous and asynchronous ($\ppmodel$). 
+We reduce the task of checking realisability in the complex asynchronous setting to the simpler synchronous case, as long as the initial system satisfies key safety properties such as deadlock-freedom and absence of orphan messages.
+This reduction strongly depends on the notion of effective complementability. 
+Our results show that existing work -— such as sender-driven global types~\cite{DBLP:conf/cav/LiSWZ23} and protocols with at most three participants -— belongs to effectively complementable classes of global types and thus confirms the decidability thresholds that Alur et al.~\cite{DBLP:journals/tcs/AlurEY05} and Lohrey~\cite{DBLP:journals/tcs/Lohrey03} established.
+
+We believe that our results not only improve theoretical clarity but also are amenable to generalisation. This paper represents a first step towards a parametric framework for realisability checking, with potential applicability across diverse communication models. Throughout the paper, we have made a deliberate effort to explicitly state the hypotheses (related to the communication model) under which our theorems hold. 
+A particularly critical assumption is that the communication models in question must be causally closed (see Definition \ref{def:causally-closed-communication-model}). Based on this, we conjecture that our results can be extended to models such as bag and causally ordered systems, both of which satisfy causal closure. In contrast, models like mailbox  or those based on bounded FIFO channels lack this property and therefore require specialised analysis. We aim to explore these cases further and, ultimately, to develop a more comprehensive framework in future work.
+
+Apart from this generalisation,  we aim to extend the framework to cover more expressive classes of global types, including those that go beyond synchronous or (quasi-synchronous) behaviour. We also plan to revisit results on the realisability of MSCs, possibly linking criteria such as send-validity and receive-validity \cite{DBLP:conf/cav/LiSWZ23,DBLP:conf/ecoop/Stutz23} to our synchronous realisability conditions. This opens the door to formally investigating whether global types that are realisable in the synchronous model satisfy send-validity, or if this is a weaker or stronger condition—this remains an open and promising question.
+
+
+Our work brings that line of research into the realm of programming language design with MPST: we build upon the insights of MSC realisability (e.g., the importance of safety conditions for realisability) and apply them in a type-theoretic framework to obtain results directly applicable to real programming abstractions for concurrency. 
+In summary, by focusing on $\ppmodel$ and synchronous communication models, we shed new light on the implementability of multiparty protocols in practical distributed programming, overcoming the limitations of sender-driven choice and advancing the state of the art in MPST-based program verification.
+
+\subsubsection*{\bf Related works}
+We conclude with a brief excursus on related work. Naturally, the most closely related lines of research are those concerning MPST. Comprehensive surveys on the topic are available in \cite{Coppo2015, DBLP:conf/icdcit/YoshidaG20}.
+It is noteworthy that in standard MPST literature, realisability—often referred to as implementability—is typically addressed through syntactic restrictions on global types. In most cases, a global type is  implementable if a projection function exists. These syntactic constraints, along with the existence of the projection, imply that the global type is sender-driven, thus placing it within one of the complementable classes discussed in this paper.
+In contrast, a recent paper by Scalas and Yoshida~\cite{DBLP:journals/pacmpl/ScalasY19} offers a novel perspective. Their approach emphasizes session fidelity and deliberately abandons syntactic restrictions on session types. Instead, they adopt semantic criteria—validated through model checking—to establish implementability, marking a significant shift from the conventional syntactic paradigm or our approach.
+Although, the comparison is difficult as the underliniung models are substantially different, it is wort mentioning \cite{10.1145/3678232.3678245} that discusses projectability in the context of synchronous MPST. 
+
+
+
+The connection between communicating automata and behavioural types were 
+first explored by Villard \cite{villard-phd} for the binary case and Deniélou and Yoshida in \cite{DBLP:conf/esop/DenielouY12} for MPSTs and later exploited by Stutz \emph{et al.} in \cite{DBLP:conf/cav/LiSWZ23,DBLP:conf/ecoop/Stutz23}.
+Although our approach automata-theoretic approach of session types is not new, it is 
+perphaps not so well established, and most of the papers on MPST define them syntactically.
+We took a fundamentally semantic view of session types, considering them as the subclass of higher order message sequence charts 
+that specify only protocols that are realisable with synchronous communications. This point of view is highly debatable, but 
+helps to clarify the relation between MPST and HMSCs.
+
+
+In~\cite{DBLP:conf/cav/LiSWZ23,DBLP:conf/ecoop/Stutz23}, the authors revisited
+the theory of MPST projections through the lenses of realisability
+of MSCs, and proposed two criteria, called \emph{send validity} and {receive validity},
+that yield the first sound and complete
+characterisation of MPST implementable in the context of
+the $\ppmodel$ communication model, provided the global type is sender-driven.
+In particular, the second criteria, receive validity,
+is strongly justified by the choice of the communication model and is unsound for
+other communication models beyond $\ppmodel$, hence not generalisable. As already commented above %
+%Finally, we contrast our approach with existing work. 
+%Stutz et al.~\cite{DBLP:conf/cav/LiSWZ23} investigate asynchronous MPST implementability using an automata-theoretic approach, constructing communicating automata to represent protocol executions. 
+ our approach provides a semantic criterion for implementability that leverages a reduction to the synchronous case, and it identifies a wider decidable subclass of global types (effectively complementable protocols) that covers the class of systems considered by Stutz et al. as a special case. 
+ 
+On a more foundational level, global types can be seen as a special form of higher-order message sequence charts (HMCS, see~\cite{DBLP:journals/tcs/AlurEY05}) with synchronous communications. 
+Thus, the question of when a global specification is realisable by a distributed system is related to the classical MSC realisability problem studied by Alur et al. In particular, the implementability problem was formally introduced by Alur et al. \cite{DBLP:journals/tcs/AlurEY05} with early undecidability results, later simplified by Lohrey \cite{DBLP:journals/tcs/Lohrey03}. Our results refine these boundaries by showing that undecidability persists with four or more participants.
+Guanciale and Tuosto \cite{DBLP:journals/jlap/GuancialeT19} extended these results on pomsets, we plan to build on their work to generalise to other communication models.
+
+
+%As a matter of fact, most of the MPST theory focuses on the peer-to-peer communication model only. To the best of our knowledge, the few attempts in considering other communicating models for MPST 
+%only concern mailbox communications~\cite{DBLP:journals/pacmpl/FowlerASGT23,deliguoro_et_al:LIPIcs.ECOOP.2018.15}.
+
+%The second group of related works concerns the framework of implementability. In particular, QS systems are a generalisation of RSC systems as introduced in \cite{DBLP:journals/corr/abs-2110-00145}. The notion of "synchronizable"
+%communications can also be found as a special case in other works,
+%including existentially-bounded communications~\cite{DBLP:journals/fuin/GenestKM07} or $1$-synchronous communications~\cite{DBLP:conf/cav/BouajjaniEJQ18}. 
+%
+%Finally, although less related to the content of this paper, we want to point to discussions and relations among communication models:  \cite{DBLP:journals/dc/Charron-BostMT96,ENGELS2002253,DBLP:conf/fm/ChevrouH0Q19} and \cite{DBLP:journals/pacmpl/GiustoFLL23}.
+
+
+
+%\etienne{A rediscuter avec Cinzia. Il faudrait que chaque papier soit relie precisement à notre travail sur une de nos contributions. Ou alors on a aussi un section related work d'un point de vue "historique", sans forcement de lien plus profond avec notre travail, mais il faudrait distinguer les deux types de related works, historiques, et concurrentiels/complementaires.}
+
+
+
+
+%\etienne{Pour moi l'un des "breakthrough" de Stutz c'est davoir defini la projection de maniere inconditionnelle, meme pour les global types non implementable. C'est trivial mais la communaute session types ne l'avait pas fait avant, il me semble}
+%\cinzia{Je ne comprends pas ce que tu veux dire}
+
+%\etienne{Il faudrait dire que l'on aimerait relier ces deux critères à nos resultats, en particulier send validity qui semble assez fondamental: est-ce que l'on peut dire que les global types implementables en synchrone sont ceux qui satisfont send validity? condition plus faible? plus forte?}
+
+
+
+
+%\etienne{Citer Baudru-Morin pour l'implementabilite en bag.}
+
+
+%\etienne{Dans les personnes "trendy" a ne pas oublier: citer Bouajjani Enea pour leur papier CAV'07 qui introduit la technique de borderline violation. Citer aussi Azadeh Farzan, par exemple LICS'2023, sur les langages de mots avec des lettres qui commutent (a creuser)}
+
+%\cinzia{A part le dernier, ce 'est plus applicable }
+
+
+%A CITER \cite{DBLP:conf/snpd/BaudruM03}.
+
+%A CITER: un vieux papier avec Jules sur les binary session types (appelés communication contracts)
+%interprétés dans des modèles de communication non fiables (avec des pertes de messages, des duplications, etc.).
+%\cite{DBLP:conf/wsfm/LozesV11}.
+

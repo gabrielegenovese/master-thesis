@@ -1,0 +1,16 @@
+\begin{proof}
+    Let $\cfsms=\projectionof{\gt}$.
+    \begin{description}
+        \item[$\Rightarrow$]
+            Let $e\in\executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}\setminus \executionsofcfsms{\cfsms}{\acommunicationmodel}$.
+            By the left-hand equality, $e$ is a strict prefix of some
+            $e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel} \subseteq \executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}$;
+            hence $\cfsms$ can extend $e$, so the reached configuration is not a dead-lock.
+        \item[$\Leftarrow$]
+            First inclusion is trivial because every word of $\executionsofcfsms{\cfsms}{\acommunicationmodel}$ is accepted by $\cfsms$.
+            For the reverse inclusion, let $e\in\executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}$
+            If $e\in \executionsofcfsms{\cfsms}{\acommunicationmodel}$ we are done; otherwise deadlock freedom supplies an extension $e'$ of $e$ that is in
+             $\executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}$; iterate until a configuration of $\cfsms$ in which all peers are final is met. 
+            The concatenation of the successive extensions belongs to $\executionsofcfsms{\cfsms}{\acommunicationmodel}$ and has $e$ as prefix.
+    \end{description}
+\end{proof}

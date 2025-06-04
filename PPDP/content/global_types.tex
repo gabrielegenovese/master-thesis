@@ -1,0 +1,195 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+
+
+In this section, we define global types. We deviate from the standard definition to allow for more liberal behaviours. In our setting, global types are automata that describe a language of MSCs. 
+%and explain how they can further describe a language of executions when the communication model
+%is fixed. We conclude with the definition of implementability of a global type.
+An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ with $p\neq q$;
+we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and write $\labelalphabet$
+to denote the finite set of arrows.
+
+\begin{definition}[Global Type]
+    A global type $\gt$ is a deterministic finite state automaton over the alphabet $\labelalphabet$.
+\end{definition}
+
+%% DIRE EN QUOI C'EST PLUS GENERAL
+% Notice that our definition is slightly more general then the standard one (such as that in \cite{HondaYC08}). 
+
+
+%\begin{remark} We do not require global types 
+%to have sender-driven choice, as in \cite{DBLP:conf/cav/LiSWZ23}.
+%\end{remark}
+
+The projection of a global type $\gt$ on a process $p$ is the CFSM $\gt_p$ obtained by 
+replacing each arrow $\marrow{q}{r}{\msg}$ of a transitions
+of $\gt$ by the corresponding action of $p$ (either $\send{p}{r}{\msg}$ if $p=q$, or $\recv{q}{p}{\msg}$ if $p=r$, 
+or $\varepsilon$ otherwise).
+
+\begin{definition}[Projected system of CFSMs]\label{def:projected-system}
+    The projected system of CFSMs $\projectionof{\gt}$ 
+    associated to a global type $\gt$ is the tuple $(\gt_p)_{p\in\Procs}$.
+\end{definition}
+
+
+%\etienne{Notion de produit synchrone: faire une definition plus marquante? dire que c'est le global type "naturel" d'un systeme?}
+Conversely, for every system, we can associate a global type computing its synchronous product. 
+Let $\cfsms=(\mathcal A_p)_{p\in\Procs}$ be a system of CFSMs, where 
+$\mathcal A_p=(L_p,\Actp,\delta_p,l_{0,p},F_p)$ is the CFSM associated to process $p$.
+The \emph{synchronous product} of $\cfsms$ is the NFA $\preproductof{\cfsms}=(L,\labelalphabet,\delta,l_{0},F)$, where
+$(L,\labelalphabet,\delta,l_{0},F)$ where $L=\Pi_{p\in\Procs}L_p$, 
+$l_0=(l_{0,p})_{p\in\Procs}$, $F=\Pi_{p\in\Procs}F_p$, and
+$\delta$ is the transition relation defined by
+$(\vec l,\marrow{p}{q}{m},\vec l')\in\delta$ if
+$(l_p,\send{p}{q}{m},l'_p)\in\delta_p$,
+$(l_q,\recv{p}{q}{m},l'_q)\in\delta_q$,
+and $l'_r=l_r$ for all $r\not\in\{p,q\}$. 
+
+Note that, in general,  $\preproductof{\cfsms}$ is not a global type, as it may be non-deterministic. 
+However, one can compute its determinisation $\productof{\gt}\eqdef\detof{\preproductof{\cfsms}}$ by standard powerset construction obtaining a  global type.
+
+We write $\labeltoexec{w}$ to denote the synchronous execution coded by the sequence of
+arrows $w$, i.e., the execution obtained by replacing each arrow $\marrow{p}{q}{m}$ of $w$ with the 
+execution $\send{p}{q}{m}\cdot\recv{p}{q}{m}$.
+We write $\labeltomsc{w}$ to denote the MSC $\mscof{\labeltoexec{w}}$.
+
+A global type defines a language of MSCs in two different ways, one existential and one universal.
+Let $\labellanguageof{\gt}$ be the set of 
+sequences of arrows $w$ accepted by $\gt$.
+Note that for 
+$w\in\Arrows^*$, the function $w \mapsto\labeltomsc{w}$ with $ \labeltomsc{w}\in\mscsetofmodel{\synchmodel}$ is not injective, as two arrows with disjoint pairs of processes
+commute. We write $w_1\sim w_2$ if 
+$\labeltomsc{w_1}=\labeltomsc{w_2}$, and
+$[w]$ for the equivalence class of $w$ wrt $\sim$.
+The existential MSC language $\existentialmsclanguageof{\gt}$ of a global type $\gt$ is the set 
+of MSCs that admit at least one representation as a sequence of arrows in $\labellanguageof{\gt}$,
+and the universal MSC language $\universalmsclanguageof{\gt}$ of a global type $\gt$ is the set
+of MSCs whose representations as a sequence of arrows are 
+all in $\labellanguageof{\gt}$:
+
+\iftwocolumns
+$$
+\begin{array}{rl}
+\existentialmsclanguageof{\gt}\eqdef & \{\labeltomsc{w}\mid w\in\labellanguageof{\gt}\}\\
+\universalmsclanguageof{\gt}\eqdef & \{\labeltomsc{w}\mid [w]\subseteq\labellanguageof{\gt}\}.
+\end{array}
+$$
+\else
+$$
+\existentialmsclanguageof{\gt}\eqdef \{\labeltomsc{w}\mid w\in\labellanguageof{\gt}\}
+\qquad
+\universalmsclanguageof{\gt}\eqdef\{\labeltomsc{w}\mid [w]\subseteq\labellanguageof{\gt}\}.
+$$
+\fi
+
+\begin{definition}[Commutation-closed]
+    A global type $\gt$ is \emph{commutation-closed} if 
+    $$
+    \existentialmsclanguageof{\gt}=\universalmsclanguageof{\gt}.
+    $$
+\end{definition} 
+In that case, we write $\msclanguageofcc{\gt}{}$ for the common language. 
+As an example, any global type with $\#\Procs\leq 3$ is commutation-closed, as 
+any two arrows share at least one process and therefore do not commute.
+
+%\begin{definition}\label{def:commutation-closed-global-type}
+%  A global type $\gt$ is \emph{commutation-closed} if 
+%$\existentialmsclanguageof{\gt}=\universalmsclanguageof{\gt}$. 
+%\end{definition}
+
+
+%\cinzia{remove proposition and make it as plain text and move it to section 6 when it is needed for the decidability}
+% \begin{proposition}\label{prop:three-machines-implies-commutation-closed}
+%     Let $\gt$ be global type with $\#\Procs\leq 3$ and no machine sending messages 
+%     to itself.
+%     Then $\gt$ is  commutation-closed.
+% \end{proposition}
+% \begin{proof}
+%     It follows easily by observing that there are no commutative arrows.
+% \end{proof}
+
+
+% \cinzia{never used, to remove}
+% A MSC language $L\subseteq\mscsetofmodel{\synchmodel}$ is \emph{recognisable} if there is
+% a commutation-closed global type $\gt$ such that $L=\msclanguageofcc{\gt}$.
+
+\begin{proposition}\label{prop:universal-existential-synch-inclusion}
+    For all global type $\gt$, 
+    $$
+    \universalmsclanguageof{\gt} \subseteq \existentialmsclanguageof{\gt} \subseteq \msclanguageofsystem{\projectionof{\gt}}{\synchmodel}.
+    $$
+\end{proposition}
+
+\begin{proof}(Sketch)
+    The first inclusion is immediate from the definitions.
+    For the second inclusion, let $M\in \existentialmsclanguageof{\gt}$, we show that $M\in\msclanguageofsystem{\projectionof{\gt}}{\synchmodel}$.
+    By definition of $\existentialmsclanguageof{\gt}$, there is a word $w\in\languageofnfa{\gt}$ such that
+    $\mscof{w}=M$. Let $\rho$ be an accepting run of $\gt$ for $w$. For every $p\in\Procs$, let $\rho_p$ denote the run of $\gt_p$ (the machine of $p$ in 
+    $\projectionof{\gt}$) obtained by projecting $\rho$: note that we kept $\varepsilon$ transitions in $\gt_p$, see Definition~\ref{def:projected-system},
+    so $\rho_p$ is obviously defined. Then $\rho_p$ is an accepting run of $\gt_p$, therefore 
+    $M\in\msclanguageof{\gt}{\synchmodel}$ (by Definition~\ref{def:executions-of-cfsms}).
+\end{proof}
+
+\begin{proposition}\label{prop:product-is-commutation-closed}
+    For all system $\cfsms$ of communicating finite state machines, 
+    $\productof{\cfsms}$ is commutation-closed and
+    $$
+    \msclanguageof{\cfsms}{\synchmodel} = \msclanguageofcc{\productof{\cfsms}}.
+    $$
+\end{proposition}
+
+\begin{proof}(Sketch)
+    The runs of the synchronous executions $$!m_1?m_1\ldots!m_k?m_k$$ of $\cfsms$ are in one-to-one correspondence with the 
+    runs of the words $m_1\ldots m_k$ of $\preproductof{\cfsms}$.
+\end{proof}
+
+When a global type is implemented in a concrete system, its behaviour obviously depend on the chosen communication model. 
+
+\begin{definition}[Global Type Language]\label{def:global-type-language}
+    Let $\gt$ be a global type and $\acommunicationmodel$ a communication model. 
+    The language of $\gt$ in $\acommunicationmodel$ is the set
+    $$
+    \executionsof{\gt}{\acommunicationmodel}\eqdef
+    \bigcup\{\linearizationsof{M}{\acommunicationmodel}\mid M\in\existentialmsclanguageof{\gt}\}
+    $$
+\end{definition}
+
+
+\subsubsection*{Realisability}\label{sec:realisability}
+
+We have finally  collected all the definitions needed to introduce our notion of realisability
+of global types that is parametric in a given communication model.
+\begin{definition}[Deadlock-free realisability]\label{def:realisability}
+    A global type $\gt$ is \emph{deadlock-free realisable}\footnote{We sometimes say simply \emph{realisable} instead of \emph{deadlock-free realisable}.}
+    in the communication model
+    $\acommunicationmodel$
+    if the following two conditions hold:
+    \begin{enumerate}
+    \item $\executionsof{\projectionof{\gt}}{\acommunicationmodel} = 
+                \executionsof{\gt}{\acommunicationmodel}$
+    \item $\projectionof{\gt}$ is deadlock-free in $\acommunicationmodel$.
+    \end{enumerate}
+\end{definition}
+
+Condition~1 of Definition~\ref{def:realisability} corresponds to  \emph{global type conformance}: the executions of the projected system do not 
+deviate from the ones specified by the global type.
+
+
+Deadlock-free realisability is equivalent to the notion of 
+\emph{safe realisability} of ~\cite{DBLP:journals/tcs/AlurEY05} 
+when $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$.
+This is not the case for other communication models, our definition better captures the fact that a key factor for 
+realisability is deadlock-freedom and deadlock freedom is strongly dependent on the communication model being causally-closed. The following proposition is easily proved.
+
+\begin{proposition}[Global type conformance as an MSC property]%{proposition}{propmscversionofcond1ofrealizability}
+    \label{prop:msc-version-of-cond1-of-realizability}
+    Let $\executionsofmodel{\acommunicationmodel}\supseteq\executionsofmodel{\synchmodel}$, 
+   Condition~1 of Definition~\ref{def:realisability} is equivalent to
+    $\mscsofcfsms{\projectionof{\gt}}{\acommunicationmodel} \subseteq \existentialmsclanguageof{\gt}$.
+\end{proposition}
+    
+
+
+%\etienne{Explain the difference and why it matters}
+

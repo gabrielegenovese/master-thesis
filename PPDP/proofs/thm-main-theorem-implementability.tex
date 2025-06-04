@@ -1,0 +1,134 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+% \begin{lemma}\label{lem:synch-completion}
+%     Assume $e$ is a synchronous execution, $\msc$ is a synchronous
+%     MSC, and $\mscof{e}\prefixorder \msc$.
+%     Then there is a synchronous execution $e'$ such that
+%     $\msc=\mscof{e\cdot e'}$.
+% \end{lemma}
+
+% \begin{proof}
+%     Let $e=s_0r_0s_1r_1..s_nr_n$ be a synchronous execution and 
+%     $\msc$ is a synchronous MSC such that $\mscof{e}\prefixorder \msc$.
+%     Let $e''=s''_0r''_0s''_1r''_1..s''_{n''}r''_{n''}$ be a synchronous linearization of $\msc$.
+%     Since $\mscof{e}\prefixorder \msc$, we have that all events $s_i$ (and their respective $r_i$) 
+%     of $e$ are present in $e''$. Let $e'$ be the restiction of $e''$ to the events that are not in $e$.
+%     We get that $e'$ is a synchronous execution, and because $\mscof{e}\prefixorder \msc$, 
+%     no event of $e$ is causally dependent on an event of $e'$ in $\msc$. Thus, 
+%     $e'' \sim e\cdot e'$ and $\mscof{e\cdot e'}=\msc$.
+% \end{proof}
+
+\begin{theorem}\label{thm:pp-realizability-implies-synch-realizability}
+    If $\gt$ is deadlock-free realisable in $\ppmodel$, then $\gt$ is deadlock-free realisable in $\synchmodel$.
+\end{theorem}
+
+\begin{proof}
+Assume that $\gt$ is $\ppmodel$-realisable. We show that $\gt$ is $\synchmodel$-realisable by verifying the 
+two conditions of Definition~\ref{def:realisability}.   
+\begin{itemize}
+\item 
+    Since $\executionsofmodel{\synchmodel}\subseteq\executionsofmodel{\ppmodel}$, we have
+    $$\mscsofcfsms{\projectionof{\gt}}{\synchmodel}\subseteq\mscsofcfsms{\projectionof{\gt}}{\ppmodel}.$$
+    By Proposition~\ref{prop:msc-version-of-cond1-of-realizability} and the hypothesis that 
+    $\gt$ is $\ppmodel$-realisable, we have that
+    $$\mscsofcfsms{\projectionof{\gt}}{\ppmodel} \subseteq \existentialmsclanguageof{\gt}.
+    $$
+    Therefore, we have
+    $$\mscsofcfsms{\projectionof{\gt}}{\synchmodel} \subseteq \existentialmsclanguageof{\gt}$$
+    and by Proposition~\ref{prop:msc-version-of-cond1-of-realizability}, $\gt$ satisfies condition~1 of Definition~\ref{def:realisability}
+    for being deadlock-free realisable in $\synchmodel$.
+
+\item By Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} and condition~1, the condition~2 of
+    Definition~\ref{def:realisability} is equivalent to
+    $$
+        \mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\acommunicationmodel}\subseteq\prefixclosureof{\existentialmsclanguageof{\gt}}
+    $$
+    when $\acommunicationmodel$ is either $\ppmodel$ or $\synchmodel$.
+    We can therefore assume that 
+    $$
+        \mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}\subseteq\prefixclosureof{\existentialmsclanguageof{\gt}}
+    $$
+    and we show that 
+    $$
+        \mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\synchmodel}\subseteq\prefixclosureof{\existentialmsclanguageof{\gt}}
+    $$
+    This follows from the fact that
+    $$
+        \mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\synchmodel}\subseteq\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}
+    $$
+    because $\executionsofmodel{\synchmodel}\subseteq\executionsofmodel{\ppmodel}$.
+\end{itemize}
+\end{proof}
+
+%So we can state our main result.
+
+\begin{restatable}[Reduction to $\synchmodel$-implementability]{theorem}{maintheoremrealisability}
+    \label{thm:main-theorem-realisability}
+        A global type $\gt$ is  deadlock-free realisable in $\ppmodel$
+        if and only if the following four conditions hold:
+        \begin{enumerate}
+            \item $\msclanguageof{\projectionof{\gt}}{\ppmodel}\subseteq\prefixclosureof{\mscsetofmodel{\synchmodel}}$
+            \item $\projectionof{\gt}$ is orphan-free in $\ppmodel$, 
+            \item $\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}\subseteq\prefixclosureof{\mscsofcfsms{\projectionof{\gt}}{\ppmodel}}$, and 
+            \item $\gt$ is deadlock-free realisable in $\synchmodel$.
+        \end{enumerate}  
+\end{restatable}
+\begin{proof}
+We show both sides in turn:
+\begin{description}
+    \item[$\Rightarrow$]
+    We first show that the four conditions are necessary.
+    Let $\gt$ be a $\ppmodel$-realisable global type.
+    \begin{enumerate}
+        \item        
+            By Condition~2 of Definition~\ref{def:realisability},
+            $\projectionof{\gt}$ is deadlock-free in $\ppmodel$.
+            By Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch},
+            $$
+                \mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}\subseteq\prefixclosureof{\mscsofcfsms{\projectionof{\gt}}{\ppmodel}}.
+            $$
+            By Condition~1 of Definition~\ref{def:realisability},
+            $$
+                \mscsofcfsms{\projectionof{\gt}}{\ppmodel} = \existentialmsclanguageof{\gt} \subseteq \mscsetofmodel{\synchmodel}.
+            $$
+            Therefore $\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}\subseteq\prefixclosureof{\mscsetofmodel{\synchmodel}}$.
+   
+        \item Let $e\in\executionsof{\projectionof{\gt}}{\ppmodel}$;
+        we show that $e$ is orphan-free.
+        By Condition~1 of Definition~\ref{def:realisability},
+        $\mscof{e}\in\existentialmsclanguageof{\gt}$, therefore
+        $\mscof{e}$ is synchronous, and in particular orphan-free.
+       
+        \item $\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\ppmodel}\subseteq\prefixclosureof{\mscsofcfsms{\projectionof{\gt}}{\ppmodel}}$ 
+            by Condition~2 of Definition~\ref{def:realisability} and Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
+
+        \item  Follows from Lemma~\ref{thm:pp-realizability-implies-synch-realizability} 
+    \end{enumerate}
+\item[$\Leftarrow$]    Next we  show that the four conditions are sufficient.
+    Let $\gt$ be a global type that verifies the four conditions.
+%    \etienne{Ca marche pas! contre-exemple: $\gt = p->q:a + r->q:b$!}
+    We prove that $\gt$ is $\ppmodel$-realisable as it satisfies the two conditions of Definition~\ref{def:realisability}.
+    \begin{description}
+        \item[Condition 1]
+          By Proposition~\ref{prop:msc-version-of-cond1-of-realizability},
+          we show that 
+          $$
+          \mscsofcfsms{\projectionof{\gt}}{\ppmodel} \subseteq \existentialmsclanguageof{\gt}.
+          $$
+          By Condition~1 of Theorem~\ref{thm:main-theorem-realisability},
+          $$
+            \mscsofcfsms{\projectionof{\gt}}{\ppmodel} = \mscsofcfsms{\projectionof{\gt}}{\synchmodel}
+          $$
+          and by Condition~4 of Theorem~\ref{thm:main-theorem-realisability} and Proposition~\ref{prop:msc-version-of-cond1-of-realizability},
+          we have that  
+          $$
+            \mscsofcfsms{\projectionof{\gt}}{\synchmodel} \subseteq \existentialmsclanguageof{\gt}
+          $$
+          which concludes the proof of Condition~1.
+          \item[Condition 2]
+        follows from Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
+        and Condition~3 of Theorem~\ref{thm:main-theorem-realisability}.
+    \end{description}
+\end{description}
+\end{proof}

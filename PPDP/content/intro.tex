@@ -1,0 +1,158 @@
+% !TEX root =  ../mainPPDP.tex
+%!TEX spellcheck = en_GB
+
+The design of communication protocols for concurrent and distributed systems is a central concern in programming language research. 
+Modern systems —- from microservices to IoT networks -— rely on structured sequences of message exchanges between multiple parties. 
+In the family of behavioural types~\cite{DBLP:conf/concur/VasconcelosH93}, multiparty session types (MPST), as introduced by Honda et al.~\cite{HondaYC08,10.1145/2873052,DBLP:conf/icdcit/YoshidaG20}, have emerged as a powerful methodology to specify and verify such structured interactions. 
+An MPST defines a global type describing the communication protocol as a whole, which can be projected into local types for each participant.% (as opposed to binary session types \cite{10.1007/3-540-57208-2_35,10.1007/3-540-58184-7_118,10.1007/BFb0053567} that only describe binary exchanges).
+
+This type-based approach enables static verification of communication safety (no message type mismatches) and liveness properties (no deadlocks) by ensuring each party's code conformes to its local type. 
+In essence, MPSTs allow protocol designers to treat communication patterns as first-class abstractions, yielding a rigorous framework for building correct distributed applications. 
+
+In this work, we focus on the realisability problem, i.e., whether the local types projected from a global type can be recomposed into a concrete system that conforms to the intended global protocol\footnote{In classical MPST papers, this problem is also referred to as the implementability or projectability problem. We preferred to stick to realisability as a reference to the work by Alur et al. \cite{DBLP:journals/tcs/AlurEY05}.}. In classical MPST theory, protocols are often formulated under the sender-driven choice assumption: only one designated participant (the sender) decides between alternative message flow branches for all parties. 
+While this assumption simplifies theoretical analysis, it proves too restrictive for many real-world protocols. 
+Modern distributed applications typically involve multiple independent agents that can initiate interactions concurrently, requiring more flexible interaction patterns than a single centralised decision maker.
+To illustrate the limitation of sender-driven choice, consider a simplified publish/subscribe scenario inspired by the MQTT (Message Queuing Telemetry Transport) protocol~\cite{mqtt311}.  Suppose we  have two client
+\begin{wrapfigure}{r}{0.25\textwidth}
+  \begin{center}
+%\begin{figure}
+    \begin{tikzpicture}[>=stealth, node distance=2cm, auto]
+        % État initial
+        \node[state, initial, initial text={}, initial distance=3mm, minimum size=1.5em] (s0) {\tiny$s_0$};
+    
+        % États pour publication c1 -> c2
+        \node[state, minimum size=1.5em] (s1) [above right=2cm and 1cm of s0] {\tiny$s_1$};
+        \node[state, minimum size=1.5em] (s2) [right=2cm of s0] {\tiny$s_2$};
+    
+        % Boucle de publication de c1
+        \draw[->, bend left=40] (s0) to node[above,sloped]{\tiny$\gtlabel{c1}{b}{pub(m)}$}(s1);
+        \draw[->, bend right=20] (s1) -- node[above,sloped] {\tiny$\gtlabel{b}{c2}{pub(m)}$} (s0);
+
+        % Boucle de publication de c2
+        \draw[->, bend left=20] (s0) to node[above,sloped]{\tiny$\gtlabel{c2}{b}{pub(m)}$}(s2);
+        \draw[->, bend right=20] (s2) -- node[below,sloped]{\tiny$\gtlabel{b}{c1}{pub(m)}$} (s0);
+    \end{tikzpicture}
+    \caption{\label{fig:MQTT}MQTT protocol with two clients}
+     \end{center}
+\end{wrapfigure}
+%\end{figure}
+  processes (publisher/subscribers) $c_1$ and $c_2$ connected to a broker $b$. 
+Both clients can independently publish messages to the broker, which in turn forwards each message to the other client. % (see Figure~\ref{fig:MQTT}). 
+After the initial setup (e.g., subscriptions to topics not described here), either $c_1$ or $c_2$ may send a message at any time, without a predefined order. 
+This pattern cannot be  captured by a sender-driven global type, as the choice of which client sends a message next is not controlled by any of the  participants.  In a sender-driven MPST, one would have to arbitrarily fix one client as the decision maker for the communication branch, which fails to reflect the  nature of the interaction.
+%This example motivates the need to go beyond sender-driven protocols and to develop a theory of implementability for more general multiparty communications.
+
+% MQTT 2-clients protocol global type
+
+\subsubsection*{Contributions}In this work, we approach the realisability question from a language design perspective. We consider two  fundamental communication models for implementing MPST protocols: the asynchronous peer-to-peer ($\ppmodel$) model and the synchronous one.
+In the $\ppmodel$ model, processes communicate via point-to-point asynchronous message passing over FIFO channels, which is the standard mode for distributed systems.
+In the synchronous model, communications are rendezvous-based (handshakes where send and receive happen simultaneously), representing a globally synchronised message-passing semantics. 
+These two models are widely considered as canonical extremes in analysing distributed protocols. 
+A large amount of our approach generalises to even more communication models, but a full generalisation is beyond the scope of this paper,
+and we only reason on general communication models for purpose of defining a notion of realisability that is parametric in the communication model (see Definition~\ref{def:realisability}).
+
+In this work, we also investigate for the first time the question of the complementability of global types, 
+i.e., whether a global type can be complemented by another global type that describes all possible complementary behaviours.
+This notion may seem at first sight rather theoretical and unrelated to realisability, but our work reveals deep relations between
+these two notions.
+
+Our main contribution is to show that realisable global types form a subclass of the complementable ones.
+More in details, we establish the following results:
+
+\begin{itemize}
+\item Every global type realisable in the synchronous communication model is complementable (Theorem~\ref{thm:realisable-complementable}), and the complementation is
+effective (based on projection and NFA complementation)
+\item Realisability is decidable in PSPACE for complementable global types provided an explicit complement is also given as input,
+both in the synchronous communication model (Theorem~\ref{thm:decidability-of-implementability-in-synch}) and in the peer-to-peer model 
+(Theorem~\ref{thm:decidability-of-implementability-in-p2p}), the latter result being based on recent results on RSC systems~\cite{germerie-phd}.
+\item On the way, we show that if a global type is realisable in the peer-to-peer model, then it is also realisable in the synchronous one (Theorem~\ref{thm:pp-realizability-implies-synch-realizability}), which is not obvious, as 
+deadlock-freedom is not a property that is monotonic in the communication model (a more permissive communication model may both hide some deadlocks and trigger new ones)
+\item We collect several interesting observations about the question of the complementability of global types: not all global types are complementable (Example~\ref{ex:non-complementable-gt}),
+but global types with at most three participants are complementable (Corollary~\ref{coro:3-participants-complementable}), 
+as well as global types with sender-driven choices (Theorem~\ref{thm:sender-driven-choice-complementation}). For the latter, we provide
+a complementation procedure with a linear blowup in the size of the global type.
+\end{itemize}
+
+
+% The communication models mentioned before form a hierarchy from relaxed to more constrained communication models, either in terms
+% of executions~\cite{DBLP:conf/fm/ChevrouH0Q19}, or in terms of message sequence 
+% charts~\cite{DBLP:journals/pacmpl/GiustoFLL23}.
+% Several interesting properties turns out to be monotonic in the communication model in the following sense: if a property is satisfied in a communication model, then it is preserved for more relaxed (resp. more constrained) ones. 
+% This  is true, for instance, when checking for reachability of a configuration,
+% for unspecified receptions (the first message in a queue cannot be received by its
+% destination process), orphan messages (i.e., messages sent by a peer but never received), etc.
+% Unfortunately, implementability is not monotonic.
+% To better understand this, take the following  two examples. First, consider an example of a global type (in standard MPST syntax) that is implementable in the peer-to-peer model but not in the mailbox one:  $$\gt_1 = \gtlabel{p}{q}{\msg_1} . \gtlabel{r}{q}{\msg_2} . \mathsf{end}.$$
+%  This global type is implementable in the peer-to-peer model, 
+% because the projection $p\parallel q \parallel r= !\msg_1 \parallel ?\msg_1.?\msg_2\parallel !\msg_2$ is deadlock-free and session conformant. However, this global type is not implementable in the mailbox model, where all incoming messages of process $q$ are stored in a unique FIFO queue,
+% because $\msg_2$ could be sent and hence stored in the queue before $\msg_1$  and cause a deadlock.
+% Second, consider this example where the converse happens: 
+% %%
+% $$ 
+% \begin{array}{lll}
+% \gt_2 & = & \gtlabel{p}{q}{\msg_1} . \textcolor{red}{\gtlabel{p}{r}{\msg_2}} . \gtlabel{p}{q}{\msg_3} 
+%         . \textcolor{blue}{\gtlabel{q}{r}{\msg_4}} . \mathsf{end} 
+% \\
+% & + & \gtlabel{p}{q}{\msg_1'} . \textcolor{blue}{\gtlabel{q}{r}{\msg_4}} . \gtlabel{q}{p}{\msg_3'} 
+%         . \textcolor{red}{\gtlabel{p}{r}{\msg_2}} . \mathsf{end}  
+% \end{array}
+% $$
+% %%
+% This global type $\gt_2$ is depicted in Figure~\ref{fig:gt2}, it features two possible
+% scenarios, starting either with $\msg_1$ or $\msg_1'$, (that  are depicted on the left). 
+% It is not implementable in the peer-to-peer model, because the projection 
+% $p\parallel q \parallel r$ also admits the interaction where  $p$ and $q$ follow the first scenario, but $r$ follows the second scenario, resulting in a non synchronisable interaction (also depicted in Figure~\ref{fig:gt2}). However, this global type is implementable in the mailbox model, because the messages sent to $r$ are stored in a unique FIFO queue, and their order in the queue, is sufficient for  $r$ to  not confuse the two scenarios.
+% \begin{figure}
+%     \begin{tikzpicture}[scale=0.7]
+%         \begin{scope}
+%             \newproc{0}{p}{-2.7};
+%             \newproc{2}{q}{-2.7};
+%             \newproc{4}{r}{-2.7};
+
+%             \newmsgm{0}{2}{-0.3}{-0.3}{1}{0.5}{black};
+%             \newmsgm{0}{4}{-1.0}{-1.0}{2}{0.25}{red};
+%             \newmsgm{0}{2}{-1.7}{-1.7}{3}{0.5}{black};
+%             \newmsgm{2}{4}{-2.4}{-2.4}{4}{0.5}{blue};
+%         \end{scope}
+
+%         \begin{scope}[xshift=7cm]
+%             \newproc{0}{p}{-2.7};
+%             \newproc{2}{q}{-2.7};
+%             \newproc{4}{r}{-2.7};
+
+%             \newmsgm{0}{2}{-0.3}{-0.3}{1'}{0.5}{black};
+%             \newmsgm{2}{4}{-1.0}{-1.0}{4}{0.5}{blue};
+%             \newmsgm{2}{0}{-1.7}{-1.7}{3'}{0.5}{black};
+%             \newmsgm{0}{4}{-2.4}{-2.4}{2}{0.25}{red};
+%         \end{scope}
+
+%         \begin{scope}[xshift=14cm]
+%             \newproc{0}{p}{-2.7};
+%             \newproc{2}{q}{-2.7};
+%             \newproc{4}{r}{-2.7};
+
+%             \newmsgm{0}{2}{-0.3}{-0.3}{1}{0.5}{black};
+%             \newmsgm{0}{4}{-1.0}{-2.4}{2}{0.25}{red};
+%             \draw[>=latex,->] (0,-1.45) -- node [below, pos = 0.25] {$\msg_{3}$} (2,-1.45);
+%             \newmsgm{2}{4}{-1.95}{-1.95}{4}{0.5}{blue};
+%         \end{scope}
+
+%     \end{tikzpicture}
+%     \caption{The two interactions specified by $\gt_2$, and another unspecified interaction that happens in the projected system in the p2p semantics}\label{fig:gt2}
+% \end{figure}
+% %%
+
+
+% These two examples show that "implentability is not monotonic",
+% and suggest that every new communication model should prompt the development of a new ad hoc theory of implementable global types, with its own syntactic conditions.
+
+
+
+%\cinzia{add precision to contributions and fix Outline}
+\subsubsection*{Outline.} The paper is organised as follows: Section~\ref{sec:preliminaries} introduces the necessary background on executions, Message Sequence Charts, communication models and communicating finite state machines. 
+MPST and realisability are introduced in Section~\ref{sec:global_types}. Then Section \ref{sec:complementability} discusses the notions of effectively complementable and give examples of known global types that follow in this class. Finally Section~\ref{sec:decidability}  shows  our results on the reduction of realisability to the synchronous communication model based on the notion of effectively complementable global types.  
+Section \ref{sec:concl} concludes with some final remarks and discusses related works.
+%An appendix containing proofs and additional material has been included for the reviewer’s convenience.
+
+
+
