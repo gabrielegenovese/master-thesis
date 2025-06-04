@@ -13,7 +13,7 @@ A set $L$ of MSCs weakly implies an MSC $M$ iff for all $1\leq i \leq n$,
 there exists an MSC $M_i \in L$ such that $M|_i = M_i|_i$.
 \end{definition}
 
-\begin{definition}{Weakly realizable}
+\begin{definition}[Weakly realizable]
 The weak closure $L^w$ of a set $L$ of MSCs contains all the MSCs $L$ weakly implies.
 The set $L$ is weakly realizable iff $L=L^w$. The MSC-graph $G$ is said to be weakly
 realizable if the set $L(G)$ of MSCs is. Thus, a weakly realizable graph already contains
@@ -47,7 +47,7 @@ Given a bounded MSC graph G, checking if G is weakly realizable is undecidable.
 \begin{proof}
 The proof is a reduction from the post correspondence problem (PCP). In the paper \cite{alur2005realizability}
 they further reduce the problem to a relaxed version. First, they reduce PCP to OneSidedPCP and then to
-Relaxed PCP (RPCP). We skip this part as is not meaningful for the proof. We can state the RPCP to be the following
+Relaxed PCP (RPCP). We skip this part as it's not meaningful for the proof. We can state the RPCP to be the following
 problem: given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
 such that $x_{i_1}...x_{i_n}=y_{i_1}...y_{i_m}$, where $x_{i_j}, y_{i_j} \in \{v_{i_j},w_{i_j}\}$, for some
 index $i_l \  x_{i_l}\neq y_{i_l}$, and for all $j\leq m,y_{i_1}...y_{i_j}$ is a prefix of $x_{i_1}...x_{i_j}$.
