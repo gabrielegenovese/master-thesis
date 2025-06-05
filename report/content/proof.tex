@@ -2,26 +2,25 @@
 
 \subsection{Useful definitions}
 
-\begin{definition}[Global type]
-An \textit{arrow} is a triple $(p,q,m)\in \mathbb{P}\times\mathbb{P}\times\mathbb{M}$
-with $p\ne q$. We write \verb|Arr| to denote the finite set of arrows. 
-A global type $G$ is a deterministic finite state automaton over the alphabet \verb|Arr|.
+In our setting, global types are automata that describe a language of MSCs. 
+An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ with $p\ne q$;
+we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and write $\labelalphabet$
+to denote the finite set of arrows.
+
+\begin{definition}[Global Type]
+A global type $\gt$ is a deterministic finite state automaton over the alphabet $\labelalphabet$.
 \end{definition}
 
-\begin{definition}{\verb|rsc|-global type}
-A global type $G$ is a \verb|rsc|-global type if it has no unmatched 
-send events and there is a linearization $\rightsquigarrow$ where any 
-matched send event is immediately followed by its respective receive event.
-\end{definition}
-
+Informally, weakly-realizable means that it's realizable and deadlock is allowed.
+%% definire da linguaggio di G
 \begin{definition}[Weakly-realizable]
-Informally, realizable without deadlock-freedom.
-More formally, in the \verb|rsc|-global type context, it's the 
-weak closure $L^w$ of a set $L$ of \verb|rsc|-global type contains all the \verb|rsc|-global type $L$ weakly implies.
-The set $L$ is weakly realizable iff $L=L^w$. The \verb|rsc|-global type-graph $G$ is said to be weakly
-realizable if the set $L(G)$ of \verb|rsc|-global type is. Thus, a weakly realizable graph already contains
+It's the 
+weak closure $L^w$ of a set $L$ of global type contains all the global type $L$ weakly implies.
+The set $L$ is weakly realizable iff $L=L^w$. The global type-graph $G$ is said to be weakly
+realizable if the set $L(G)$ of global type is. Thus, a weakly realizable graph already contains
 all the implied scenarios.
 \end{definition}
+
 
 \begin{definition}[Relaxed Post Correspondence Problem (RPCP) problem]
 Given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
@@ -38,35 +37,37 @@ PCP problem by Alur, et al. \cite{alur2005realizability}.
 \subsection{Proof}
 
 \begin{theorem}
-Given a \verb|rsc|-global type $G$, checking if $G$ is (weakly)-realizable is undecidable.
+Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
 \end{theorem}
 
 \begin{proof}
-The proof proceeds via a reduction from the RPCP problem. 
+The proof proceeds via a reduction from the RPCP problem. Let's define some useful
+elements for the proof.
 
-Given a finite set $L$ of \verb|rsc|-global type, 
-let $L^*$ denote the \verb|rsc|-global type graph that consists of the \textit{complete}
-graph with $|L|$ vertices, one per \verb|rsc|-global type in the set $L$, dummy initial
-and terminal vertices $v_I$, $v_T$ with empty transition, and edges from
-$v_I$ to all vertices of $L$ and from those to $v_T$. Thus, a \verb|rsc|-global type of
-this graph is simply a concatenation of \verb|rsc|-global type from the set $L$.
+Given a finite set $L$ of global types, where each is defined as a deterministic
+finite state automaton over the alphabet $\labelalphabet$, we define $L^*$
+to be the language consisting of all finite concatenations of languages in $L$.
+To construct an automaton recognizing $L^*$, we introduce an initial state
+$v_I$ and a terminal state $v_T$, and for each automaton in $L$, we add
+a transition from $v_I$ to its initial state and from each of its final states
+to $v_T$. Additionally, we connect every final state of each automaton in $L$
+to the initial state of every other automaton in $L$. Thus, $L^*$ contains all
+MSCs that can be obtained by concatenating MSCs from individual languages in $L$.
 
-Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of
-RPCP, we build a set $L$ of \verb|rsc|-global type over 4 processes as follows.
-For each pair $(v_i, w_i)$ we build a global type $G^n_i$,
-which is depicted in Fig.~\ref{fig:gtype}. The double arrow denote that 
-an ACK message consisted of the same message is sent.
-Thus, in $G^n_i$ where $n\in\{0,1\}$, process $q$ sends $(i, n)$ to process $q$,
-then sends the index $i$ to process 4, and then process 4 sends $(i, 0)$ to process 3. 
-After that, process 2 sends the sequence of characters of $v_i$ to process 3 
-(note we assume $c$ is the length of $v_i$ and $d$ the length of $w_i$
-in the figure), $G^1_i$ is similar. Observe that the communication graph of each of these
-global types are strongly connected and involves all the processes, and
-hence, the global type graph $L^*$ is bounded.
+Given an instance $\Delta = {(v_1, w_1), \ldots, (v_m, w_m)}$ of RPCP,
+we build a set $L$ of languages over 4 processes as follows.
+For each pair $(v_i, w_i)$ we construct a language $\mathcal{L}_i^n$
+(where $n \in {0,1}$) consisting of MSCs specified by an automaton
+$A_i^n$ (described in Fig.~\ref{fig:gtype}).
 
-\newcommand{\arrmess}[3]{%
-  $#1 \xleftrightarrow{#3} #2$
-}
+In each global type $G_i^n$, process $q$ sends a message $(i,n)$ to itself,
+then sends the index $i$ to process 4; process 4 then sends $(i,n)$
+to process 3. After this, process 2 sends the characters of $v_i$
+(or $w_i$, depending on $n$) to process 3. This communication pattern
+ensures that the MSCs in $\mathcal{L}_i^n$ describe structured
+interactions with explicit acknowledgments.
+Observe that the communication graph of each MSC in $\mathcal{L}_i^n$
+is strongly connected and involves all processes.
 
 \begin{figure}[h]
 \centering
@@ -90,24 +91,30 @@ hence, the global type graph $L^*$ is bounded.
 \label{fig:gtype}
 \end{figure}
 
-We need to prove
+We need to prove:
 \begin{center}
-    $\Delta \in \text{RPCP}$ if and only if the global type $L^*$ is not realizable.
+$\Delta \in \text{RPCP}$ if and only if the language $L^*$ is not realizable.
 \end{center}
 
-First, we prove that if we have a solution of RPCP we can create $G_i^n$.
-All the proof follow the one of Alur. The only additional claim that we need to 
-prove is that the created global type is a \verb|rsc|-global type.
+\begin{itemize}
 
-\textbf{Claim 1:} $G_i^n$ is a \verb|rsc|-global type.
+  \item[$\Rightarrow$] Suppose there is a solution to RPCP: $\Delta = \{i_1,\ldots,i_k$\}
+  with $v_{i_1}\ldots v_{i_k} = w_{i_1}\ldots w_{i_k}$. Then, ...
+  
+  \item[$\Leftarrow$] If the language $L^*$ is not realizable,...
+
+\end{itemize}
+
+\textbf{Lemma.} Each $\mathcal{L}_i^n$ is a synch-language.
+
 \begin{proof}
-We just need to prove that all the possible linearization can be considered synchronous.
-Thanks to the ACK message, we have almost always the corresponding receive after the send.
-The only receive that can ``move'' is the ACK message from \arrmess{p}{s}{i}.
+We show that the MSCs in $\mathcal{L}_i^n$ admit only synchronous linearizations.
+Due to the presence of ACK messages, send and receive
+events are closely paired. The only possible reordering involves
+the ACK from \arrmess{p}{s}{i}, ...
+\end{proof}
+
 
 \end{proof}
 
-Lastly, we need to prove the other way, but we follow the same strategy of Alur.
-
-\end{proof}
 

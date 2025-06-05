@@ -55,16 +55,6 @@ The relaxed problem essentially says that must have the left side of the equival
 we must have also some tuple that are different, and that we can choose whatever side of tuple for the composition
 of the string. Now we reduce RPCP to weak realizability.
 
-\newcommand{\syncmess}[3]{%
-  \mess{#1}{#2}{#3}%
-  \mess{}{#3}{#2}%
-  \nextlevel
-}
-
-\newcommand{\asyncmess}[3]{%
-  \mess{#1}{#2}{#3}%
-  \nextlevel
-}
 
 \begin{figure}[h]
 \centering
@@ -74,12 +64,12 @@ of the string. Now we reduce RPCP to weak realizability.
     \declinst{P3}{P3}{}
     \declinst{P4}{P4}{}
 
-    \syncmess{$(i,0)$}{P1}{P2}
-    \asyncmess{$i$}{P1}{P4}
-    \syncmess{$(i,0)$}{P3}{P4}
-    \syncmess{$v_i^1$}{P2}{P3}
-    \syncmess{...}{P2}{P3}
-    \syncmess{$v_i^c$}{P2}{P3}
+    \syncmscmess{$(i,0)$}{P1}{P2}
+    \asyncmscmess{$i$}{P1}{P4}
+    \syncmscmess{$(i,0)$}{P3}{P4}
+    \syncmscmess{$v_i^1$}{P2}{P3}
+    \syncmscmess{...}{P2}{P3}
+    \syncmscmess{$v_i^c$}{P2}{P3}
 \end{msc}
 \caption{The $M_i^0$ MSC. For a string $u$, let $u_l$ denote the $l$’th character of the string.}
 \end{figure}
@@ -92,12 +82,12 @@ of the string. Now we reduce RPCP to weak realizability.
     \declinst{P3}{P3}{}
     \declinst{P4}{P4}{}
 
-    \syncmess{$(i,1)$}{P1}{P2}
-    \asyncmess{$i$}{P1}{P4}
-    \syncmess{$(i,1)$}{P3}{P4}
-    \syncmess{$w_i^1$}{P2}{P3}
-    \syncmess{...}{P2}{P3}
-    \syncmess{$w_i^d$}{P2}{P3}
+    \syncmscmess{$(i,1)$}{P1}{P2}
+    \asyncmscmess{$i$}{P1}{P4}
+    \syncmscmess{$(i,1)$}{P3}{P4}
+    \syncmscmess{$w_i^1$}{P2}{P3}
+    \syncmscmess{...}{P2}{P3}
+    \syncmscmess{$w_i^d$}{P2}{P3}
 \end{msc}
 \caption{The $M_i^1$ MSC. For a string $u$, let $u_l$ denote the $l$’th character of the string.}
 \end{figure}
@@ -205,22 +195,6 @@ regarding a participant $p\in P$.
 
 \subsubsection{Definitions}
 
-\newcommand{\send}[3]{%
-  #1\rhd #2 ! #3
-}
-
-\newcommand{\recv}[3]{%
-  #1\lhd #2 ? #3
-}
-
-\newcommand{\Epsilon}[0]{%
-  \mathcal{E}
-}
-
-\newcommand{\doublebrace}[1]{%
-  \{\!\!\{#1\}\!\!\}
-}
-
 \begin{definition}{CSM}
 A \textit{communicating state machine} (CSM) is $\mathsf{A} = \doublebrace{A_p}_{p\in P}$
 over $P$ and $V$ if $A_p$ is a finite state machine over $\Gamma_p$ for every $p \in P$,
@@ -232,12 +206,12 @@ each channel to a sequence of messages. We may write $\Epsilon(p, q)$ for $\Epsi
 We use $\overrightarrow{q}_p$ to denote the state of $p$ in $\overrightarrow{q}$. The
 relation, denoted $\to$, is defined as follows:
 \begin{itemize}
-  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\send{p}{q}{m}} (\overrightarrow{q}', \Epsilon')$
-  if $(\overrightarrow{q_p},\send{p}{q}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
+  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\defsend{p}{q}{m}} (\overrightarrow{q}', \Epsilon')$
+  if $(\overrightarrow{q_p},\defsend{p}{q}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
   for every participant $r\neq p$, $\Epsilon'((p,q)) = \Epsilon((p,q))\cdot m$ and $\Epsilon'(c) = \Epsilon(c)$
   for every other channel $c \in $ Chan.
-  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\recv{q}{p}{m}} (\overrightarrow{q}', \Epsilon')$
-  if $(\overrightarrow{q_p},\recv{q}{p}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
+  \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\defrecv{q}{p}{m}} (\overrightarrow{q}', \Epsilon')$
+  if $(\overrightarrow{q_p},\defrecv{q}{p}{m},\overrightarrow{q_p}') \in \delta_p, \overrightarrow{q_r} =\overrightarrow{q_r}'$
   for every participant $r\neq p$, $\Epsilon((p,q)) = m\cdot\Epsilon'((p,q))$ and $\Epsilon'(c) = \Epsilon(c)$
   for every other channel $c \in $ Chan.
   \item $(\overrightarrow{q}, \Epsilon) \xrightarrow{\epsilon} (\overrightarrow{q}', \Epsilon)$ if 
