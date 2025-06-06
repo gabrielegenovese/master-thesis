@@ -11,10 +11,10 @@ to denote the finite set of arrows.
 A global type $\gt$ is a deterministic finite state automaton over the alphabet $\labelalphabet$.
 \end{definition}
 
-Informally, weakly-realizable means that it's realizable and deadlock is allowed.
+Informally, weakly-realizable means that it is realizable and deadlock is allowed.
 %% definire da linguaggio di G
 \begin{definition}[Weakly-realizable]
-It's the 
+It is the 
 weak closure $L^w$ of a set $L$ of global type contains all the global type $L$ weakly implies.
 The set $L$ is weakly realizable iff $L=L^w$. The global type-graph $G$ is said to be weakly
 realizable if the set $L(G)$ of global type is. Thus, a weakly realizable graph already contains
@@ -34,6 +34,55 @@ of the string.
 RPCP is proven to be an undecidable problem by reduction from the classic
 PCP problem by Alur, et al. \cite{alur2005realizability}.
 
+%% def di m_synch
+
+
+A global type defines a language of MSCs in two different ways, one  
+existential and one universal. Let $\labellanguageof{\gt}$ be the set of  
+sequences of arrows $w$ accepted by $\gt$. Note that for $w \in \Arrows^*$,  
+the function $w \mapsto \labeltomsc{w}$ with  
+$\labeltomsc{w} \in \mscsetofmodel{\synchmodel}$ is not injective, as two  
+arrows with disjoint pairs of processes commute. We write $w_1 \sim w_2$ if  
+$\labeltomsc{w_1} = \labeltomsc{w_2}$, and $[w]$ for the equivalence class  
+of $w$ with respect to $\sim$.  
+
+The existential MSC language $\existentialmsclanguageof{\gt}{}$ of a global  
+type $\gt$ is the set of MSCs that admit at least one representation as a  
+sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC  
+language $\universalmsclanguageof{\gt}$ of a global type $\gt$ is the set of  
+MSCs whose representations as sequences of arrows are all in  
+$\labellanguageof{\gt}$:  
+
+$$
+\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid 
+w \in \labellanguageof{\gt}\} \qquad
+\universalmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid 
+[w] \subseteq \labellanguageof{\gt}\}.
+$$
+
+\begin{definition}[Commutation-closed]
+    A global type $\gt$ is \emph{commutation-closed} if
+    $$
+    \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
+    $$
+\end{definition}
+
+We write $\msclanguageof{\gt}{}$ for the common language.
+
+
+\begin{definition}[The $L^*$ global type]\label{def:lstar}
+Assume to have a finite set $L$ of MSCs, where  
+$L = \{m\ |\ m \in M_{\text{synch}}\}$. Let $G^*$ be the set of global types  
+$G$, where each global type is defined so that its language consists of a  
+single MSC in $L$ (i.e., $\msclanguageof{\gt}{M} = \{M\}$).  
+We define the global type $L^*_{N}$ as follows. Introduce an initial state  
+$v_I$ and a terminal state $v_T$. Then, add a transition from $v_I$ to all  
+initial states of the global types in $G^*$. Similarly, connect each final  
+state of every global type in $G^*$ to $v_T$. Furthermore, for all  
+$G, G' \in G^*$, connect each final state of $G$ to the initial state of  
+$G'$. Finally, $L^*$ is obtained as the determinization of $L^*_{N}$.
+\end{definition}
+
 \subsection{Proof}
 
 \begin{theorem}
@@ -44,62 +93,86 @@ Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
 The proof proceeds via a reduction from the RPCP problem. Let's define some useful
 elements for the proof.
 
-Given a finite set $L$ of global types, where each is defined as a deterministic
-finite state automaton over the alphabet $\labelalphabet$, we define $L^*$
-to be the language consisting of all finite concatenations of languages in $L$.
-To construct an automaton recognizing $L^*$, we introduce an initial state
-$v_I$ and a terminal state $v_T$, and for each automaton in $L$, we add
-a transition from $v_I$ to its initial state and from each of its final states
-to $v_T$. Additionally, we connect every final state of each automaton in $L$
-to the initial state of every other automaton in $L$. Thus, $L^*$ contains all
-MSCs that can be obtained by concatenating MSCs from individual languages in $L$.
+Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of RPCP, we  
+construct a set $L$ of MSCs over four processes as follows. For each pair  
+$(v_i, w_i)$, we define two MSCs, $M^0_i$ and $M^1_i$, as illustrated in  
+Fig.~\ref{fig:msc}.  
+In $M^0_i$, process~1 synchronously sends the label $(i, 0)$ to process~2,  
+then transmits the index $i$ to process~4. Subsequently, process~4 sends  
+$(i, 0)$ synchronously to process~3. After these control messages, process~2  
+sends the characters of $v_i$ synchronously to process~3 (where $c$ is the  
+length of $v_i$, and $d$ that of $w_i$, as indicated in the figure).  
+The MSC $M^1_i$ is constructed analogously, replacing $v_i$ with $w_i$ and
+0 with 1.  
+Observe that the communication graph of each MSC is strongly connected and  
+involves all four processes. Therefore, the MSC graph $L^*$ derived from $L$  
+is bounded. With the set $L$, and following the Definition~\ref{def:lstar},
+we can construct the global type $L^*$.
 
-Given an instance $\Delta = {(v_1, w_1), \ldots, (v_m, w_m)}$ of RPCP,
-we build a set $L$ of languages over 4 processes as follows.
-For each pair $(v_i, w_i)$ we construct a language $\mathcal{L}_i^n$
-(where $n \in {0,1}$) consisting of MSCs specified by an automaton
-$A_i^n$ (described in Fig.~\ref{fig:gtype}).
+% \begin{figure}[h]
+% \centering
+% \begin{tikzpicture}[->, node distance=24mm, on grid, auto]
+%   \node[state] (q0) {$q_0$};
+%   \node[state] (q1) [right=of q0] {$q_1$};
+%   \node[state] (q2) [right=of q1] {$q_2$};
+%   \node[state] (q3) [right=of q2] {$q_3$};
+%   \node[state] (q4) [right=of q3] {$q_4$};
+%   \node[state] (q5) [right=of q4] {$q_x$};
+%   \node[state] (q6) [right=of q5] {$q_y$};
 
-In each global type $G_i^n$, process $q$ sends a message $(i,n)$ to itself,
-then sends the index $i$ to process 4; process 4 then sends $(i,n)$
-to process 3. After this, process 2 sends the characters of $v_i$
-(or $w_i$, depending on $n$) to process 3. This communication pattern
-ensures that the MSCs in $\mathcal{L}_i^n$ describe structured
-interactions with explicit acknowledgments.
-Observe that the communication graph of each MSC in $\mathcal{L}_i^n$
-is strongly connected and involves all processes.
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[->, node distance=24mm, on grid, auto]
-  \node[state] (q0) {$q_0$};
-  \node[state] (q1) [right=of q0] {$q_1$};
-  \node[state] (q2) [right=of q1] {$q_2$};
-  \node[state] (q3) [right=of q2] {$q_3$};
-  \node[state] (q4) [right=of q3] {$q_4$};
-  \node[state] (q5) [right=of q4] {$q_x$};
-  \node[state] (q6) [right=of q5] {$q_y$};
-
-  \path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
-  \path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
-  \path (q2) edge[] node[above] {\arrmess{s}{r}{(i,n)}} (q3);
-  \path (q3) edge[] node[above] {\arrmess{q}{r}{x_i^1}} (q4);
-  \path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
-  \path (q5) edge[] node[above] {\arrmess{q}{r}{x_i^c}} (q6);
-\end{tikzpicture}
-\caption{The global type $G^n_i$ where $n\in\{0,1\}$ and $x\in\{v,w\}$.}
-\label{fig:gtype}
-\end{figure}
+%   \path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
+%   \path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
+%   \path (q2) edge[] node[above] {\arrmess{s}{r}{(i,n)}} (q3);
+%   \path (q3) edge[] node[above] {\arrmess{q}{r}{x_i^1}} (q4);
+%   \path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
+%   \path (q5) edge[] node[above] {\arrmess{q}{r}{x_i^c}} (q6);
+% \end{tikzpicture}
+% \caption{The global type $G^n_i$ where $n\in\{0,1\}$ and $x\in\{v,w\}$.}
+% \label{fig:gtype}
+% \end{figure}
 
 We need to prove:
 \begin{center}
-$\Delta \in \text{RPCP}$ if and only if the language $L^*$ is not realizable.
+$\Delta \in \text{RPCP}$ if and only if the global type $L^*$ is not weakly-realizable.
 \end{center}
 
 \begin{itemize}
 
-  \item[$\Rightarrow$] Suppose there is a solution to RPCP: $\Delta = \{i_1,\ldots,i_k$\}
-  with $v_{i_1}\ldots v_{i_k} = w_{i_1}\ldots w_{i_k}$. Then, ...
+  \item[$\Rightarrow$] Let's assume that
+  $R = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
+  for a solution to a generic RPCP problem instance, and the bits $a_j$ and 
+  $b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into 
+  the two (left and right)
+  long strings. Consider the new MSCs $M$ and $M'$ obtained from the sequences
+  $M = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M' = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
+  Executions of both of these (sequences of) MSCs must exist in any
+  realization of $L^*$. We then look at the projections $M|_1$, $M|_2$, $M|_3$,
+  and $M|_4$ of $M$, and $M'|_1$, $M'|_2$, $M'|_3$, $M'|_4$ of $M'$ onto the
+  4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
+  $M|_3$, and $M|_4$. The claim is that the combined MSC $M''$ is weakly
+  implied by $L^*$. By definition, the only thing to establish is that $M''$
+  is indeed an MSC, in the sense that it is acyclic, well-formed, and complete
+  and synchronous.
+
+  The only new situation in terms of communication in $M''$ is the
+  communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+  But the communication between $P_1$ and $P_4$ is consistent in
+  $M'|_1$ and $M|_4$ (i.e., the sequence of messages sent from $P_1$ to
+  $P_4$ in $M'|_1$ is equal to the sequence of messages received in $M|_4$),
+  and the communication between $P_2$ and $P_3$ is consistent in
+  $M'|_2$ and $M|_3$ because $R$ is a solution to the RPCP.
+
+  Furthermore, the acyclicity of $M''$ follows from the property of the
+  solution that the string formed by the first $j$ words on processes 1
+  and 2 is always a prefix of the string formed by the first $j$ words
+  on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
+  is sent before it needs to be received.
+
+  But note that $M''$ cannot itself be in $L^*$ because there must be
+  some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
+  after process 1 announces the index, what process 2 sends is not
+  identical to what process 3 receives.
+
   
   \item[$\Leftarrow$] If the language $L^*$ is not realizable,...
 

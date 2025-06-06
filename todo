@@ -15,8 +15,6 @@ confronti fra le principali def:
 - realyzability/impletability
 - sender driven (in stutz) che viene ritrovata da noi non so dove
 
-22 23 24 maggio no cinzia
-
 ----------------- riunione etien
 
 se sei p2p hai tutte le esecuzioni che corrispondono all'MSC
@@ -27,3 +25,12 @@ prova di marcus lohrey
 aggiungere la trasizione di sincronia per i
 M'' deve essere sincrono (da dimostrare)
 
+----------------- riunione etienne 2
+
+fifo auto A with accepting state
+quest: esiste acc. run? indecidibile in generale
+
+G_A  global type del automaton A s.t.
+G_A is safe realizabile iff non esiste acc state in A
+
+-----------------

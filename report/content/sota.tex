@@ -47,7 +47,7 @@ Given a bounded MSC graph G, checking if G is weakly realizable is undecidable.
 \begin{proof}
 The proof is a reduction from the post correspondence problem (PCP). In the paper \cite{alur2005realizability}
 they further reduce the problem to a relaxed version. First, they reduce PCP to OneSidedPCP and then to
-Relaxed PCP (RPCP). We skip this part as it's not meaningful for the proof. We can state the RPCP to be the following
+Relaxed PCP (RPCP). We skip this part as it is not meaningful for the proof. We can state the RPCP to be the following
 problem: given $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, determinate whether there are indices $i_1, ..., i_m$
 such that $x_{i_1}...x_{i_n}=y_{i_1}...y_{i_m}$, where $x_{i_j}, y_{i_j} \in \{v_{i_j},w_{i_j}\}$, for some
 index $i_l \  x_{i_l}\neq y_{i_l}$, and for all $j\leq m,y_{i_1}...y_{i_j}$ is a prefix of $x_{i_1}...x_{i_j}$.
@@ -72,6 +72,7 @@ of the string. Now we reduce RPCP to weak realizability.
     \syncmscmess{$v_i^c$}{P2}{P3}
 \end{msc}
 \caption{The $M_i^0$ MSC. For a string $u$, let $u_l$ denote the $l$’th character of the string.}
+\label{fig:msc}
 \end{figure}
 
 \begin{figure}[h]
@@ -133,7 +134,10 @@ and $M|_4$ of $M$, and $M'|_1$, $M'|_2$, $M'|_3$, $M'|_4$ of $M'$ onto the
 4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
 $M|_3$, and $M|_4$. The claim is that the combined MSC $M''$ is weakly
 implied by $L^*$. By definition, the only thing to establish is that $M''$
-is indeed an MSC, in the sense that it is acyclic, well-formed, and complete.
+is indeed an MSC, in the sense that it is acyclic, well-formed, and complete. 
+
+% TODO: AGGIUNGERE A QUESTA PARTE che deve essere sincrono e dimostrarlo
+% cioè appartiene all'insieme M_synch
 
 The only new situation in terms of communication in $M''$ is the
 communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
