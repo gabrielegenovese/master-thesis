@@ -2,11 +2,25 @@
 
 \subsection{Useful definitions}
 
+\begin{definition}[Synchronous communication model]\label{def:synch}
+An execution $\execution=(w,\source) \in \executionsofmodel{\synchmodel}$
+if for all send event $s\in\sendeventsof{e}$, $s+1$ is a receive event
+of $e$ and $\source(s+1)=s$.
+\end{definition}
+
+\begin{definition}[$\acommunicationmodel$-linearisable MSC]\label{def:linearisable-msc}
+An MSC $\mmsc$ is \textit{linearisable} in a communication model $\acommunicationmodel$ if  
+$\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$.
+We write $\mscsetofmodel{\acommunicationmodel}$ for the set of all MSCs linearisable in $\acommunicationmodel$.
+\end{definition}
+
+In other words, an MSC $M$ belongs to $\mscsetofmodel{\synchmodel}$ if
+all send events are immediately followed by their corresponding receive events.
+
 In our setting, global types are automata that describe a language of MSCs. 
 An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ with $p\ne q$;
 we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and write $\labelalphabet$
 to denote the finite set of arrows.
-
 \begin{definition}[Global Type]
 A global type $\gt$ is a deterministic finite state automaton over the alphabet $\labelalphabet$.
 \end{definition}
@@ -32,10 +46,7 @@ of the string.
 \end{definition}
 
 RPCP is proven to be an undecidable problem by reduction from the classic
-PCP problem by Alur, et al. \cite{alur2005realizability}.
-
-%% def di m_synch
-
+PCP problem by Alur,~et~al.~\cite{alur2005realizability}.
 
 A global type defines a language of MSCs in two different ways, one  
 existential and one universal. Let $\labellanguageof{\gt}$ be the set of  
@@ -70,20 +81,54 @@ $$
 We write $\msclanguageof{\gt}{}$ for the common language.
 
 
-\begin{definition}[The $L^*$ global type]\label{def:lstar}
-Assume to have a finite set $L$ of MSCs, where  
-$L = \{m\ |\ m \in M_{\text{synch}}\}$. Let $G^*$ be the set of global types  
-$G$, where each global type is defined so that its language consists of a  
-single MSC in $L$ (i.e., $\msclanguageof{\gt}{M} = \{M\}$).  
-We define the global type $L^*_{N}$ as follows. Introduce an initial state  
-$v_I$ and a terminal state $v_T$. Then, add a transition from $v_I$ to all  
-initial states of the global types in $G^*$. Similarly, connect each final  
-state of every global type in $G^*$ to $v_T$. Furthermore, for all  
-$G, G' \in G^*$, connect each final state of $G$ to the initial state of  
-$G'$. Finally, $L^*$ is obtained as the determinization of $L^*_{N}$.
+\begin{definition}[$G^*$]\label{def:gstar}
+Given a set of MSCs $M$, define $G^*$ to be the set of global types
+$\{G\ |\ \forall m \in M.\ \msclanguageof{M}{}\in\msclanguageof{\gt}{}\}$.
 \end{definition}
 
+%% scrivere proprio gli stati e le transizioni in maniera formale,
+% fare altra def per parti intermedie
+\begin{definition}[The $L^*$ global type]\label{def:lstar}
+Assume to have a finite set $L$ of MSCs, where  
+$L = \{m\ |\ m \in M_{\text{synch}}\}$. Let $G^*$ defined as
+Definition~\ref{def:gstar}.
+We define the global type $L^*_{N}$ as the following automata
+$\mathcal A = (Q,\Sigma, \delta, l_0, F)$ where:
+\begin{itemize}
+  \item $Q$ is a set of states where there are $\{v_I,v_T\}$ united with
+  all the state of the global types in $G^*$;
+  \item $\Sigma$ is an alphabet composed by the $\epsilon$ united with
+  all the labels of the global types in $G^*$;
+  \item $\delta:Q\times\Sigma\to 2^Q$ is the transition relation, and
+  we correlate: 
+  \begin{itemize}
+    \item $v_I$ to all initial states of the global types in $G^*$;
+    \item each final state of every global type in $G^*$ to $v_T$;
+    \item for all $G, G' \in G^*$, connect each final state of $G$
+    to the initial state of $G'$.
+  \end{itemize}
+  \item $l_0 = v_I$ is the initial state;
+  \item and F is the set accepting state compose by only $v_F$.
+\end{itemize}
+Finally, $L^*$ is obtained by the determinisation of $L^*_{N}$.
+\end{definition}
+Informally, we define $L^*$ as the global type that represent all the
+possible MSCs execution of a set of MSCs.
+
 \subsection{Proof}
+
+\begin{lemma}\label{lemma:minsynch}
+The MSC $M_i^n$ with $n \in \{0,1\}$ is in $\mscsetofmodel{\synchmodel}$.
+\end{lemma}
+
+\begin{proof}
+By Definition~\ref{def:linearisable-msc} and Definition~\ref{def:synch},
+we just need to show a linearization with all the send operations
+followed by the corresponding receive operations, that is
+$$
+\{~!m_1?m_1!m_2?m_2!m_3?m_3!m_4?m_4!m_5?m_5!m_6?m_6...~\}.
+$$
+\end{proof}
 
 \begin{theorem}
 Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
@@ -151,8 +196,9 @@ $\Delta \in \text{RPCP}$ if and only if the global type $L^*$ is not weakly-real
   4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
   $M|_3$, and $M|_4$. The claim is that the combined MSC $M''$ is weakly
   implied by $L^*$. By definition, the only thing to establish is that $M''$
-  is indeed an MSC, in the sense that it is acyclic, well-formed, and complete
-  and synchronous.
+  is indeed an MSC, in the sense that it is acyclic, well-formed, complete
+  and synchronous. This and the previous MSCs are all in
+  $\mscsetofmodel{\synchmodel}$ thanks to Lemma~\ref{lemma:minsynch}.
 
   The only new situation in terms of communication in $M''$ is the
   communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
