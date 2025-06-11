@@ -1,15 +1,18 @@
 \documentclass{beamer}
-\usetheme[numbering=fraction]{Madrid}
+\usetheme{metropolis}
 
 \usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{caption}
 \usepackage{adjustbox}
 \usepackage{listings}
-\usepackage{tikz}
 \usepackage{wrapfig}
 \usepackage{color}
 \usepackage{listings}
+
 \usetikzlibrary{automata,positioning,shapes,snakes}
 \usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 \pgfmathtruncatemacro\distance{1}
 
 
@@ -20,60 +23,229 @@
 
 
 \title{Choreographies for Program Understanding}
-\author{Gabriele Genovese et al.}
-\date{\today}
+\author{Gabriele Genovese, Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto,
+and Germ\'an Vidal}
+\date{}
 
 \begin{document}
 
-\frame{\titlepage}
+\maketitle
 
-% \begin{frame}{Overview}
-% \tableofcontents
-% \end{frame}
+\begin{frame}{Distributed Systems are Hard}
+Abstractions in order to simplify:
 
-\begin{frame}{Motivation}
-	\begin{itemize}
-		\item Distributed systems use message-passing for coordination.
-		\item Understanding communication behavior is challenging.
-		\item Existing choreography-based approaches focus on top-down development.
-		\item This paper promotes bottom-up extraction of choreographies for program understanding.
-	\end{itemize}
+\bigskip
+
+\tikzstyle{box} = [rectangle, rounded corners, draw=blue!60, fill=blue!10, thick,
+                   text width=7.5em, text centered, minimum height=2em]
+
+\centering
+\begin{tikzpicture}[node distance=1cm]
+\node (ind) [box] {Actor model\\(industry)};
+\node (sci) [box, right=of ind] {Choreographies\\(research)};
+\draw[->] (sci) -- (ind);
+\draw[->] (ind) -- (sci);
+\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Goals and Vision}
-	\begin{itemize}
-		\item Automatically extract global views from existing code.
-		\item Help understand interaction patterns and detect bugs.
-		\item Support debugging through graphical, analyzable global views.
-	\end{itemize}
+\begin{frame}{The Actor Model}
+\begin{columns}
+\column{0.48\textwidth}
+\begin{block}{Main concepts}
+\begin{itemize}
+    \item Process with mailbox
+    \item Asynchronous messaging
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{figure}
+\includegraphics[width=1.1\textwidth]{images/actors.png}
+\end{figure}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Requirements}
-	\begin{itemize}
-		\item Push-button extraction from real code (e.g., Erlang, Go).
-		\item Capture both correct and faulty behaviors.
-		\item Highlight misbehaviors like deadlocks and races.
-		\item Provide readable and precise graphical representations.
-	\end{itemize}
+\begin{frame}{The Actor Model}
+\begin{columns}
+\column{0.48\textwidth}
+\begin{block}{Ecosystem}
+\begin{itemize}
+    \item Erlang, Elixir, Scala
+    \item Akka (Java), Actix (Rust)
+    \item Go routines and channels
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{figure}
+\includegraphics[width=\textwidth]{images/pl.png}
+\end{figure}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Challenges}
-	\begin{itemize}
-		\item \textbf{Undecidability:} Complete extraction is impossible in general.
-		\item \textbf{Approximation:} Over- and under-approximations may introduce noise.
-		\item \textbf{Scalability:} Large programs lead to complex choreographies.
-	\end{itemize}
+\begin{frame}{Choreography Automata \small{[1]}}
+\begin{columns}
+\column{0.48\textwidth}
+\begin{block}{Informally:}
+\begin{itemize}
+    \item Choreography: describes distributed protocols
+    \item Paired with automata theory
+\end{itemize}
+\end{block}
+\column{0.45\textwidth}
+\begin{figure}
+\includegraphics[width=\textwidth]{images/chorauto.png}
+\end{figure}
+\end{columns}
+\vspace{0.5em}
+{\tiny [1] Barbanera et al. "Choreography automata." COORDINATION, 2020.}
 \end{frame}
 
-\begin{frame}{Examples}
-	\begin{itemize}
-		\item \textbf{Dining Philosophers:} Detects potential deadlock.
-		\item \textbf{Bank Account:} Reveals potential race in balance updates.
-	\end{itemize}
-	\vspace{0.5em}
-	Both examples are processed with the prototype tool \texttt{Chorer}.
+
+\tikzset{
+  state/.style={
+	 inner sep=1pt,
+	 minimum size = 4pt,
+	 draw,
+	 circle,
+	 font=\scriptsize,
+	 transform shape
+  },
+  mylabel/.style={
+	 font=\tiny,
+	 sloped,
+	 above
+  }
+}
+
+\begin{frame}{Global vs Local View}
+\begin{columns}
+\column{0.48\textwidth}
+\begin{block}{Global}
+\vspace{2em}
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, transform shape]
+	\node[state] (n_1) {1};
+	\node[state] (n_2) [right of=n_1] {2};
+	\node[state,accepting] (n_3) [right of=n_2] {3};
+	
+	\draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:hello} (n_2);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:bye} (n_3);
+\end{tikzpicture}
+\end{center}
+	
+\bigskip
+The communication system is seen as a whole.
+
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Local}
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, transform shape]
+	\node[state] (n_1) {1};
+	\node[state] (n_2) [right of=n_1] {2};
+	\node[state,accepting] (n_3) [right of=n_2] {3};
+	\node[state] (n_4) [below of=n_1] {1};
+	\node[state] (n_5) [right of=n_4] {2};
+	\node[state,accepting] (n_6) [right of=n_5] {3};
+	
+	\draw[->] (n_1) edge[bend left=0] node[mylabel] {!B:hello} (n_2);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {?B:bye} (n_3);
+
+	\draw[->] (n_4) edge[bend left=0] node[mylabel] {?A:hello} (n_5);
+	\draw[->] (n_5) edge[bend left=0] node[mylabel] {!A:bye} (n_6);
+\end{tikzpicture}
+\end{center}
+	
+An actor’s individual perspective.
+
+\end{block}
+\end{columns}
 \end{frame}
 
+
+\begin{frame}[fragile]{Deadlock}
+\begin{figure}[t]
+  \centering
+	 \begin{tikzpicture}[node distance=2cm, transform shape]
+        \node[state] (n_1) {1};
+        \node[state] (n_2) [above right of=n_1] {2};
+        \node[state] (n_3) [below right of=n_1, fill=red] {3};
+        
+        \draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:error} (n_3);
+        \draw[->] (n_1) edge[bend left=25]  node[mylabel] {A→B:data} (n_2);
+        \draw[->] (n_2) edge[bend left=25]  node[mylabel] {B→A:res} (n_1);
+      \end{tikzpicture}
+  \caption{A deadlock can occur if a non-final state without outgoing transitions is present.}
+  \label{fig:deadlock}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Aim}
+\centering
+\begin{tikzpicture}[
+    node distance=1cm,
+    block/.style={rectangle, draw=teal!60, fill=teal!10, rounded corners,
+                  text width=8em, align=center, minimum height=2em}]
+\node[block] (bridge) {Bridge theory and practice};
+\node[block, below=of bridge] (extract) {Extract global specification from code};
+\node[block, below=of extract] (tool) {Tool-based analysis};
+
+\draw[->] (bridge) -- (extract);
+\draw[->] (extract) -- (tool);
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Why}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Benefits}
+\begin{itemize}
+    \item Highlights bugs
+    \item Improves understanding of the code
+    \item Useful for legacy code
+    \item Educational potential
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{example-image-a}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Requirements and Problems}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Requirements}
+\begin{itemize}
+    \item Bottom-up analysis
+    \item Over-approximation
+    \item Mainstream language support
+    \item Simple notation
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{block}{Problems}
+\begin{itemize}
+    \item Undecidability
+    \item Complex models
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Motivating Examples}
+\textbf{Two example:}
+
+\bigskip
+
+\centering
+\begin{tikzpicture}[
+    example/.style={rectangle, draw=orange!60, fill=orange!10, rounded corners,
+                    text width=10em, align=center, minimum height=2em}]
+\node[example] (philo) {Dining Philosophers\\(deadlock)};
+\node[example, below=1cm of philo] (bank) {Bank Account\\(race condition)};
+
+% \draw[->] (philo) -- (bank);
+\end{tikzpicture}
+\end{frame}
 
 \begin{frame}[fragile]{Dining philosophers example}
 \begin{lstlisting}
@@ -96,21 +268,6 @@ fork() $\to$
 \end{frame}
 
 
-\tikzset{
-  state/.style={
-	 inner sep=1pt,
-	 minimum size = 4pt,
-	 draw,
-	 circle,
-	 font=\scriptsize,
-	 transform shape
-  },
-  mylabel/.style={
-	 font=\tiny,
-	 sloped,
-	 above
-  }
-}
 \begin{frame}[fragile]{Dining Philosophers global-view}
 \begin{figure}[t]
   \centering
@@ -214,21 +371,26 @@ client() $\to$
 \end{figure}
 \end{frame}
 
-
-\begin{frame}{Tool Support: Chorer}
-	\begin{itemize}
-		\item Parses Erlang programs and extracts local/global automata.
-		\item Uses static analysis and Graphviz DOT for output.
-		\item Detects deadlocks; supports heuristics to manage complexity.
-	\end{itemize}
-\end{frame}
-
 \begin{frame}{Conclusion}
-	\begin{itemize}
-		\item Choreographies can aid in understanding real-world message-passing code.
-		\item Bottom-up extraction complements traditional top-down design.
-		\item Future work includes better support for loops, recursion, and dynamic actors.
-	\end{itemize}
+\begin{block}{Summary}
+\begin{itemize}
+	\item Bridge the gap between programming and theoretical frameworks
+	\item Use of bottom-up and over-approx techniques
+\end{itemize}
+\end{block}
 \end{frame}
+
+\begin{frame}{Future Work}
+\begin{itemize}
+	\item WIP on a tool called Chorer
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{}
+\centering
+\Huge Thanks for listening!
+\end{frame}
+
 
 \end{document}
