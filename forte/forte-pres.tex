@@ -10,13 +10,20 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{pgfpages}
-\setbeameroption{show notes on second screen=right}
+% \setbeameroption{show notes on second screen=right}
 
 \usetikzlibrary{automata,positioning,shapes,snakes}
 \usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usetikzlibrary{shapes.geometric,arrows.meta}
 \pgfmathtruncatemacro\distance{1}
 
+\tikzset{
+  mylabel/.style={
+	 font=\tiny,
+	 sloped,
+	 above
+  }
+}
 
 \lstset{language=erlang, basicstyle=\sffamily\footnotesize,
   keywordstyle=\color{blue}, numberstyle=\tiny, numbers=none,
@@ -35,13 +42,14 @@ and Germ\'an Vidal}
 % title
 \maketitle
 \note{
-  Good afternoon, everyone. Today I’m presenting our work titled
-  “Choreographies for Program Understanding,” developed in collaboration
-  with Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto, and Germán Vidal.
+  Good afternoon, everyone. I'm Gabriele Genovese, and I'm a master
+  student of the University of Bologna. Today I’m presenting 
+  this work titled “Choreographies for Program Understanding,” 
+  developed in collaboration with Professors Ivan Lanese, 
+  Cinzia Di Giusto, Emilio Tuosto, and Germán Vidal.
   This work is about analyzing distributed systems from a global
-  perspective, even when we only have access to the local code with
-  an ad-hoc extraction techniques.
-  Let’s start by looking at the big picture of distributed systems.
+  perspective with an extraction technique,
+  even when we only have access to the local code.
 }
 
 % slide 1
@@ -56,19 +64,27 @@ Abstractions in order to simplify:
 
 \centering
 \begin{tikzpicture}[node distance=1cm]
-\node (ind) [box] {Actor model\\(industry)};
-\node (sci) [box, right=of ind] {Choreographies\\(research)};
+\node (ind) [box] {Distributed systems};
+\node (act) [box, below=of ind] {Actor model};
+\node (sci) [box, right=of ind] {Choreography};
+\node (auto) [box, below=of sci] {Choreography automata};
 \draw[->] (sci) -- (ind);
 \draw[->] (ind) -- (sci);
+\draw[->] (act) edge[bend left=0] node[mylabel,sloped=false,right] {instance of} (ind);
+\draw[->] (auto) edge[bend left=0] node[mylabel,sloped=false,,left] {instance of} (sci);
+% \draw[->] (auto) -- (act);
+% \draw[->] (act) -- (auto);
+
 \end{tikzpicture}
 \end{frame}
 \note{
-Distributed systems are complex by nature.
-To manage this complexity, we rely on abstractions
-that help structure and reason about interactions.
-In industry, the actor model is commonly used—think Erlang or Akka.
-Meanwhile, in academia, we focus on choreographies,
-which give a global view of the system behavior.
+So, we are in the context of distributed systems and
+distributed systems are complex by nature.
+To manage this complexity, computer scientist can up with abstractions
+that help to structure and reason about interactions in these systems.
+% In industry, the actor model is commonly used.
+% Meanwhile, in academia, we focus on choreographies,
+% which give a global view of the system behavior.
 In this talk, I’ll show how we bridge these two views.
 }
 
@@ -79,7 +95,7 @@ In this talk, I’ll show how we bridge these two views.
 \column{0.48\textwidth}
 \begin{block}{Main concepts}
 \begin{itemize}
-    \item Process with mailbox
+    \item Processes with mailbox
     \item Asynchronous messaging
 \end{itemize}
 \end{block}
@@ -104,12 +120,12 @@ In this talk, I’ll show how we bridge these two views.
 \begin{itemize}
     \item Erlang, Elixir, Scala
     \item Akka (Java), Actix (Rust)
-    \item Go routines and channels
+    % \item Go routines and channels
 \end{itemize}
 \end{block}
 \column{0.48\textwidth}
 \begin{figure}
-\includegraphics[width=\textwidth]{images/pl.png}
+  \includegraphics[width=\textwidth]{images/pl.png}
 \end{figure}
 \end{columns}
 \end{frame}
@@ -119,6 +135,18 @@ In this talk, I’ll show how we bridge these two views.
   Frameworks like Akka for Java and Actix for Rust are built around it.
   Even Go, although not actor-based, has a similar concurrency model
   using goroutines and channels.
+}
+
+
+\tikzset{
+  state/.style={
+	 inner sep=3pt,
+	 minimum size = 6pt,
+	 draw,
+	 circle,
+	 font=\scriptsize,
+	 transform shape
+  }
 }
 
 % slide 4
@@ -132,11 +160,18 @@ In this talk, I’ll show how we bridge these two views.
 \end{itemize}
 \end{block}
 \column{0.45\textwidth}
-\begin{figure}
-\includegraphics[width=0.9\textwidth]{images/chorauto.png}
-\end{figure}
+\begin{center}
+\begin{tikzpicture}[node distance=2cm, transform shape]
+	\node[state] (n_1) {1};
+	\node[state] (n_2) [right of=n_1] {2};
+	\node[state,accepting] (n_3) [right of=n_2] {3};
+	
+	\draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:hello} (n_2);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:hi} (n_3);
+\end{tikzpicture}
+\end{center}
 \end{columns}
-\vspace{0.5em}
+\vspace{1.5em}
 {\tiny [1] Barbanera et al. "Choreography automata." COORDINATION, 2020.}
 \end{frame}
 \note{
@@ -149,22 +184,6 @@ In this talk, I’ll show how we bridge these two views.
   by Barbanera et al.
 }
 
-
-\tikzset{
-  state/.style={
-	 inner sep=3pt,
-	 minimum size = 6pt,
-	 draw,
-	 circle,
-	 font=\scriptsize,
-	 transform shape
-  },
-  mylabel/.style={
-	 font=\tiny,
-	 sloped,
-	 above
-  }
-}
 
 % slide 5
 \begin{frame}{Global vs Local View}
@@ -199,7 +218,7 @@ The communication system is seen as a whole.
 \column{0.48\textwidth}
 \begin{block}{Local}
 \begin{center}
-\begin{tikzpicture}[node distance=1.5cm, transform shape]
+\begin{tikzpicture}[node distance=1.6cm, transform shape]
 	\node[state, draw=none] (n_0) [left of=n_1,node distance=0.8cm] {A:};
 	\node[state] (n_1) {1};
 	\node[state] (n_2) [right of=n_1] {2};
@@ -209,11 +228,11 @@ The communication system is seen as a whole.
 	\node[state] (n_5) [right of=n_4] {2};
 	\node[state,accepting] (n_6) [right of=n_5] {3};
 	
-	\draw[->] (n_1) edge[bend left=0] node[mylabel] {!B:hello} (n_2);
-	\draw[->] (n_2) edge[bend left=0] node[mylabel] {?B:hi} (n_3);
+	\draw[->] (n_1) edge[bend left=0] node[mylabel] {A!B:hello} (n_2);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {A?B:hi} (n_3);
 
-	\draw[->] (n_4) edge[bend left=0] node[mylabel] {?A:hello} (n_5);
-	\draw[->] (n_5) edge[bend left=0] node[mylabel] {!A:hi} (n_6);
+	\draw[->] (n_4) edge[bend left=0] node[mylabel] {B?A:hello} (n_5);
+	\draw[->] (n_5) edge[bend left=0] node[mylabel] {B!A:hi} (n_6);
 \end{tikzpicture}
 \end{center}
 	
@@ -225,13 +244,50 @@ An actor’s individual perspective.
 
 % slide 6
 \begin{frame}{Top-Down Approach}
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    every node/.style={font=\sffamily},
+    rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
+    circ/.style={circle, draw=black, minimum size=1cm},
+    arrow/.style={-{Stealth[scale=1.1]}, thick}
+]
+
+% Nodes
+\node[rect] (G) {\textcolor{red}{$\mathcal{G}$}};
+\node[circ, below=of G] (TB) {\textcolor{blue}{$L_\text{B}$}};
+\node[circ, left=of TB] (TA) {\textcolor{blue}{$L_\text{A}$}};
+\node[circ, right=of TB] (TC) {\textcolor{blue}{$L_\text{C}$}};
+
+\node[rect, below=of TA] (PA) {\textcolor{brown}{$P_\text{A}$}};
+\node[rect, below=of TB] (PB) {\textcolor{brown}{$P_\text{B}$}};
+\node[rect, below=of TC] (PC) {\textcolor{brown}{$P_\text{C}$}};
+
+\node[rect,draw=none,right=of TC] (LC) {\textbf{\textcolor{blue}{2. Local view}}};
+\node[rect,draw=none,above=of LC] (LG) {\textbf{\textcolor{red}{1. Global view}}};
+\node[rect,draw=none,below=of LC] (LG) {\textbf{\textcolor{brown}{3. Processes}}};
+
+% Arrows
+\draw[arrow] (G) -- (TA) node[midway, left] {Projection};
+\draw[arrow] (G) -- (TB);
+\draw[arrow] (G) -- (TC);
+
+\draw[arrow] (PA) -- (TA) node[midway, left] {Respect};
+\draw[arrow] (PB) -- (TB);
+\draw[arrow] (PC) -- (TC);
+
+\end{tikzpicture}
+\end{frame}
+
+% slide 7
+\begin{frame}{Top-Down Approach}
 \textbf{Steps:}
 \begin{enumerate}
   \item Write the global specification
-  \item Project to obtain the local specification
-  \item Write the local functions that respect the specification
+  \item Project to obtain the local specifications
+  \item Write the local programs that respect the specifications
 \end{enumerate}
-\textbf{Problem:} no way to include existing code and architecture.
+\textbf{Problem:} difficult to include existing code and architecture.
 \end{frame}
 \note{
   One classical approach is top-down:
@@ -243,17 +299,21 @@ An actor’s individual perspective.
 
 % slide 7
 \begin{frame}{Aim}
+\hspace{-10em}
 \centering
 \begin{tikzpicture}[
     node distance=1cm,
     block/.style={rectangle, draw=teal!60, fill=teal!10, rounded corners,
                   text width=8em, align=center, minimum height=2em}]
 \node[block] (bridge) {Debug and understand legacy code};
-\node[block, below=of bridge] (extract) {Extract global specification from code};
-\node[block, below=of extract] (tool) {Tool based on statical analysis};
-
-\draw[->] (bridge) -- (extract);
-\draw[->] (extract) -- (tool);
+\node[block, below=of bridge] (extr) {Extract global specification from code};
+\node[block, below=of extr] (tool) {Tool based on statical analysis};
+\node[block,fill=none,draw=none,left=0.5cm of bridge] (pr) {Problem:};
+\node[block,fill=none,draw=none,left=0.5cm of extr] (how) {How?};
+\node[block,fill=none,draw=none,left=0.5cm of tool] (supp) {Support};
+% aggiungere problem, methodology, tool support
+\draw[->] (bridge) -- (extr);
+\draw[->] (extr) -- (tool);
 \end{tikzpicture}
 \end{frame}
 \note{
@@ -265,13 +325,53 @@ An actor’s individual perspective.
 }
 
 % slide 8
+
+% slide 6
+\begin{frame}{Bottom-up Approach}
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    every node/.style={font=\sffamily},
+    rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
+    circ/.style={circle, draw=black, minimum size=1cm},
+    arrow/.style={-{Stealth[scale=1.1]}, thick}
+]
+
+% Nodes
+\node[rect] (PB) {\textcolor{brown}{$P_\text{B}$}};
+\node[rect, left=of PB] (PA) {\textcolor{brown}{$P_\text{A}$}};
+\node[rect, right=of PB] (PC) {\textcolor{brown}{$P_\text{C}$}};
+
+\node[circ, below=of PB] (TB) {\textcolor{blue}{$L_\text{B}$}};
+\node[circ, below=of PA] (TA) {\textcolor{blue}{$L_\text{A}$}};
+\node[circ, below=of PC] (TC) {\textcolor{blue}{$L_\text{C}$}};
+
+\node[rect, below=of TB] (G) {\textcolor{red}{$\mathcal{G}$}};
+
+\node[rect,draw=none,right=of TC] (LC) {\textbf{\textcolor{blue}{2. Local view}}};
+\node[rect,draw=none,below=of LC] (LG) {\textbf{\textcolor{red}{3. Global view}}};
+\node[rect,draw=none,above=of LC] (LG) {\textbf{\textcolor{brown}{1. Processes}}};
+
+% Arrows
+\draw[arrow] (TA) -- (G) node[midway, left] {Combination};
+\draw[arrow] (TB) -- (G);
+\draw[arrow] (TC) -- (G);
+
+\draw[arrow] (PA) -- (TA) node[midway, left] {Create};
+\draw[arrow] (PB) -- (TB);
+\draw[arrow] (PC) -- (TC);
+
+\end{tikzpicture}
+\end{frame}
 \begin{frame}{Bottom-up approach}
 \textbf{Extraction steps:}
 \begin{enumerate}
   \item Analyze an input source code
-  \item Create the local view
-  \item Combine the local view to create an approximation global view
+  \item Create the local views
+  \item Combine local views to create an approximated global view
 \end{enumerate}
+\textbf{Over-approximation:} explore all possible behaviors (including some that may not occur).
+% in order to ensure no potential issues are missed
 \end{frame}
 \note{
   So instead of top-down, we use a bottom-up approach:
@@ -283,18 +383,19 @@ An actor’s individual perspective.
 
 % slide 9
 \begin{frame}{Why}
-\begin{columns}
-\column{0.5\textwidth}
 \begin{block}{Benefits}
 \begin{itemize}
-  \item Highlights bugs (deadlock, race condition, etc...)
-  \item Improves understanding of the code: give also good behavior
+  \item Improves understanding of the code
+  \begin{itemize}
+    \item Give also good behavior
+  \end{itemize}
+  \item Highlight bugs
+  \begin{itemize}
+    \item Like deadlock, race condition, etc...
+  \end{itemize}
   % \item Educational potential
 \end{itemize}
 \end{block}
-\column{0.5\textwidth}
-\includegraphics[width=\linewidth]{example-image-a}
-\end{columns}
 \end{frame}
 \note{
   Why go through all this effort?
@@ -309,11 +410,11 @@ An actor’s individual perspective.
 % slide 10
 \begin{frame}{Requirements}
 \begin{itemize}
-  \item Automatic extraction using bottom-up and over-approximation techniques
-  \item Capture good behaviors and highlight misbehavior
-  \item Support multiple actors
-  \item Target mainstream language
-  \item Simple notation
+  \item Automatic extraction
+  \item Target mainstream languages
+  \item Support creation and removal of participants
+  \item Capture good behaviors and highlight misbehavior % vogliamo catturare bad beha senza crashare
+  \item Use a simple notation as output
 \end{itemize}
 \end{frame}
 \note{
@@ -329,10 +430,25 @@ An actor’s individual perspective.
 
 % slide 11
 \begin{frame}{Problems}
+
+
+\begin{columns}
+\column{0.52\textwidth}
 \begin{itemize}
-    \item Undecidability: we should decide termination
-    \item Huge descriptions: given the over-approximation approach
+  \item \textbf{Undecidability}: it would imply deciding termination
+  \begin{itemize}
+    \item Use of over-approximation
+  \end{itemize}
+  \item \textbf{Huge descriptions}: by nature of distributed systems
+  \begin{itemize}
+    \item Needs of abstraction mechanism
+  \end{itemize}
 \end{itemize}
+\column{0.47\textwidth}
+\begin{figure}
+\includegraphics[width=0.8\textwidth]{images/huge.png}
+\end{figure}
+\end{columns}
 \end{frame}
 \note{
   Naturally, there are challenges.
@@ -344,7 +460,7 @@ An actor’s individual perspective.
 }
 
 \begin{frame}{Motivating Examples}
-\textbf{Two example:}
+\textbf{Two examples:}
 
 \bigskip
 
@@ -360,25 +476,29 @@ An actor’s individual perspective.
 \end{frame}
 
 \begin{frame}[fragile]{Deadlock}
-\begin{figure}[t]
-  \centering
-	 \begin{tikzpicture}[node distance=2cm, transform shape]
-        \node[state] (n_1) {1};
-        \node[state] (n_2) [above right of=n_1] {2};
-        \node[state] (n_3) [below right of=n_1, fill=red] {3};
-        
-        \draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:error} (n_3);
-        \draw[->] (n_1) edge[bend left=25] node[mylabel] {A→B:req} (n_2);
-        \draw[->] (n_2) edge[bend left=25] node[mylabel] {B→A:res} (n_1);
-      \end{tikzpicture}
-  \caption{A deadlock can occur if a non-final state without outgoing transitions is present.}
-  \label{fig:deadlock}
-\end{figure}
+\vspace{1em}
+\textbf{Final state}: all the active participant are in a \textit{local} final state.
+
+\textbf{Deadlock}: it can occur if a non-final state without outgoing transitions is present.
+
+\begin{center}
+\begin{tikzpicture}[node distance=2cm, transform shape]
+  \node[state] (n_1) {1};
+  \node[state] (n_2) [above right of=n_1] {2};
+  \node[state] (n_3) [right of=n_1, fill=red,node distance=1.6cm] {3};
+  \node[state, accepting] (n_4) [below of=n_1,node distance=1.6cm] {4};
+  
+  \draw[->] (n_1) edge[bend left=0] node[mylabel,below] {A→B:error} (n_3);
+  \draw[->] (n_1) edge[bend left=25] node[mylabel] {A→B:req} (n_2);
+  \draw[->] (n_2) edge[bend left=25] node[mylabel] {B→A:res} (n_1);
+  \draw[->] (n_1) edge[bend left=0] node[mylabel,sloped=false,right] {A→B:end} (n_4);
+\end{tikzpicture}
+\end{center}
 \end{frame}
 
 \begin{frame}[fragile]{Dining Philosophers example}
 \begin{columns}
-\column{0.53\textwidth}
+\column{0.55\textwidth}
 \begin{lstlisting}
 philosopher(Fork1, Fork2) $\to$
   send req to Fork1,
@@ -396,7 +516,7 @@ fork() $\to$
   receive release from Phil,
   fork().
 \end{lstlisting}
-\column{0.46\textwidth}
+\column{0.44\textwidth}
 \textbf{Participants:}
 \begin{itemize}
   \item 2 philosophers
@@ -418,34 +538,68 @@ fork() $\to$
 \end{columns}
 \end{frame}
 
+\begin{frame}{Dining Philosophers example's local views}
+\textbf{Attention}: merge of redundant communication!
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+    \node[state] (n_1) {1};
+    \node[state] (n_2) [right of=n_1] {2};
+    \node[state] (n_3) [right of=n_2] {3};
+    
+    \draw[->] (n_1) edge[bend left=0] node[mylabel] {Philo!Fork\{0,1\}:req} (n_2);
+    \draw[->] (n_2) edge[bend left=0] node[mylabel] {Philo?Fork\{0,1\}:ack} (n_3);
+    \draw[->] (n_3) edge[bend left=25] node[mylabel] {Philo!Fork\{0,1\}:release} (n_1);
+  \end{tikzpicture}
+  \caption{Philosopher's local view.}
+  \label{graph:loc-philo}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+    \node[state] (n_1) {1};
+    \node[state] (n_2) [right of=n_1] {2};
+    \node[state] (n_3) [right of=n_2] {3};
+    
+    \draw[->] (n_1) edge[bend left=0] node[mylabel] {Fork?Philo:req} (n_2);
+    \draw[->] (n_2) edge[bend left=0] node[mylabel] {Fork!Philo:ack} (n_3);
+    \draw[->] (n_3) edge[bend left=25] node[mylabel] {Fork?Philo:release} (n_1);
+  \end{tikzpicture}
+  \caption{Fork's local view.}
+  \label{graph:loc-fork}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}[fragile]{Dining Philosophers global-view}
+% spiegare notazione
 \begin{figure}[t]
   \centering
-	 \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
-        \node[state] (n_1) {1};
-        \node[state] (n_5) [below of=n_1, yshift=1cm, fill=red] {5};
-        \node[state] (n_2) [right of=n_5] {2};
-        \node[state] (n_3) [left of=n_5] {3};
-        \node[state] (n_4) [right of=n_2] {4};
-        \node[state] (n_6) [left of=n_3] {6};
-        
-        \draw[->] (n_1) edge[bend left=5] node[mylabel] {philo0→fork0:req} (n_2);
-        \draw[->] (n_1) edge[bend right=5]  node[mylabel] {philo1→fork1:req} (n_3);
-        \draw[->] (n_2) -- node[mylabel] {philo1→fork1:req} (n_5);
-        \draw[->] (n_3) -- node[mylabel] {philo0→fork0:req} (n_5);
-        \draw[->] (n_2) -- node[mylabel] {philo0→fork1:req} (n_4);
-        \draw[->] (n_4) edge[bend right=20] node[mylabel] {philo0→fork\{0,1\}:release} (n_1);
-        \draw[->] (n_3) -- node[mylabel] {philo1→fork0:req} (n_6);
-        \draw[->] (n_6) edge[bend left=20] node[mylabel] {philo1→fork\{0,1\}:release} (n_1);
-      \end{tikzpicture}
-  \caption{Global view of the dining philosophers example.}
+  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+    \node[state] (n_1) {1};
+      \node[state] (n_5) [below of=n_1, yshift=1cm, fill=red] {5};
+      \node[state] (n_2) [right of=n_5] {2};
+      \node[state] (n_3) [left of=n_5] {3};
+      \node[state] (n_4) [right of=n_2] {4};
+      \node[state] (n_6) [left of=n_3] {6};
+      
+      \draw[->] (n_1) edge[bend left=5] node[mylabel] {philo0→fork0:req} (n_2);
+      \draw[->] (n_1) edge[bend right=5]  node[mylabel] {philo1→fork1:req} (n_3);
+      \draw[->] (n_2) -- node[mylabel] {philo1→fork1:req} (n_5);
+      \draw[->] (n_3) -- node[mylabel] {philo0→fork0:req} (n_5);
+      \draw[->] (n_2) -- node[mylabel] {philo0→fork1:req} (n_4);
+      \draw[->] (n_4) edge[bend right=20] node[mylabel] {philo0→fork\{0,1\}:release} (n_1);
+      \draw[->] (n_3) -- node[mylabel] {philo1→fork0:req} (n_6);
+      \draw[->] (n_6) edge[bend left=20] node[mylabel] {philo1→fork\{0,1\}:release} (n_1);
+    \end{tikzpicture}
+  \caption{Global view of the Dining Philosophers example.}
   \label{graph:philosophers}
 \end{figure}
 \end{frame}
 
 
-\begin{frame}[fragile]{Bank account example}
+\begin{frame}[fragile]{Bank Account example}
 \begin{columns}
 \column{0.53\textwidth}
 \begin{lstlisting}
@@ -485,6 +639,39 @@ client() $\to$
 \end{columns}
 \end{frame}
 
+
+\begin{frame}{Bank Account example's local views}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+    \node[state] (n_1) {1};
+    \node[state] (n_2) [right of=n_1] {2};
+    
+    \draw[->] (n_1) edge[bend left=0] node[mylabel] {Acc?Client:read} (n_2);
+    \draw[->] (n_2) edge[bend left=25] node[mylabel,below] {Acc!Client:Value} (n_1);
+    \draw[->] (n_1) edge[loop above] node[mylabel] {Acc?Client:NewValue} (n_1);
+  \end{tikzpicture}
+  \caption{Account's local view.}
+  \label{graph:loc-philo}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=2.6cm and .5cm, transform shape]
+    \node[state] (n_1) {1};
+    \node[state] (n_2) [right of=n_1] {2};
+    \node[state] (n_3) [right of=n_2] {3};
+    \node[state] (n_4) [right of=n_3] {4};
+    
+    \draw[->] (n_1) edge[bend left=0] node[mylabel] {Acc!Client:read} (n_2);
+    \draw[->] (n_2) edge[bend left=0] node[mylabel] {Acc?Client:Value} (n_3);
+    \draw[->] (n_3) edge[bend left=0] node[mylabel] {Acc!Client:NewValue} (n_4);
+  \end{tikzpicture}
+  \caption{Clients' local view.}
+  \label{graph:loc-fork}
+\end{figure}
+\end{frame}
+
 \newcommand\dummy{C}
 \tikzset{
 	hpath/.style={
@@ -496,7 +683,7 @@ client() $\to$
 			color = teal!30
 		}
 }
-\begin{frame}[fragile]{Bank account global-view}
+\begin{frame}[fragile]{Bank Account global-view}
 \begin{figure}[h!]
 	\centering
 	\begin{tikzpicture}[node distance={27mm}, scale = .6, transform shape, thick, main/.style = {draw, circle}]
@@ -540,21 +727,28 @@ client() $\to$
 		\draw[->] (n_6) -- node[midway, above right] {acc→C1:Value} (n_10);
 		\draw[->] (n_10) -- node[midway, above right] {C1→acc:NewValue} (n_14);
 	\end{tikzpicture}
-	\caption{Global view of the bank account example}
+	\caption{Global view of the Bank Account example}
 	\label{fig:account}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Conclusion}
+\begin{frame}[fragile]{Conclusion}
 \begin{block}{Summary}
 \begin{itemize}
-  \item Problem: no way to express legacy code
+  \item Problem: difficult to express legacy code
 	\item Bridge the gap between programming and theoretical frameworks
 	\item Use of bottom-up and over-approx techniques
 \end{itemize}
 \end{block}
-\textbf{Future work:} create the tool as described ({\color{red}WIP}) 
-and evaluate it on real-world examples.
+\begin{columns}
+\column{0.72\textwidth}
+\textbf{Future work:} create the tool as described ({\color{red}WIP}
+on {\color{blue!60}\verb|github.com/gabrielegenovese/chorer|}) and evaluate it on real-world examples.
+\column{0.27\textwidth}
+\begin{figure}
+\includegraphics[width=0.8\textwidth]{images/qrcode.png}
+\end{figure}
+\end{columns}
 \end{frame}
 
 % \begin{frame}{Future Work}
