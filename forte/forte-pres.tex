@@ -9,6 +9,8 @@
 \usepackage{wrapfig}
 \usepackage{color}
 \usepackage{listings}
+\usepackage{pgfpages}
+\setbeameroption{show notes on second screen=right}
 
 \usetikzlibrary{automata,positioning,shapes,snakes}
 \usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
@@ -25,11 +27,24 @@
 \title{Choreographies for Program Understanding}
 \author{\textbf{Gabriele Genovese}, Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto,
 and Germ\'an Vidal}
-\date{}
+\date{17 June 2025}
 
 \begin{document}
 
+
+% title
 \maketitle
+\note{
+  Good afternoon, everyone. Today I’m presenting our work titled
+  “Choreographies for Program Understanding,” developed in collaboration
+  with Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto, and Germán Vidal.
+  This work is about analyzing distributed systems from a global
+  perspective, even when we only have access to the local code with
+  an ad-hoc extraction techniques.
+  Let’s start by looking at the big picture of distributed systems.
+}
+
+% slide 1
 
 \begin{frame}{Distributed Systems are Hard}
 Abstractions in order to simplify:
@@ -47,6 +62,17 @@ Abstractions in order to simplify:
 \draw[->] (ind) -- (sci);
 \end{tikzpicture}
 \end{frame}
+\note{
+Distributed systems are complex by nature.
+To manage this complexity, we rely on abstractions
+that help structure and reason about interactions.
+In industry, the actor model is commonly used—think Erlang or Akka.
+Meanwhile, in academia, we focus on choreographies,
+which give a global view of the system behavior.
+In this talk, I’ll show how we bridge these two views.
+}
+
+% slide 2
 
 \begin{frame}{The Actor Model}
 \begin{columns}
@@ -63,7 +89,14 @@ Abstractions in order to simplify:
 \end{figure}
 \end{columns}
 \end{frame}
+\note{
+  Let’s start with the actor model.
+  Each actor is an independent process with its own mailbox.
+  They interact purely by sending and receiving messages asynchronously.
+  This model scales well and fits naturally into distributed environments.
+}
 
+% slide 3
 \begin{frame}{The Actor Model}
 \begin{columns}
 \column{0.48\textwidth}
@@ -80,7 +113,15 @@ Abstractions in order to simplify:
 \end{figure}
 \end{columns}
 \end{frame}
+\note{
+  The actor model has strong practical support.
+  Languages like Erlang, Elixir, and Scala adopt it directly.
+  Frameworks like Akka for Java and Actix for Rust are built around it.
+  Even Go, although not actor-based, has a similar concurrency model
+  using goroutines and channels.
+}
 
+% slide 4
 \begin{frame}{Choreography Automata \small{[1]}}
 \begin{columns}
 \column{0.48\textwidth}
@@ -98,6 +139,15 @@ Abstractions in order to simplify:
 \vspace{0.5em}
 {\tiny [1] Barbanera et al. "Choreography automata." COORDINATION, 2020.}
 \end{frame}
+\note{
+  In research, we often take a more global view of communication.
+  A choreography describes all the participants and their interactions
+  from a central perspective.
+  By pairing this with automata theory, we can rigorously define
+  and analyze these protocols.
+  This idea was formalized in “Choreography Automata”
+  by Barbanera et al.
+}
 
 
 \tikzset{
@@ -116,6 +166,7 @@ Abstractions in order to simplify:
   }
 }
 
+% slide 5
 \begin{frame}{Global vs Local View}
 \begin{columns}
 \column{0.48\textwidth}
@@ -131,6 +182,15 @@ Abstractions in order to simplify:
 	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:hi} (n_3);
 \end{tikzpicture}
 \end{center}
+\note{
+  Choreographies offer both a global view—where we see all interactions—
+  and local views, where each participant sees only their own role.
+  For example, if A sends “hello” to B and B replies “hi”,
+  the global view captures the full exchange.
+  Locally, A just sees “send hello”, and B just sees “receive hello,
+  then send hi”.
+  Translating between these two views is key to our work.
+}
 	
 \bigskip
 The communication system is seen as a whole.
@@ -163,39 +223,25 @@ An actor’s individual perspective.
 \end{columns}
 \end{frame}
 
+% slide 6
 \begin{frame}{Top-Down Approach}
-\textbf{Definition:}
+\textbf{Steps:}
 \begin{enumerate}
   \item Write the global specification
   \item Project to obtain the local specification
   \item Write the local functions that respect the specification
 \end{enumerate}
+\textbf{Problem:} no way to include existing code and architecture.
 \end{frame}
+\note{
+  One classical approach is top-down:
+  You write a global choreography, project it to get local specifications,
+  and implement those locally.
+  However, this doesn’t work well if you’re dealing with existing systems
+  or legacy code—you can’t easily inject a top-down design after the fact.
+}
 
-% \begin{frame}{Top-Down Approach}
-% \centering
-% \begin{tikzpicture}[node distance=1.2cm,
-%   block/.style={rectangle, draw=blue!60, fill=blue!10, rounded corners,
-%                     text width=8em, align=center, minimum height=2.5em}]
-
-% \node[block] (g) {Global Specification};
-% \node[block, below=of g] (l) {Project to Local Views};
-% \node[block, below=of l] (i) {Implement Local Functions};
-
-% \draw[->] (g) -- (l);
-% \draw[->] (l) -- (i);
-% \end{tikzpicture}
-% \end{frame}
-
-\begin{frame}{Bottom-up approach}
-\textbf{Extraction:}
-\begin{enumerate}
-  \item Analyze an input source code
-  \item Create the local view
-  \item Combine the local view to create an approximation global view
-\end{enumerate}
-\end{frame}
-
+% slide 7
 \begin{frame}{Aim}
 \centering
 \begin{tikzpicture}[
@@ -210,7 +256,32 @@ An actor’s individual perspective.
 \draw[->] (extract) -- (tool);
 \end{tikzpicture}
 \end{frame}
+\note{
+  Our aim is different:
+  We want to understand and debug legacy systems.
+  The idea is to extract a global view from already written code.
+  We’re building a tool to do this using static analysis,
+  starting from real programs.
+}
 
+% slide 8
+\begin{frame}{Bottom-up approach}
+\textbf{Extraction steps:}
+\begin{enumerate}
+  \item Analyze an input source code
+  \item Create the local view
+  \item Combine the local view to create an approximation global view
+\end{enumerate}
+\end{frame}
+\note{
+  So instead of top-down, we use a bottom-up approach:
+  First, we analyze the code to extract local views.
+  Then, we combine them to build an approximate global view.
+  It’s not perfect, but it can already tell us a lot—
+  especially when we care about communication behavior.
+}
+
+% slide 9
 \begin{frame}{Why}
 \begin{columns}
 \column{0.5\textwidth}
@@ -225,22 +296,52 @@ An actor’s individual perspective.
 \includegraphics[width=\linewidth]{example-image-a}
 \end{columns}
 \end{frame}
+\note{
+  Why go through all this effort?
+  Well, the extracted models can reveal bugs like deadlocks
+  or race conditions.
+  But they also show correct behaviors—
+  they help us understand what the code actually does.
+  This is helpful both for developers and educators
+  working on distributed algorithms.
+}
 
+% slide 10
 \begin{frame}{Requirements}
 \begin{itemize}
   \item Automatic extraction using bottom-up and over-approximation techniques
+  \item Capture good behaviors and highlight misbehavior
   \item Support multiple actors
-  \item Mainstream language support
+  \item Target mainstream language
   \item Simple notation
 \end{itemize}
 \end{frame}
+\note{
+  To make this useful in practice, we need several things:
+  First, the process should be automatic,
+  using static analysis and over-approximation.
+  It should highlight both good and bad behaviors,
+  support multiple actors,
+  and be applicable to mainstream languages.
+  Finally, the output should be easy to read—
+  something people can reason with.
+}
 
+% slide 11
 \begin{frame}{Problems}
 \begin{itemize}
     \item Undecidability: we should decide termination
     \item Huge descriptions: given the over-approximation approach
 \end{itemize}
 \end{frame}
+\note{
+  Naturally, there are challenges.
+  One is undecidability: we can’t always determine termination
+  or correctness.
+  Another is that over-approximations can lead to very large models,
+  which can be hard to manage.
+  So the trick is to balance precision and scalability.
+}
 
 \begin{frame}{Motivating Examples}
 \textbf{Two example:}
@@ -447,18 +548,20 @@ client() $\to$
 \begin{frame}{Conclusion}
 \begin{block}{Summary}
 \begin{itemize}
+  \item Problem: no way to express legacy code
 	\item Bridge the gap between programming and theoretical frameworks
 	\item Use of bottom-up and over-approx techniques
 \end{itemize}
 \end{block}
+\textbf{Future work:} create the tool as described ({\color{red}WIP}) 
+and evaluate it on real-world examples.
 \end{frame}
 
-\begin{frame}{Future Work}
-\begin{itemize}
-	\item WIP on a tool called Chorer
-\end{itemize}
-\end{frame}
-
+% \begin{frame}{Future Work}
+% \begin{itemize}
+% 	\item WIP on a tool called Chorer
+% \end{itemize}
+% \end{frame}
 
 \begin{frame}{}
 \centering
