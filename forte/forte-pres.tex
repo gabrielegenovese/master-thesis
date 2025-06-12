@@ -23,7 +23,7 @@
 
 
 \title{Choreographies for Program Understanding}
-\author{Gabriele Genovese, Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto,
+\author{\textbf{Gabriele Genovese}, Ivan Lanese, Cinzia Di Giusto, Emilio Tuosto,
 and Germ\'an Vidal}
 \date{}
 
@@ -84,7 +84,7 @@ Abstractions in order to simplify:
 \begin{frame}{Choreography Automata \small{[1]}}
 \begin{columns}
 \column{0.48\textwidth}
-\begin{block}{Informally:}
+\begin{block}{Informally}
 \begin{itemize}
     \item Choreography: describes distributed protocols
     \item Paired with automata theory
@@ -92,7 +92,7 @@ Abstractions in order to simplify:
 \end{block}
 \column{0.45\textwidth}
 \begin{figure}
-\includegraphics[width=\textwidth]{images/chorauto.png}
+\includegraphics[width=0.9\textwidth]{images/chorauto.png}
 \end{figure}
 \end{columns}
 \vspace{0.5em}
@@ -102,8 +102,8 @@ Abstractions in order to simplify:
 
 \tikzset{
   state/.style={
-	 inner sep=1pt,
-	 minimum size = 4pt,
+	 inner sep=3pt,
+	 minimum size = 6pt,
 	 draw,
 	 circle,
 	 font=\scriptsize,
@@ -122,13 +122,13 @@ Abstractions in order to simplify:
 \begin{block}{Global}
 \vspace{2em}
 \begin{center}
-\begin{tikzpicture}[node distance=1.5cm, transform shape]
+\begin{tikzpicture}[node distance=2cm, transform shape]
 	\node[state] (n_1) {1};
 	\node[state] (n_2) [right of=n_1] {2};
 	\node[state,accepting] (n_3) [right of=n_2] {3};
 	
 	\draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:hello} (n_2);
-	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:bye} (n_3);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:hi} (n_3);
 \end{tikzpicture}
 \end{center}
 	
@@ -140,18 +140,20 @@ The communication system is seen as a whole.
 \begin{block}{Local}
 \begin{center}
 \begin{tikzpicture}[node distance=1.5cm, transform shape]
+	\node[state, draw=none] (n_0) [left of=n_1,node distance=0.8cm] {A:};
 	\node[state] (n_1) {1};
 	\node[state] (n_2) [right of=n_1] {2};
 	\node[state,accepting] (n_3) [right of=n_2] {3};
+	\node[state, draw=none] (n_10) [below of=n_0] {B:};
 	\node[state] (n_4) [below of=n_1] {1};
 	\node[state] (n_5) [right of=n_4] {2};
 	\node[state,accepting] (n_6) [right of=n_5] {3};
 	
 	\draw[->] (n_1) edge[bend left=0] node[mylabel] {!B:hello} (n_2);
-	\draw[->] (n_2) edge[bend left=0] node[mylabel] {?B:bye} (n_3);
+	\draw[->] (n_2) edge[bend left=0] node[mylabel] {?B:hi} (n_3);
 
 	\draw[->] (n_4) edge[bend left=0] node[mylabel] {?A:hello} (n_5);
-	\draw[->] (n_5) edge[bend left=0] node[mylabel] {!A:bye} (n_6);
+	\draw[->] (n_5) edge[bend left=0] node[mylabel] {!A:hi} (n_6);
 \end{tikzpicture}
 \end{center}
 	
@@ -161,22 +163,37 @@ An actor’s individual perspective.
 \end{columns}
 \end{frame}
 
+\begin{frame}{Top-Down Approach}
+\textbf{Definition:}
+\begin{enumerate}
+  \item Write the global specification
+  \item Project to obtain the local specification
+  \item Write the local functions that respect the specification
+\end{enumerate}
+\end{frame}
 
-\begin{frame}[fragile]{Deadlock}
-\begin{figure}[t]
-  \centering
-	 \begin{tikzpicture}[node distance=2cm, transform shape]
-        \node[state] (n_1) {1};
-        \node[state] (n_2) [above right of=n_1] {2};
-        \node[state] (n_3) [below right of=n_1, fill=red] {3};
-        
-        \draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:error} (n_3);
-        \draw[->] (n_1) edge[bend left=25]  node[mylabel] {A→B:data} (n_2);
-        \draw[->] (n_2) edge[bend left=25]  node[mylabel] {B→A:res} (n_1);
-      \end{tikzpicture}
-  \caption{A deadlock can occur if a non-final state without outgoing transitions is present.}
-  \label{fig:deadlock}
-\end{figure}
+% \begin{frame}{Top-Down Approach}
+% \centering
+% \begin{tikzpicture}[node distance=1.2cm,
+%   block/.style={rectangle, draw=blue!60, fill=blue!10, rounded corners,
+%                     text width=8em, align=center, minimum height=2.5em}]
+
+% \node[block] (g) {Global Specification};
+% \node[block, below=of g] (l) {Project to Local Views};
+% \node[block, below=of l] (i) {Implement Local Functions};
+
+% \draw[->] (g) -- (l);
+% \draw[->] (l) -- (i);
+% \end{tikzpicture}
+% \end{frame}
+
+\begin{frame}{Bottom-up approach}
+\textbf{Extraction:}
+\begin{enumerate}
+  \item Analyze an input source code
+  \item Create the local view
+  \item Combine the local view to create an approximation global view
+\end{enumerate}
 \end{frame}
 
 \begin{frame}{Aim}
@@ -185,9 +202,9 @@ An actor’s individual perspective.
     node distance=1cm,
     block/.style={rectangle, draw=teal!60, fill=teal!10, rounded corners,
                   text width=8em, align=center, minimum height=2em}]
-\node[block] (bridge) {Bridge theory and practice};
+\node[block] (bridge) {Debug and understand legacy code};
 \node[block, below=of bridge] (extract) {Extract global specification from code};
-\node[block, below=of extract] (tool) {Tool-based analysis};
+\node[block, below=of extract] (tool) {Tool based on statical analysis};
 
 \draw[->] (bridge) -- (extract);
 \draw[->] (extract) -- (tool);
@@ -199,10 +216,9 @@ An actor’s individual perspective.
 \column{0.5\textwidth}
 \begin{block}{Benefits}
 \begin{itemize}
-    \item Highlights bugs
-    \item Improves understanding of the code
-    \item Useful for legacy code
-    \item Educational potential
+  \item Highlights bugs (deadlock, race condition, etc...)
+  \item Improves understanding of the code: give also good behavior
+  % \item Educational potential
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
@@ -210,25 +226,20 @@ An actor’s individual perspective.
 \end{columns}
 \end{frame}
 
-\begin{frame}{Requirements and Problems}
-\begin{columns}
-\column{0.5\textwidth}
-\begin{block}{Requirements}
+\begin{frame}{Requirements}
 \begin{itemize}
-    \item Bottom-up analysis
-    \item Over-approximation
-    \item Mainstream language support
-    \item Simple notation
+  \item Automatic extraction using bottom-up and over-approximation techniques
+  \item Support multiple actors
+  \item Mainstream language support
+  \item Simple notation
 \end{itemize}
-\end{block}
-\column{0.5\textwidth}
-\begin{block}{Problems}
+\end{frame}
+
+\begin{frame}{Problems}
 \begin{itemize}
-    \item Undecidability
-    \item Complex models
+    \item Undecidability: we should decide termination
+    \item Huge descriptions: given the over-approximation approach
 \end{itemize}
-\end{block}
-\end{columns}
 \end{frame}
 
 \begin{frame}{Motivating Examples}
@@ -247,7 +258,26 @@ An actor’s individual perspective.
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[fragile]{Dining philosophers example}
+\begin{frame}[fragile]{Deadlock}
+\begin{figure}[t]
+  \centering
+	 \begin{tikzpicture}[node distance=2cm, transform shape]
+        \node[state] (n_1) {1};
+        \node[state] (n_2) [above right of=n_1] {2};
+        \node[state] (n_3) [below right of=n_1, fill=red] {3};
+        
+        \draw[->] (n_1) edge[bend left=0] node[mylabel] {A→B:error} (n_3);
+        \draw[->] (n_1) edge[bend left=25] node[mylabel] {A→B:req} (n_2);
+        \draw[->] (n_2) edge[bend left=25] node[mylabel] {B→A:res} (n_1);
+      \end{tikzpicture}
+  \caption{A deadlock can occur if a non-final state without outgoing transitions is present.}
+  \label{fig:deadlock}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Dining Philosophers example}
+\begin{columns}
+\column{0.53\textwidth}
 \begin{lstlisting}
 philosopher(Fork1, Fork2) $\to$
   send req to Fork1,
@@ -265,6 +295,26 @@ fork() $\to$
   receive release from Phil,
   fork().
 \end{lstlisting}
+\column{0.46\textwidth}
+\textbf{Participants:}
+\begin{itemize}
+  \item 2 philosophers
+  \item 2 forks
+\end{itemize}
+\bigskip
+
+\centering
+\begin{tikzpicture}
+\node[state] (philo0) {Philo0};
+\node[state,below=1cm of philo0, draw=none] (hidden) {};
+\node[state,left=1 of hidden] (fork0) {Fork0};
+\node[state,right=1 of hidden] (fork1) {Fork1};
+\node[state,below=1cm of hidden] (philo1) {Philo1};
+
+\draw[->,style=dashed] (philo0) -- (fork0);
+\draw[->,style=dashed] (philo1) -- (fork1);
+\end{tikzpicture}
+\end{columns}
 \end{frame}
 
 
@@ -293,7 +343,10 @@ fork() $\to$
 \end{figure}
 \end{frame}
 
+
 \begin{frame}[fragile]{Bank account example}
+\begin{columns}
+\column{0.53\textwidth}
 \begin{lstlisting}
 account(Value) $\to$
   receive
@@ -309,6 +362,26 @@ client() $\to$
   % operations on Value
   send NewValue to Acc.
 \end{lstlisting}
+\column{0.46\textwidth}
+\textbf{Participants:}
+\begin{itemize}
+  \item 1 account
+  \item 2 clients
+\end{itemize}
+
+\bigskip
+
+\centering
+\begin{tikzpicture}
+\node[state] (acc) {Acc};
+\node[state,below=1cm of acc, draw=none] (hidden) {};
+\node[state,left=1 of hidden] (c1) {C1};
+\node[state,right=1 of hidden] (c2) {C2};
+
+\draw[->,style=dashed] (c1) -- (acc);
+\draw[->,style=dashed] (c2) -- (acc);
+\end{tikzpicture}
+\end{columns}
 \end{frame}
 
 \newcommand\dummy{C}
