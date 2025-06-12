@@ -47,9 +47,9 @@ and Germ\'an Vidal}
   this work titled “Choreographies for Program Understanding,” 
   developed in collaboration with Professors Ivan Lanese, 
   Cinzia Di Giusto, Emilio Tuosto, and Germán Vidal.
-  This work is about analyzing distributed systems from a global
-  perspective with an extraction technique,
-  even when we only have access to the local code.
+  This work is about analyzing distributed systems programs
+  from a global perspective with a novel extraction technique,
+  that works when we only have access to the codebase.
 }
 
 % slide 1
@@ -236,7 +236,7 @@ The communication system is seen as a whole.
 \end{tikzpicture}
 \end{center}
 	
-An actor’s individual perspective.
+A participant's individual perspective.
 
 \end{block}
 \end{columns}
@@ -539,17 +539,18 @@ fork() $\to$
 \end{frame}
 
 \begin{frame}{Dining Philosophers example's local views}
+\vspace{1.5em}
 \textbf{Attention}: merge of redundant communication!
 \begin{figure}
   \centering
-  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+  \begin{tikzpicture}[node distance=2.6cm , transform shape]
     \node[state] (n_1) {1};
     \node[state] (n_2) [right of=n_1] {2};
     \node[state] (n_3) [right of=n_2] {3};
     
     \draw[->] (n_1) edge[bend left=0] node[mylabel] {Philo!Fork\{0,1\}:req} (n_2);
     \draw[->] (n_2) edge[bend left=0] node[mylabel] {Philo?Fork\{0,1\}:ack} (n_3);
-    \draw[->] (n_3) edge[bend left=25] node[mylabel] {Philo!Fork\{0,1\}:release} (n_1);
+    \draw[->] (n_3) edge[bend left=25] node[mylabel,below] {Philo!Fork\{0,1\}:release} (n_1);
   \end{tikzpicture}
   \caption{Philosopher's local view.}
   \label{graph:loc-philo}
@@ -557,14 +558,14 @@ fork() $\to$
 
 \begin{figure}
   \centering
-  \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
+  \begin{tikzpicture}[node distance=2.6cm, transform shape]
     \node[state] (n_1) {1};
     \node[state] (n_2) [right of=n_1] {2};
     \node[state] (n_3) [right of=n_2] {3};
     
     \draw[->] (n_1) edge[bend left=0] node[mylabel] {Fork?Philo:req} (n_2);
     \draw[->] (n_2) edge[bend left=0] node[mylabel] {Fork!Philo:ack} (n_3);
-    \draw[->] (n_3) edge[bend left=25] node[mylabel] {Fork?Philo:release} (n_1);
+    \draw[->] (n_3) edge[bend left=25] node[mylabel,below] {Fork?Philo:release} (n_1);
   \end{tikzpicture}
   \caption{Fork's local view.}
   \label{graph:loc-fork}
@@ -661,7 +662,7 @@ client() $\to$
     \node[state] (n_1) {1};
     \node[state] (n_2) [right of=n_1] {2};
     \node[state] (n_3) [right of=n_2] {3};
-    \node[state] (n_4) [right of=n_3] {4};
+    \node[state,accepting] (n_4) [right of=n_3] {4};
     
     \draw[->] (n_1) edge[bend left=0] node[mylabel] {Acc!Client:read} (n_2);
     \draw[->] (n_2) edge[bend left=0] node[mylabel] {Acc?Client:Value} (n_3);
@@ -697,10 +698,10 @@ client() $\to$
 		\node (n_8) [state, below left of=n_5] {\phantom{11}};
 		\node (n_9) [state, below right of=n_5] {\phantom{11}};
 		\node (n_10) [state, below of=n_6] {10};
-		\node (n_11) [state, accepting, below= of n_7] {11};
-		\node (n_12) [state, accepting, below=1.5cm of n_8] {\phantom{12}};
-		\node (n_13) [state, accepting, below= 1.5cm of n_9] {\phantom{13}};
-		\node (n_14) [state, accepting, below=2.5cm of n_10] {14};
+		\node (n_11) [state, below= of n_7] {11}; % accepting
+		\node (n_12) [state, below=1.5cm of n_8] {\phantom{12}}; % accepting
+		\node (n_13) [state, below= 1.5cm of n_9] {\phantom{13}}; % accepting
+		\node (n_14) [state, below=2.5cm of n_10] {14}; % accepting
 
 		\draw[->] (n_1) -- node[midway, above left] {acc→\dummy1:Value} (n_2);
 		\draw[->] (n_2) -- node[midway, below left] {acc→\dummy2:Value} (n_5);
