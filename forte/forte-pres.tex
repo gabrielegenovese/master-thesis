@@ -47,10 +47,12 @@ and Germ\'an Vidal}
   this work titled “Choreographies for Program Understanding,” 
   developed in collaboration with Professors Ivan Lanese, 
   Cinzia Di Giusto, Emilio Tuosto, and Germán Vidal.
-  This work is about analyzing distributed systems programs
-  from a global perspective with a novel extraction technique,
-  that works when we only have access to the codebase.
+  In this work we present how we can extract global
+  communication views from local code. This helps with
+  understanding and verifying distributed systems, even 
+  when they weren't designed with a global model in mind.
 }
+
 
 % slide 1
 \begin{frame}{Distributed Systems are Hard}
@@ -77,18 +79,18 @@ Abstractions in order to simplify:
 \end{tikzpicture}
  \end{frame}
 \note{
-So, we are in the context of distributed systems and
-distributed systems are complex by nature.
-To manage this complexity, computer scientist can up with abstractions
-that help to structure and reason about interactions in these systems.
-% In industry, the actor model is commonly used.
-% Meanwhile, in academia, we focus on choreographies,
-% which give a global view of the system behavior.
-In this talk, I’ll show how we bridge these two views.
+So we are in the context of distributed system, and
+you're probably familiar with how hard it's to create
+new application and protocols.
+In order to simplify our lives, we create some 
+abstractions. 
+The actor model is a very popular programming
+paradigm and choreographies provide a higher-level view 
+of interactions.
 }
 
-% slide 2
 
+% slide 2
 \begin{frame}{The Actor Model}
 \begin{columns}
 \column{0.48\textwidth}
@@ -105,11 +107,12 @@ In this talk, I’ll show how we bridge these two views.
 \end{columns}
 \end{frame}
 \note{
-  Let’s start with the actor model.
-  Each actor is an independent process with its own mailbox.
-  They interact purely by sending and receiving messages asynchronously.
-  This model scales well and fits naturally into distributed environments.
+Just to be on the same I'll briefly introduce these concepts.
+In the actor model, we have processes, called actors, than
+that interacts with each other 
+sending and receiving messages in an asynchronous network.
 }
+
 
 % slide 3
 \begin{frame}{The Actor Model}
@@ -129,11 +132,10 @@ In this talk, I’ll show how we bridge these two views.
 \end{columns}
 \end{frame}
 \note{
-  The actor model has strong practical support.
-  Languages like Erlang, Elixir, and Scala adopt it directly.
-  Frameworks like Akka for Java and Actix for Rust are built around it.
-  Even Go, although not actor-based, has a similar concurrency model
-  using goroutines and channels.
+The actor model is widely adopted: Erlang, Elixir, Scala
+are languages that implement the actor model vary well.
+There are also many libraries and frameworks that implement
+this model like Akka in Java, Actix in Rust.
 }
 
 
@@ -174,13 +176,12 @@ In this talk, I’ll show how we bridge these two views.
 {\tiny [1] Barbanera et al. "Choreography automata." COORDINATION, 2020.}
 \end{frame}
 \note{
-  In research, we often take a more global view of communication.
-  A choreography describes all the participants and their interactions
-  from a central perspective.
-  By pairing this with automata theory, we can rigorously define
-  and analyze these protocols.
-  This idea was formalized in “Choreography Automata”
-  by Barbanera et al.
+In research, it is often taken a more global view of communication.
+A choreography describes all the participants and their interactions
+from a central perspective.
+By pairing this with automata theory, we can rigorously define
+and analyze these protocols.
+For example, here you can see a global view...
 }
 
 
@@ -200,16 +201,7 @@ In this talk, I’ll show how we bridge these two views.
 	\draw[->] (n_2) edge[bend left=0] node[mylabel] {B→A:hi} (n_3);
 \end{tikzpicture}
 \end{center}
-\note{
-  Choreographies offer both a global view—where we see all interactions—
-  and local views, where each participant sees only their own role.
-  For example, if A sends “hello” to B and B replies “hi”,
-  the global view captures the full exchange.
-  Locally, A just sees “send hello”, and B just sees “receive hello,
-  then send hi”.
-  Translating between these two views is key to our work.
-}
-	
+
 \bigskip
 The communication system is seen as a whole.
 
@@ -240,6 +232,13 @@ A participant's individual perspective.
 \end{block}
 \end{columns}
 \end{frame}
+\note{
+We distinguish between global and local views. The global view
+describes the full protocol seen from above.
+The local view is the individual perspective of a participant.
+For example, here...
+}
+
 
 % slide 6
 \begin{frame}{Usual practice: Top-Down Approach}
@@ -280,6 +279,15 @@ A participant's individual perspective.
 
 \end{tikzpicture}
 \end{frame}
+\note{
+The usual practice used with this kid of frameworks is to 
+first write the global view of the protocol, then
+project it into local views and implement into processes.
+This approach is what we call a top-down approach, because
+you first start by imagine the protocol, and later you implement
+the details
+}
+
 
 % slide 7
 \begin{frame}{Usual practice: Top-Down Approach}
@@ -292,14 +300,14 @@ A participant's individual perspective.
 \textbf{Problem:} difficult to integrate existing code and architecture.
 \end{frame}
 \note{
-  One classical approach is top-down:
-  You write a global choreography, project it to get local specifications,
-  and implement those locally.
-  However, this doesn’t work well if you’re dealing with existing systems
-  or legacy code—you can’t easily inject a top-down design after the fact.
+This approach is very useful because it can assure 
+some properties over the communication.
+However, with this approach it's difficult to integrate
+existing or legacy code.
 }
 
-% slide 7
+
+% slide 8
 \begin{frame}{Aim}
 \hspace{-10em}
 \centering
@@ -309,7 +317,7 @@ A participant's individual perspective.
                   text width=8em, align=center, minimum height=2em}]
 \node[block] (bridge) {Debug and understand legacy code};
 \node[block, below=of bridge] (extr) {Extract global specification from code};
-\node[block, below=of extr] (tool) {Tool based on statical analysis};
+\node[block, below=of extr] (tool) {Tool based on static analysis};
 \node[block,fill=none,draw=none,left=0.5cm of bridge] (pr) {Problem:};
 \node[block,fill=none,draw=none,left=0.5cm of extr] (how) {How?};
 \node[block,fill=none,draw=none,left=0.5cm of tool] (supp) {Support};
@@ -319,16 +327,16 @@ A participant's individual perspective.
 \end{tikzpicture}
 \end{frame}
 \note{
-  Our aim is different:
-  We want to understand and debug legacy systems.
-  The idea is to extract a global view from already written code.
-  We’re building a tool to do this using static analysis,
-  starting from real programs.
+In fact, our goal is to understand and debug legacy systems. How? We think
+that a good way to do it is to
+extract a global view directly from code using a tool.
+This tool should be based on static analysis.
+This extraction algorithm is the inverse of the top-down approach explained
+before, this leads to a bottom-up approach.
 }
 
-% slide 8
 
-% slide 6
+% slide 9
 \begin{frame}{Bottom-up Approach}
 \centering
 \begin{tikzpicture}[
@@ -365,6 +373,14 @@ A participant's individual perspective.
 
 \end{tikzpicture}
 \end{frame}
+\note{
+First, we analyze the code to extract local views that represents
+the processes.
+Then, we combine them to build an approximate global view of the systems.
+}
+
+
+% slide 10
 \begin{frame}{Bottom-up approach}
 \begin{block}{Extraction steps}
 \begin{enumerate}
@@ -379,14 +395,14 @@ A participant's individual perspective.
 % in order to ensure no potential issues are missed
 \end{frame}
 \note{
-  So instead of top-down, we use a bottom-up approach:
-  First, we analyze the code to extract local views.
-  Then, we combine them to build an approximate global view.
-  It’s not perfect, but it can already tell us a lot—
-  especially when we care about communication behavior.
+With this approach, we obtain an abstraction that should capture all
+the possible behavior of the system, just by analyzing the code.
+And with this abstraction, we can perform some analysis over it to
+discover some properties.
 }
 
-% slide 9
+
+% slide 11
 \begin{frame}{Why}
 \begin{block}{Possible benefits}
 \begin{itemize}
@@ -403,16 +419,15 @@ A participant's individual perspective.
 \end{block}
 \end{frame}
 \note{
-  Why go through all this effort?
-  Well, the extracted models can reveal bugs like deadlocks
-  or race conditions.
-  But they also show correct behaviors—
-  they help us understand what the code actually does.
-  This is helpful both for developers and educators
-  working on distributed algorithms.
+Why, in out opinion, is this useful?
+First, we get a better understanding of the code, thanks of the
+rap presentation of all the good behaviors.
+We can also highlight bugs like deadlocks or race
+conditions.
 }
 
-% slide 10
+
+% slide 12
 \begin{frame}{Requirements}
 \begin{itemize}
   \item Automatic extraction
@@ -424,19 +439,19 @@ A participant's individual perspective.
 \end{itemize}
 \end{frame}
 \note{
-  To make this useful in practice, we need several things:
-  First, the process should be automatic,
-  using static analysis and over-approximation.
-  It should highlight both good and bad behaviors,
-  support multiple actors,
-  and be applicable to mainstream languages.
-  Finally, the output should be easy to read—
-  something people can reason with.
+To make this useful in practice, we need several things:
+First, the process should be automatic,
+using static analysis and over-approximation.
+It should highlight both good and bad behaviors,
+support multiple actors,
+and be applicable to mainstream languages.
+Finally, the output should be easy to read,
+something people can reason with.
 }
 
 
+% slide 13
 \begin{frame}{Extraction steps}
-
 \begin{tikzpicture}[
   box/.style={
     draw, 
@@ -458,13 +473,13 @@ A participant's individual perspective.
   node distance=0.7cm
 ]
 
-\node[box] (step1) {Take the\\file input\\and perform\\some simple\\analysis};
+\node[box] (step1) {Take the\\file input\\and perform\\simple\\analysis};
 \node[circ, above left=0.2cm and -0.1cm of step1] {1};
 
 \node[box, right=of step1] (step2) {Extract a\\local-view\\for each\\actor found};
 \node[circ, above left=0.2cm and -0.1cm of step2] {2};
 
-\node[box, right=of step2] (step3) {Create a\\global-view\\using the\\local-views};
+\node[box, right=of step2] (step3) {Compose a\\global-view\\using the\\local-views};
 \node[circ, above left=0.2cm and -0.1cm of step3] {3};
 
 \node[box, right=of step3] (step4) {Minimize\\and analyse\\the output\\graph};
@@ -472,16 +487,32 @@ A participant's individual perspective.
 
 \end{tikzpicture}
 \end{frame}
+\note{
+To sum it up, here's an overview of our analysis pipeline: start from
+a file, extract the actors' local views, reconstruct a global view, and
+finally minimize and analyze the output.
+}
 
+
+% slide 14
 \begin{frame}{Problems - Undecidability}
 It would imply deciding termination. Choice of:
 \begin{itemize}
-  \item Under-approximation
-  \item Over-approximation
+  \item Under-approximation: we can leave out some useful behavior
+  \item \textbf{Over-approximation}: we include many behaviors (good or bad, present or not)
 \end{itemize}
 \end{frame}
+\note{
+This comes obviously with some challenges.
+One is undecidability. We should be able to decide termination, 
+but this is a known undecidable problem. Therefore, we must use some
+approximation techniques.
+We choose over-approximation over under-approximation because 
+it's coherent with the requirements that we established.
+}
 
-% slide 11
+
+% slide 15
 \begin{frame}{Problems - Huge descriptions}
 \begin{columns}
 \column{0.49\textwidth}
@@ -497,14 +528,15 @@ It would imply deciding termination. Choice of:
 \end{columns}
 \end{frame}
 \note{
-  Naturally, there are challenges.
-  One is undecidability: we can’t always determine termination
-  or correctness.
-  Another is that over-approximations can lead to very large models,
-  which can be hard to manage.
-  So the trick is to balance precision and scalability.
+Another challenge is the scale of the output, that can be 
+very huge with little local views. Distributed systems are by nature
+really big. So, we need abstraction and simplification
+techniques, like the removal or redundant information or minimization
+to make the output manageable and understandable.
 }
 
+
+% slide 16
 \begin{frame}{Motivating Examples}
 \textbf{Two examples:}
 
@@ -520,7 +552,14 @@ It would imply deciding termination. Choice of:
 % \draw[->] (philo) -- (bank);
 \end{tikzpicture}
 \end{frame}
+\note{
+We now show two examples where this analysis helps. One is the
+classic dining philosophers problem, where a deadlock may occur. The
+other is a bank account system example that exhibits a race condition.
+}
 
+
+% slide 17
 \begin{frame}[fragile]{Deadlock}
 \vspace{1em}
 \textbf{Final state}: all the participants are in a \textit{local} final state.
@@ -543,7 +582,15 @@ It would imply deciding termination. Choice of:
 \end{tikzpicture}
 \end{center}
 \end{frame}
+\note{
+A deadlock occurs when actors reach a state from which no
+progress is possible. In this example, A and B communicate in a
+way that may lead to such a blocked state. Our tool identifies
+this by analyzing the state machine.
+}
 
+
+% slide 18
 \begin{frame}[fragile]{Dining Philosophers example}
 \begin{columns}
 \column{0.55\textwidth}
@@ -585,7 +632,14 @@ fork() $\to$
 \end{tikzpicture}
 \end{columns}
 \end{frame}
+\note{
+Each philosopher tries to acquire two forks before eating. If all
+philosophers grab one fork and wait for the other, they block.
+The code here expresses that logic using message-passing syntax.
+}
 
+
+% slide 19
 \begin{frame}{Dining Philosophers example's local views}
 \vspace{1em}
 \textbf{Note}: merge of redundant communication!
@@ -618,8 +672,14 @@ Philosopher's local view.
 Fork's local view.
 \end{center}
 \end{frame}
+\note{
+From the code, we extract the local views. The philosopher sends
+requests and receives acknowledgments. The fork reacts. These
+views are simplified to reduce redundancy and highlight structure.
+}
 
 
+% slide 20
 \begin{frame}[fragile]{Dining Philosophers global-view}
 % spiegare notazione
 \begin{center}
@@ -646,8 +706,15 @@ Fork's local view.
   
 \end{center}
 \end{frame}
+\note{
+By composing the local views, we obtain this global view. We can
+see how deadlock arises when both philosophers wait on each
+other’s forks. This validates the analysis and helps us fix the
+design.
+}
 
 
+% slide 21
 \begin{frame}[fragile]{Bank Account example}
 \begin{columns}
 \column{0.53\textwidth}
@@ -687,8 +754,15 @@ client() $\to$
 \end{tikzpicture}
 \end{columns}
 \end{frame}
+\note{
+This second example models an account accessed by multiple
+clients. Each client reads the balance, performs operations, and
+sends an updated value. This leads to race conditions if not
+carefully synchronized.
+}
 
 
+% slide 22
 \begin{frame}{Bank Account example's local views}
 \begin{center}
   \begin{tikzpicture}[node distance=2.5cm and .5cm, transform shape]
@@ -718,6 +792,13 @@ client() $\to$
   Clients' local view.
 \end{center}
 \end{frame}
+\note{
+Here are the local views. The account handles read and update
+messages. The clients interact by sending and receiving these
+messages. We abstract the operations and focus on communication.
+}
+
+
 
 \newcommand\dummy{C}
 \tikzset{
@@ -730,6 +811,9 @@ client() $\to$
 			color = teal!30
 		}
 }
+
+
+% slide 23
 \begin{frame}[fragile]{Bank Account global-view}
 \begin{center}
   \begin{tikzpicture}[node distance={27mm}, scale = .6, transform shape, thick, main/.style = {draw, circle}]
@@ -778,7 +862,15 @@ client() $\to$
   
 \end{center}
 \end{frame}
+\note{
+This global view shows interleavings of client operations. Some
+paths result in lost updates due to races. Others behave
+correctly. With this analysis, we can identify and prevent
+unsafe interleavings.
+}
 
+
+% slide 24
 \begin{frame}[fragile]{Conclusion}
 \begin{block}{Summary}
 \begin{itemize}
@@ -797,12 +889,13 @@ on {\color{blue!60}\verb|github.com/gabrielegenovese/chorer|}) and evaluate it o
 \end{figure}
 \end{columns}
 \end{frame}
-
-% \begin{frame}{Future Work}
-% \begin{itemize}
-% 	\item WIP on a tool called Chorer
-% \end{itemize}
-% \end{frame}
+\note{
+To conclude: our work extracts global views from local code in
+distributed systems. We use static analysis and
+over-approximation to capture all behaviors. Our tool, called
+Chorer, is under development and will be evaluated on real
+systems.
+}
 
 \begin{frame}{}
 \centering
