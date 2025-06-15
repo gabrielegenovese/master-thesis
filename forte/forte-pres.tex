@@ -10,7 +10,7 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{pgfpages}
-% \setbeameroption{show notes on second screen=right}
+\setbeameroption{show notes on second screen=right}
 
 \usetikzlibrary{automata,positioning,shapes,snakes}
 \usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
@@ -441,7 +441,7 @@ conditions.
 \note{
 To make this useful in practice, we need several things:
 First, the process should be automatic,
-using static analysis and over-approximation.
+using static analysis.
 It should highlight both good and bad behaviors,
 support multiple actors,
 and be applicable to mainstream languages.
