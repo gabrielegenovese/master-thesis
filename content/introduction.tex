@@ -1,0 +1,129 @@
+\section{Introduction}
+
+Informally, a \textit{distributed system} is a collection of independent 
+computing entities (interchangeably called processes, actors, 
+nodes, or participants) that communicate and coordinate their 
+actions through message passing over a medium of communication 
+(typically an \textbf{asynchronous network}), with the goal of solving a 
+common problem. For example, a client-server application can be seen 
+as a form of distributed system, where the shared objective is to provide 
+services to an end user.
+
+Distributed systems address a wide range of challenges which are 
+difficult to solve without such an architecture, for example reliability
+under failures safety in critical systems, and consistency of data.
+% Being able to \textbf{scale} to handle large volumes of incoming requests 
+% would be nearly impossible without distributed systems. Likewise, achieving 
+% \textbf{fault-tolerant} and high-performance applications would be 
+% extremely difficult without them. 
+% For these reasons,
+Distributed systems are 
+widely adopted in domains such as \textit{cloud computing}, critical 
+infrastructures, and telecommunication-oriented applications (i.e.\ 
+autonomous cars, aerospace systems, etc.). Given their ubiquity, it is 
+crucial to study every aspect of their \textbf{design}, \textbf{execution}, 
+and \textbf{verification}.
+
+One recurring difficulty is writing \textbf{correct programs} in this 
+context. Avoiding programming and logical errors is inherently hard, even 
+for experienced developers. To mitigate this, many abstractions have been 
+introduced, and computer scientists have focused their efforts on developing 
+\textit{formal frameworks} that provide developers with guarantees about 
+their programs. Formal methods for distributed systems offer 
+mathematically rigorous techniques to specify, design, and 
+verify such systems. They are valuable during development, helping 
+detect errors early, and during analysis, enabling the study of critical 
+properties such as \textbf{safety}, \textbf{liveness}, and 
+\textbf{deadlock-freedom}. Two primary verification approaches are 
+\textit{model checking} and \textit{by-construction} verification. Model 
+checking systematically explores a system's state space to confirm 
+properties, while by-construction verification guarantees correctness 
+through the design process itself, preventing errors from being introduced. 
+
+There exists several models to reason about distributed systems.
+Different model are specialized in different aspects of a system, and we
+are interested in the ones about the exchange of information, such as
+Calculus of Communicating Systems (CCS), the $\pi$-calculus, and Petri nets.
+In this work, however, we focus on 
+\textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty} 
+and \textit{choreographies}~\cite{montesi2014choreographic}, 
+since these formalisms place particular emphasis on structured and 
+verifiable communication protocols, making them especially well suited 
+for protocol design.
+In MPST, communication is specified by a \emph{global type}, which 
+describes the entire interaction among participants. 
+This global type is then \emph{projected} into 
+\emph{local types}, one for each participant. 
+Local types serve as contracts that guarantee each component is compliant to 
+the described protocol, therefore ensuring certain properties, 
+such as deadlock-freedom, at compile time. 
+The implementability problem in MPST is comparable to verifying 
+whether a given global type can be correctly projected into local 
+types, preserving the intended behavior.
+
+\subsection{Goal}
+The goal of this work is to study the \textbf{implementability
+problem}, which concerns whether a global specification can be
+faithfully realized by a set of \textit{local processes} in a
+distributed system.
+In essence, it asks: does an implementation really \textbf{respect}
+the behavior described by a given specification model?
+
+To illustrate the relevance of this problem, consider the following
+example.
+\begin{example}
+Given four processes $A, B, C, D$ distributed over
+a network, and four messages $x, y, z, w$ to be exchanged according to
+the description in Listing~\ref{lst:not-impl-exm}, is it possible to
+implement it in a real world system?
+
+\begin{lstlisting}[caption={Example specification of message exchanges},
+                   label={lst:not-impl-exm},
+                   keywordstyle=\color{blue}\bfseries,morekeywords={sends,If,then}]
+A sends B either message x or y.
+
+If A sends B message x,
+    then C sends D message z.
+
+If A sends B message y,
+then C sends D message w.
+\end{lstlisting}
+While the specification can be expressed using several of the
+formalisms mentioned earlier, only some are capable of revealing that
+it is, in fact, impossible to implement in a real distributed system.
+The reason is that process $C$ cannot determine which message to send
+to $D$ without knowing which message $A$ sent to $B$, because this 
+information is not locally available to $C$.
+\end{example}
+
+This problem is examined from a theoretical
+perspective to provide a more formal and precise understanding of
+the fundamental limits that exist and why syntactical constrains
+of certain models works.
+In this work, we use an \textit{automata-based} approach to Global Types. 
+This formalism is designed to be highly modular, 
+incorporating various \textit{network semantics} (such as asynchronous, 
+peer-to-peer, causal ordering, and synchronous semantics) as explicit 
+parameters of the framework. This parameterization allows flexible 
+analysis of different communication models within a unified setting.
+
+The main contributions of this work are: 
+\begin{itemize}
+    \item a \textbf{state-of-the-art} review, highlighting
+    existing research and results in this particular domain and giving
+    perspective to our work;
+    \item we prove \textbf{undecidability} of the \textit{weak implementability} 
+    problem under the synchronous semantics of our framework;
+    \item we extend and improve the model-checking tool \textsc{ReSCu}~\cite{rescurepo},  
+    enabling verification of \textit{deadlock-freedom} and \textit{progress} 
+    for synchronous systems.
+\end{itemize}
+The report begins in Section~\ref{sec:sota} with a state-of-the-art
+overview, presented in a general and accessible manner, avoiding
+formal definitions and proofs. Sections~\ref{sec:pre} and
+\ref{sec:proof} then introduce the necessary formal definitions,
+followed by the main theoretical contribution and in 
+Section~\ref{sec:rescu} the practical contributions of
+this work. Finally, Section~\ref{sec:end} presents concluding
+remarks and outlines possible directions for future research and
+development.

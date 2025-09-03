@@ -1,0 +1,39 @@
+\section{Conclusion}\label{sec:end}
+This work addressed the \emph{implementability problem} for Global 
+Types, a central concern in the verification of distributed systems. 
+After surveying the state of the art, I positioned our contribution 
+within an ongoing research effort, bridging well-established 
+theoretical foundations with practical tool development.  
+
+On the theoretical side, I introduced the necessary background 
+notions-CFSMs, Global Types, MSCs, and communication models-and 
+formalized weak realizability. The main contribution was to connect 
+the implementability problem to classical undecidability results, in 
+particular through a reduction to the Relaxed Post Correspondence 
+Problem (RPCP).  
+
+On the practical side, I improved and extended the 
+\textsc{ReSCu} tool, used for checking realizability and other semantic 
+properties of Symbolic Communicating Machines (SCMs). The input grammar 
+was refined for greater usability, and new verification routines were 
+implemented, including checks for progress and deadlock-freedom. The tool 
+now also generates visual representations of synchronous systems, along 
+with illustrative examples. These extensions strengthen 
+\textsc{ReSCu} both as a research prototype and as a practical aid for 
+automated verification.  
+
+Overall, the contributions span two complementary directions: a refined 
+theoretical understanding of implementability, and concrete advances in 
+tool support for experimenting with increasingly expressive models.  
+
+\subsection{Future Work}
+Future directions include extending the theoretical results beyond weak 
+realizability toward a decidability result of \emph{safe realizability} 
+(therefore, including deadlock-freedom) for 
+Global Types, building on the techniques developed here and extending
+an existing proof made by Lohrey, et al. \cite{lohrey2003realizability}.
+On the practical side, a natural goal is to further enhance \textsc{ReSCu} to  
+support these results, ultimately aiming for a complete algorithm to decide 
+implementability for restricted classes of Global Types. This would 
+enable systematic benchmarking against existing methods and real-world 
+protocols.

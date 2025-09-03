@@ -1,0 +1,186 @@
+\section{ReSCu}\label{sec:rescu}
+I now present \textsc{ReSCu} (first introduced in \cite{desgeorges2023rsc, di2023multiparty, guizouarn2023communicating}),
+describing its features, the input
+language it uses, its implementation, and the modifications I introduced to
+extend its functionality~\cite{rescuoriginalrepo}. The updated repository with 
+the new examples is available on GitHub~\cite{rescurepo}.
+
+\subsection{Characteristics}
+\textsc{ReSCu} is a command-line tool that can check both membership in the 
+class of \verb|synch| systems (called Realizable with Synchronous Communication 
+or, in brief, RSC from now on) and reachability of regular sets of configurations. It 
+accepts input systems with arbitrary topologies and supports both FIFO and 
+bag buffers. The tool provides several options: 
+\verb|-isrsc| checks whether the system is RSC, and \verb|-mc| checks reachability of 
+bad configurations. Both checks can be combined in a single run. The \verb|-fifo| option 
+overrides buffer types by treating all as FIFO. When a system is unsafe, the 
+\verb|-counter| option (used with \verb|-mc|) produces an RSC execution that leads 
+to the bad configuration, while the same option used with \verb|-isrsc| outputs the 
+borderline violation execution if the system is not RSC. Additional features include 
+a progress display to estimate remaining runtime during long computations, and 
+\verb|-to_dot|, which exports the system to DOT format for visualization.
+One of the most similar tools is \textsc{McScm} \cite{heussner2012mcscm}, that
+uses a framework with for different verification techniques. 
+Symbolic Communicating Machines (SCM), defined and used in \cite{brand1983communicating} 
+serve as the input format of the tool.
+The grammar has been updated to provide greater flexibility and clarity. In
+particular, transition guards have been made optional (with a default value
+\verb|: when true|), and a new \verb|final| keyword has been introduced to
+explicitly specify final states. The updated grammar is shown in
+Listing~\ref{lst:scm-grammar}, found in Appendix~\ref{apx:rescu}. 
+A formal definition for this object is stated
+in Definition~\ref{def:cfsm}.
+
+\subsection{Progress and Deadlock-Freedom}
+I extended \textsc{ReSCu} with verification routines that focus on two
+fundamental correctness properties of distributed systems: \emph{progress} and
+\emph{deadlock-freedom}. To enable this, the tool constructs the synchronous
+system using the synchronous product whenever the input SCM is recognized as an
+RSC. These two verification routines are triggered only after another check: 
+once the system is proven to be RSC, we can safely construct a well-formed 
+synchronous product from it. Let's first define basic notion to understand this operation.
+
+I assume standard notations for automata, words, and languages. 
+\begin{definition}[NFA]
+    A nondeterministic finite automaton (NFA) is a tuple 
+    $\mathcal A = (Q, \Sigma, \delta, l_0, F)$, where $Q$ is the set of states, 
+    $\Sigma$ the alphabet, $\delta : Q \times \Sigma \to 2^Q$ the transition relation, 
+    $l_0$ the initial state, and $F \subseteq Q$ the set of accepting states. 
+    We denote by $\languageofnfa{\mathcal A}$ the language of $\mathcal A$. 
+    Deterministic automata and $\varepsilon$-transitions are defined in the standard way.  
+\end{definition}
+
+\begin{definition}[CFSM] \label{def:cfsm}
+    A \emph{communicating finite state machine} (CFSM) is an NFA with 
+    $\varepsilon$-transitions $\acfsm$ over the alphabet $\Act$.  
+    A system of CFSMs is a tuple $\cfsms = (\acfsm_p)_{p \in \Procs}$.
+\end{definition}
+
+This definition corresponds to the concept of an SCM. We now present the
+definition of the Synchronous Product, which has been implemented in the
+tool and serves as a key component for analyzing.
+
+\begin{definition}[Synchronous Product]
+Let $\mathcal{S} = (\mathcal{A}_p)_{p \in \mathbb{P}}$ be a system of CFSMs, where 
+$\mathcal{A}_p = (L_p, \mathit{Act}_p, \delta_p, l_{0,p}, F_p)$ is the CFSM associated 
+to process $p$.  
+
+The \emph{synchronous product} of $\mathcal{S}$ is the global type 
+$\mathrm{prod}(\mathcal{S}) = (L, \mathit{Arr}, \delta, l_0, F)$,
+where
+\begin{itemize}
+    \item $L = \prod_{p \in \mathbb{P}} L_p$ is the set of global locations,
+    \item $l_0 = (l_{0,p})_{p \in \mathbb{P}}$ is the initial global state,
+    \item $F = \prod_{p \in \mathbb{P}} F_p$ is the set of global final states,
+    \item $\delta$ is the transition relation defined as follows:  
+    $(\vec{l}, \; p \xrightarrow{m} q, \; \vec{l}\,') \in \delta$ if
+    \[
+    (l_p,\, !m^{p \to q},\, l'_p) \in \delta_p, \quad 
+    (l_q,\, ?m^{p \to q},\, l'_q) \in \delta_q, \quad 
+    l'_r = l_r \;\; \text{for all } r \notin \{p,q\}.
+    \]
+\end{itemize}
+\end{definition}
+
+After constructing the synchronous product, the tool performs several
+important post-processing operations. In particular, it removes any
+unreachable nodes from the resulting product, simplifying the structure
+and ensuring that only relevant states are retained for further analysis.
+We can now define the two properties added to the tool.
+
+I denote $\text{Reach}$ as the function that, given a node, gives the set of 
+reachable nodes, and $\text{Init}, \text{Final}$ as the initial and final node.
+Informally, a given system satisfies \emph{progress} if, 
+from every reachable node,
+either the system can eventually perform a transition, or the node is
+a final one.
+\begin{definition}[Progress]
+	A system $S$ has the progress property iff $\text{Prod}_{sync}(S)$
+	has the property
+	$\text{Reach}(\text{Init})\subseteq \text{Reach}(\text{Final})$.
+\end{definition}
+
+%% sostituire posit con reach: sono tutti gli stati raggiungibili
+
+In other words, this property is implemented by checking for all nodes 
+that are not a final state
+if they are without any outgoing transitions. 
+This definition allows infinite loops.
+Informally, a system is \emph{deadlock-free} if no reachable
+non-final node exists in which all processes are blocked (i.e., no further
+actions can be taken).
+
+\begin{definition}[Deadlock-Freedom]
+	A system $S$ is deadlock-free iff
+    $\text{Prod}_{\text{sync}}(S)$ has the property
+	$\text{Reach}(\text{Init})\subseteq \text{Prefixes}(\text{Final})$.
+\end{definition}
+%% mettere controesempio x questa def: in un sistema non sincrono potrei non vedere un deadlock con questa def
+
+%% nella tesi mettere la def di ppdp spiegata bene che è quella che include tutte le semantiche di network
+
+% Intuitively, the set of all the execution that starts from the initial state
+% are a subsection of the set of all prefixes of the executions that start from
+% the final state.
+More precisely, a system that can reach, from its initial states, some state
+that does not lead to a final state is not deadlock-free. Under this definition,
+even a loop that never reaches a final state is considered a deadlock,
+making the property more restrictive. This check is implemented using a
+reverse search algorithm starting from the final states.
+
+Additionally, the synchronized system can be exported in DOT format
+(with a default filename of \verb|sync.dot|), which allows for graphical 
+visualization of its structure and behavior.
+% Some illustrative examples 
+% demonstrating these new features are included in the
+% \verb|rescu/examples/deadlock| folder.
+Let's finally see some relevant examples.
+
+% CINZIA, X TESI:
+% pensare ad un esempio che fa vedere che non è vero in generale
+
+\subsection{Examples}
+
+To illustrate these notions, I present two examples. The first is the
+classical \emph{Dining Philosophers} problem, which shows how resource
+contention can lead to deadlock. The second is a minimal looping system
+that demonstrates how a process may satisfy the progress property while
+still failing to be deadlock-free.
+
+\begin{example}\label{exm:philo}
+Consider two philosophers $P_0, P_1$ and two forks $F_1, F_2$, arranged
+so that each philosopher needs both forks to eat. If both philosophers
+pick up their left fork simultaneously, each waits indefinitely for the
+other fork, producing a deadlock. This captures the essence of the Dining
+Philosophers problem: concurrent processes blocking one another when
+competing for shared resources.
+
+The behavior of the four participants is shown in
+Figure~\ref{fig:philo} of Appendix~\ref{apx}. Running the tool on
+this input produces the terminal output in
+Listing~\ref{lst:philo} and the corresponding synchronous system in
+Figure~\ref{fig:philo-sync}, both included in the appendix. In the
+generated figure, the red state marks a configuration where no further
+actions are possible, while the three yellow states correspond to
+deadlocks, i.e.\ executions where both philosophers wait for each other
+indefinitely. The terminal output also lists the precise configurations
+of these problematic states.
+\end{example}
+
+\begin{example}\label{exm:loop}
+Now consider two processes $A$ and $B$ that exchange data. At some
+point, each makes a nondeterministic choice: one branch continues
+sending messages indefinitely, while the other leads to termination.
+Once the choice to continue is taken, however, there is no way to
+return to the terminating branch. As a result, the system may remain
+stuck in an infinite loop, never reaching a final state. Although both
+processes remain active, the system is effectively deadlocked.
+
+The behavior of this system is shown in Figure~\ref{fig:loop} of
+Appendix~\ref{apx}. Executing the tool produces the output in
+Listing~\ref{lst:loop} and the synchronous system in
+Figure~\ref{fig:loop-sync}, also included in the appendix. In the
+generated figure, yellow states highlight the deadlocked executions,
+while the terminal output provides the configuration of each detected
+deadlock.
+\end{example}

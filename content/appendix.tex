@@ -1,0 +1,926 @@
+\begin{appendices}\label{apx}
+  
+\section*{ReSCu}\label{apx:rescu}
+
+Here are the details of the SCM grammar for the \textsc{ReSCu}'s input.
+
+%,morekeywords={}]
+\begin{lstlisting}[language={},caption={Simplified SCM grammar},
+    keywordstyle=\color{blue}\bfseries,label={lst:scm-grammar}] 
+prog         ::= <header> <aut_list> [<bad_confs>]
+header       ::= scm <ident>:<channels> [<bags>] <parameters>
+channels     ::= nb_channels = <int>;
+bags         ::= //# bag_buffers = <int_list>
+int_list     ::= <int>
+               | <int_list>, <int>
+parameters   ::= parameters = <param_list>
+param_list   ::= <param>
+               | <param> <param_list>
+param        ::= {int | real} <ident>;
+aut_list     ::= automaton <ident>:<initial>;<final>; <state_list>
+initial      ::= initial : <int_list>;
+final        ::= final : <int_list>;
+state_list   ::= <state>
+               | <state_list> <state>
+state        ::= state <int> : <trans_list>
+trans_list   ::= <transition>
+               | <trans_list> <transition>
+guard        ::= : when true | <nothing>
+transition   ::= to <int> : when true , <int> <action> <ident>
+action       ::= "!" | "?"
+bad_confs    ::= bad_states: <bad_list>
+bad_list     ::= (<bad_conf>)
+               | <bad_list> (<bad_conf>)
+bad_conf     ::= <bad_state>
+               | <bad_state> with <bad_buffers>
+bad_state    ::= automaton <ident>: in <int>: true [<bad_state>]
+bad_buffers  ::= <regular_expression>
+nothing      ::= 
+\end{lstlisting}
+
+\newpage
+
+\subsection*{Output for Example~\ref{exm:philo}}
+
+\begin{lstlisting}[language={},caption={Output of Example~\ref{exm:philo}},
+    label={lst:philo}]
+This system is RSC.
+There are some sink states:
+Sink: Id=11 Configuration={{ F0:4; F1:3; P1:2; P2:2 }}
+There are some deadlock states:
+Deadlock: Id=4 Configuration={{ F0:2; F1:1; P1:1; P2:1 }}
+Deadlock: Id=11 Configuration={{ F0:4; F1:3; P1:2; P2:2 }}
+Deadlock: Id=8 Configuration={{ F0:4; F1:1; P1:1; P2:2 }}
+Deadlock: Id=7 Configuration={{ F0:2; F1:3; P1:2; P2:1 }}
+\end{lstlisting}
+
+\subsection*{Output for Example~\ref{exm:loop}}
+
+\begin{lstlisting}[language={},caption={Output of Example~\ref{exm:loop}.},
+    label={lst:loop}]
+This system is RSC.
+The system has the progress property.
+There are some deadlock states:
+Deadlock: Id=17 Configuration={{ A:1; B:4 }}
+Deadlock: Id=15 Configuration={{ A:3; B:3 }}
+\end{lstlisting}
+
+\subsection*{Figures for Example~\ref{exm:philo}}\label{apx:philo}
+
+\newpage
+
+\begin{figure}[!ht]
+    \centering
+
+\begin{tikzpicture}[>=latex',line join=bevel,scale=0.422]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: F02F10P10P21 -> F04F10P10P22
+  \draw [->] (189.25bp,1034.3bp) .. controls (169.54bp,1030.6bp) and (138.3bp,1021.8bp)  .. (119.97bp,1001.9bp) .. controls (114.12bp,995.5bp) and (110.44bp,987.01bp)  .. (105.68bp,967.53bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (160.09bp,993.61bp) node {F0$\to$P2:ack};
+  % Edge: F02F10P10P21 -> F02F11P11P21
+  \draw [->] (203.95bp,1020.1bp) .. controls (202.74bp,1009.5bp) and (202.82bp,995.93bp)  .. (208.47bp,985.36bp) .. controls (213.61bp,975.75bp) and (222.68bp,968.2bp)  .. (241.61bp,957.13bp);
+  \draw (247.84bp,993.61bp) node {P1$\to$F1:req};
+  % Edge: F00F11P11P20 -> F00F13P12P20
+  \draw [->] (326.29bp,1031.1bp) .. controls (341.23bp,1025.4bp) and (362.88bp,1015.5bp)  .. (378.22bp,1001.9bp) .. controls (386.47bp,994.5bp) and (393.59bp,984.71bp)  .. (404.75bp,965.88bp);
+  \draw (432.79bp,993.61bp) node {F1$\to$P1:ack};
+  % Edge: F00F11P11P20 -> F02F11P11P21
+  \draw [->] (303.61bp,1020.5bp) .. controls (299.71bp,1010.1bp) and (294.0bp,996.48bp)  .. (287.22bp,985.36bp) .. controls (284.34bp,980.64bp) and (280.86bp,975.88bp)  .. (270.19bp,962.98bp);
+  \draw (335.18bp,993.61bp) node {P2$\to$F0:req};
+  % Edge: F00F14P16P25 -> F00F10P16P26
+  \draw [->] (346.7bp,101.34bp) .. controls (342.73bp,90.805bp) and (337.27bp,77.518bp)  .. (331.22bp,66.262bp) .. controls (328.92bp,61.983bp) and (326.27bp,57.598bp)  .. (317.18bp,43.862bp);
+  \draw (376.72bp,74.512bp) node {P2$\to$F1:rel};
+  % Edge: F04F12P16P23 -> F04F14P16P24
+  \draw [->] (358.73bp,286.17bp) .. controls (357.82bp,274.34bp) and (356.63bp,258.91bp)  .. (354.72bp,234.19bp);
+  \draw (397.47bp,260.04bp) node {F1$\to$P2:ack};
+  % Edge: F04F13P15P22 -> F04F10P16P22
+  \draw [->] (472.84bp,472.57bp) .. controls (468.1bp,461.18bp) and (460.64bp,446.93bp)  .. (450.22bp,437.31bp) .. controls (435.13bp,423.38bp) and (413.97bp,414.07bp)  .. (385.94bp,404.92bp);
+  \draw (500.58bp,445.56bp) node {P1$\to$F1:rel};
+  % Edge: F03F13P14P26 -> F00F13P15P26
+  \draw [->] (253.43bp,193.41bp) .. controls (253.56bp,181.57bp) and (253.73bp,166.15bp)  .. (254.0bp,141.43bp);
+  \draw (291.68bp,167.27bp) node {P1$\to$F0:rel};
+  % Edge: F00F10P10P26 -> F00F11P11P26
+  \draw [->] (182.48bp,565.26bp) .. controls (186.43bp,554.64bp) and (191.99bp,541.23bp)  .. (198.47bp,530.07bp) .. controls (201.07bp,525.59bp) and (204.16bp,521.04bp)  .. (214.22bp,507.83bp);
+  \draw (237.84bp,538.32bp) node {P1$\to$F1:req};
+  % Edge: F00F10P10P20 -> F02F10P10P21
+  \draw [->] (241.27bp,1119.4bp) .. controls (228.61bp,1114.0bp) and (212.22bp,1104.7bp)  .. (204.47bp,1090.4bp) .. controls (200.63bp,1083.3bp) and (199.83bp,1074.8bp)  .. (202.04bp,1055.6bp);
+  \draw (243.84bp,1082.1bp) node {P2$\to$F0:req};
+  % Edge: F00F10P10P20 -> F00F11P11P20
+  \draw [->] (270.19bp,1112.7bp) .. controls (275.83bp,1106.4bp) and (282.37bp,1098.3bp)  .. (287.22bp,1090.4bp) .. controls (291.88bp,1082.7bp) and (296.04bp,1073.9bp)  .. (303.61bp,1055.2bp);
+  \draw (335.18bp,1082.1bp) node {P1$\to$F1:req};
+  % Edge: F04F10P10P22 -> F04F11P11P22
+  \draw [->] (104.36bp,931.24bp) .. controls (105.32bp,920.23bp) and (108.26bp,906.29bp)  .. (116.47bp,896.86bp) .. controls (131.82bp,879.23bp) and (157.16bp,870.42bp)  .. (188.23bp,863.91bp);
+  \draw (155.84bp,905.11bp) node {P1$\to$F1:req};
+  % Edge: F04F10P10P22 -> F04F12P10P23
+  \draw [->] (85.982bp,948.0bp) .. controls (62.433bp,946.43bp) and (22.249bp,939.77bp)  .. (3.468bp,913.36bp) .. controls (-3.2418bp,903.93bp) and (1.3095bp,892.39bp)  .. (15.345bp,873.94bp);
+  \draw (42.843bp,905.11bp) node {P2$\to$F1:req};
+  % Edge: F00F13P12P26 -> F01F13P13P26
+  \draw [->] (251.22bp,378.93bp) .. controls (251.22bp,367.1bp) and (251.22bp,351.67bp)  .. (251.22bp,326.95bp);
+  \draw (290.59bp,352.8bp) node {P1$\to$F0:req};
+  % Edge: F04F14P10P24 -> F00F14P10P25
+  \draw [->] (91.098bp,754.24bp) .. controls (103.29bp,740.05bp) and (121.79bp,718.53bp)  .. (143.32bp,693.48bp);
+  \draw (162.08bp,723.85bp) node {P2$\to$F0:rel};
+  % Edge: F00F13P15P26 -> F00F10P16P26
+  \draw [->] (250.98bp,100.66bp) .. controls (250.07bp,90.03bp) and (250.45bp,76.872bp)  .. (255.47bp,66.262bp) .. controls (259.48bp,57.777bp) and (266.16bp,50.36bp)  .. (282.35bp,37.222bp);
+  \draw (293.34bp,74.512bp) node {P1$\to$F1:rel};
+  % Edge: F00F13P12P20 -> F01F13P13P20
+  \draw [->] (430.17bp,946.17bp) .. controls (449.25bp,942.78bp) and (478.53bp,934.29bp)  .. (492.22bp,913.36bp) .. controls (496.82bp,906.32bp) and (497.52bp,897.53bp)  .. (494.3bp,878.0bp);
+  \draw (536.24bp,905.11bp) node {P1$\to$F0:req};
+  % Edge: F00F13P12P20 -> F02F13P12P21
+  \draw [->] (405.19bp,932.32bp) .. controls (399.68bp,921.23bp) and (391.14bp,906.76bp)  .. (380.22bp,896.86bp) .. controls (367.77bp,885.57bp) and (351.01bp,877.08bp)  .. (326.28bp,867.22bp);
+  \draw (433.49bp,905.11bp) node {P2$\to$F0:req};
+  % Edge: F02F11P11P21 -> F04F11P11P22
+  \draw [->] (241.08bp,942.68bp) .. controls (228.04bp,937.35bp) and (211.02bp,927.98bp)  .. (202.97bp,913.36bp) .. controls (199.02bp,906.19bp) and (198.31bp,897.57bp)  .. (200.87bp,878.16bp);
+  \draw (243.09bp,905.11bp) node {F0$\to$P2:ack};
+  % Edge: F02F11P11P21 -> F02F13P12P21
+  \draw [->] (270.19bp,935.74bp) .. controls (275.83bp,929.37bp) and (282.37bp,921.31bp)  .. (287.22bp,913.36bp) .. controls (291.88bp,905.71bp) and (296.04bp,896.9bp)  .. (303.61bp,878.22bp);
+  \draw (335.93bp,905.11bp) node {F1$\to$P1:ack};
+  % Edge: F04F14P16P24 -> F00F14P16P25
+  \draw [->] (353.22bp,193.41bp) .. controls (353.22bp,181.57bp) and (353.22bp,166.15bp)  .. (353.22bp,141.43bp);
+  \draw (391.09bp,167.27bp) node {P2$\to$F0:rel};
+  % Edge: F04F11P11P22 -> F04F13P12P22
+  \draw [->] (202.78bp,842.71bp) .. controls (201.54bp,832.22bp) and (201.58bp,818.86bp)  .. (206.97bp,808.36bp) .. controls (211.87bp,798.83bp) and (220.47bp,791.12bp)  .. (238.89bp,779.41bp);
+  \draw (247.09bp,816.61bp) node {F1$\to$P1:ack};
+  % Edge: start_node -> F00F10P10P20
+  \draw [->] (258.22bp,1181.5bp) .. controls (258.22bp,1173.9bp) and (258.22bp,1164.7bp)  .. (258.22bp,1144.8bp);
+  % Edge: F01F13P13P26 -> F03F13P14P26
+  \draw [->] (251.4bp,286.05bp) .. controls (251.51bp,275.86bp) and (251.7bp,263.14bp)  .. (251.97bp,251.79bp) .. controls (252.02bp,249.7bp) and (252.07bp,247.55bp)  .. (252.5bp,233.93bp);
+  \draw (292.09bp,260.04bp) node {F0$\to$P1:ack};
+  % Edge: F00F11P11P26 -> F00F13P12P26
+  \draw [->] (232.19bp,472.14bp) .. controls (235.41bp,459.97bp) and (239.67bp,443.86bp)  .. (246.25bp,418.96bp);
+  \draw (281.49bp,445.56bp) node {F1$\to$P1:ack};
+  % Edge: F02F10P16P21 -> F04F10P16P22
+  \draw [->] (366.22bp,471.69bp) .. controls (366.22bp,459.86bp) and (366.22bp,444.43bp)  .. (366.22bp,419.71bp);
+  \draw (406.34bp,445.56bp) node {F0$\to$P2:ack};
+  % Edge: F00F10P16P20 -> F02F10P16P21
+  \draw [->] (305.57bp,572.79bp) .. controls (291.39bp,562.08bp) and (274.73bp,545.2bp)  .. (284.47bp,530.07bp) .. controls (295.6bp,512.79bp) and (316.96bp,503.46bp)  .. (346.05bp,495.85bp);
+  \draw (323.84bp,538.32bp) node {P2$\to$F0:req};
+  % Edge: F01F13P13P20 -> F03F13P14P20
+  \draw [->] (480.38bp,844.42bp) .. controls (473.96bp,831.77bp) and (464.71bp,813.55bp)  .. (452.04bp,788.61bp);
+  \draw (509.87bp,816.61bp) node {F0$\to$P1:ack};
+  % Edge: F04F12P10P23 -> F04F14P10P24
+  \draw [->] (36.7bp,844.83bp) .. controls (43.899bp,832.06bp) and (54.405bp,813.44bp)  .. (68.669bp,788.16bp);
+  \draw (96.337bp,816.61bp) node {F1$\to$P2:ack};
+  % Edge: F04F10P16P22 -> F04F12P16P23
+  \draw [->] (364.95bp,378.93bp) .. controls (364.16bp,367.1bp) and (363.14bp,351.67bp)  .. (361.51bp,326.95bp);
+  \draw (403.13bp,352.8bp) node {P2$\to$F1:req};
+  % Edge: F02F13P12P21 -> F04F13P12P22
+  \draw [->] (303.57bp,843.53bp) .. controls (299.65bp,833.11bp) and (293.93bp,819.52bp)  .. (287.22bp,808.36bp) .. controls (284.38bp,803.64bp) and (280.99bp,798.86bp)  .. (270.47bp,785.71bp);
+  \draw (335.87bp,816.61bp) node {F0$\to$P2:ack};
+  % Edge: F03F13P14P20 -> F00F13P15P20
+  \draw [->] (439.07bp,750.42bp) .. controls (436.41bp,738.33bp) and (432.89bp,722.36bp)  .. (427.43bp,697.56bp);
+  \draw (472.88bp,723.85bp) node {P1$\to$F0:rel};
+  % Edge: F00F13P15P20 -> F00F10P16P20
+  \draw [->] (403.7bp,671.83bp) .. controls (385.85bp,666.66bp) and (359.82bp,656.67bp)  .. (343.47bp,639.34bp) .. controls (337.21bp,632.7bp) and (332.71bp,624.0bp)  .. (326.03bp,604.75bp);
+  \draw (381.34bp,631.09bp) node {P1$\to$F1:rel};
+  % Edge: F00F13P15P20 -> F02F13P15P21
+  \draw [->] (423.22bp,657.22bp) .. controls (423.22bp,645.39bp) and (423.22bp,629.96bp)  .. (423.22bp,605.24bp);
+  \draw (462.59bp,631.09bp) node {P2$\to$F0:req};
+  % Edge: F00F14P10P25 -> F00F10P10P26
+  \draw [->] (160.36bp,657.66bp) .. controls (163.03bp,645.57bp) and (166.55bp,629.6bp)  .. (172.01bp,604.8bp);
+  \draw (205.88bp,631.09bp) node {P2$\to$F1:rel};
+  % Edge: F02F13P15P21 -> F04F13P15P22
+  \draw [->] (439.12bp,571.79bp) .. controls (447.03bp,565.13bp) and (456.17bp,556.25bp)  .. (462.22bp,546.57bp) .. controls (466.69bp,539.42bp) and (470.07bp,531.0bp)  .. (475.63bp,512.06bp);
+  \draw (509.77bp,538.32bp) node {F0$\to$P2:ack};
+  % Edge: F02F13P15P21 -> F02F10P16P21
+  \draw [->] (406.94bp,572.27bp) .. controls (398.56bp,565.64bp) and (388.8bp,556.61bp)  .. (382.47bp,546.57bp) .. controls (377.99bp,539.47bp) and (374.68bp,531.06bp)  .. (369.41bp,512.11bp);
+  \draw (420.34bp,538.32bp) node {P1$\to$F1:rel};
+  % Node: F02F10P10P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (207.22bp,1037.86bp) ellipse (18.0bp and 18.0bp);
+  \draw (207.22bp,1037.9bp) node {2};
+\end{scope}
+  % Node: F04F10P10P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (104.22bp,949.36bp) ellipse (18.0bp and 18.0bp);
+  \draw (104.22bp,949.36bp) node {5};
+\end{scope}
+  % Node: F02F11P11P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,1.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (258.22bp,949.36bp) ellipse (18.0bp and 18.0bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (258.22bp,949.36bp) node {4};
+\end{scope}
+  % Node: F00F11P11P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (309.22bp,1037.86bp) ellipse (18.0bp and 18.0bp);
+  \draw (309.22bp,1037.9bp) node {1};
+\end{scope}
+  % Node: F00F13P12P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (412.22bp,949.36bp) ellipse (18.0bp and 18.0bp);
+  \draw (412.22bp,949.36bp) node {3};
+\end{scope}
+  % Node: F00F14P16P25
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (353.22bp,120.89bp) ellipse (20.13bp and 20.13bp);
+  \draw (353.22bp,120.89bp) node {27};
+\end{scope}
+  % Node: F00F10P16P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (303.22bp,24.13bp) ellipse (20.13bp and 20.13bp);
+  \draw (303.22bp,24.13bp) ellipse (24.13bp and 24.13bp);
+  \draw (303.22bp,24.131bp) node {29};
+\end{scope}
+  % Node: F04F12P16P23
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (360.22bp,306.42bp) ellipse (20.13bp and 20.13bp);
+  \draw (360.22bp,306.42bp) node {23};
+\end{scope}
+  % Node: F04F14P16P24
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (353.22bp,213.66bp) ellipse (20.13bp and 20.13bp);
+  \draw (353.22bp,213.66bp) node {25};
+\end{scope}
+  % Node: F04F13P15P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (479.22bp,491.94bp) ellipse (20.13bp and 20.13bp);
+  \draw (479.22bp,491.94bp) node {19};
+\end{scope}
+  % Node: F04F10P16P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (366.22bp,399.18bp) ellipse (20.13bp and 20.13bp);
+  \draw (366.22bp,399.18bp) node {21};
+\end{scope}
+  % Node: F03F13P14P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (253.22bp,213.66bp) ellipse (20.13bp and 20.13bp);
+  \draw (253.22bp,213.66bp) node {26};
+\end{scope}
+  % Node: F00F13P15P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (254.22bp,120.89bp) ellipse (20.13bp and 20.13bp);
+  \draw (254.22bp,120.89bp) node {28};
+\end{scope}
+  % Node: F00F10P10P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (176.22bp,584.7bp) ellipse (20.13bp and 20.13bp);
+  \draw (176.22bp,584.7bp) node {17};
+\end{scope}
+  % Node: F00F11P11P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (227.22bp,491.94bp) ellipse (20.13bp and 20.13bp);
+  \draw (227.22bp,491.94bp) node {20};
+\end{scope}
+  % Node: F00F10P10P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (258.22bp,1126.36bp) ellipse (18.0bp and 18.0bp);
+  \draw (258.22bp,1126.4bp) node {0};
+\end{scope}
+  % Node: F04F11P11P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,1.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (206.22bp,860.86bp) ellipse (18.0bp and 18.0bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (206.22bp,860.86bp) node {8};
+\end{scope}
+  % Node: F04F12P10P23
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (28.22bp,860.86bp) ellipse (18.0bp and 18.0bp);
+  \draw (28.218bp,860.86bp) node {9};
+\end{scope}
+  % Node: F00F13P12P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (251.22bp,399.18bp) ellipse (20.13bp and 20.13bp);
+  \draw (251.22bp,399.18bp) node {22};
+\end{scope}
+  % Node: F01F13P13P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (251.22bp,306.42bp) ellipse (20.13bp and 20.13bp);
+  \draw (251.22bp,306.42bp) node {24};
+\end{scope}
+  % Node: F04F14P10P24
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (78.22bp,770.23bp) ellipse (20.13bp and 20.13bp);
+  \draw (78.218bp,770.23bp) node {12};
+\end{scope}
+  % Node: F00F14P10P25
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (156.22bp,677.47bp) ellipse (20.13bp and 20.13bp);
+  \draw (156.22bp,677.47bp) node {14};
+\end{scope}
+  % Node: F01F13P13P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (488.22bp,860.86bp) ellipse (18.0bp and 18.0bp);
+  \draw (488.22bp,860.86bp) node {6};
+\end{scope}
+  % Node: F02F13P12P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,1.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (309.22bp,860.86bp) ellipse (18.0bp and 18.0bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (309.22bp,860.86bp) node {7};
+\end{scope}
+  % Node: F04F13P12P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (257.22bp,770.23bp) ellipse (20.13bp and 20.13bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (257.22bp,770.23bp) node {11};
+\end{scope}
+  % Node: start_node
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (258.22bp,1199.4bp) node {start};
+\end{scope}
+  % Node: F02F10P16P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (366.22bp,491.94bp) ellipse (20.13bp and 20.13bp);
+  \draw (366.22bp,491.94bp) node {18};
+\end{scope}
+  % Node: F00F10P16P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (322.22bp,584.7bp) ellipse (20.13bp and 20.13bp);
+  \draw (322.22bp,584.7bp) node {16};
+\end{scope}
+  % Node: F03F13P14P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (443.22bp,770.23bp) ellipse (20.13bp and 20.13bp);
+  \draw (443.22bp,770.23bp) node {10};
+\end{scope}
+  % Node: F00F13P15P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (423.22bp,677.47bp) ellipse (20.13bp and 20.13bp);
+  \draw (423.22bp,677.47bp) node {13};
+\end{scope}
+  % Node: F02F13P15P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (423.22bp,584.7bp) ellipse (20.13bp and 20.13bp);
+  \draw (423.22bp,584.7bp) node {15};
+\end{scope}
+%
+\end{tikzpicture}
+
+    \caption{Synchronous Product of the Example~\ref{exm:philo}.}
+    \label{fig:philo-sync}
+\end{figure}
+
+\newpage
+
+\begin{figure}[!ht]
+    \centering
+\begin{tikzpicture}[>=latex',line join=bevel,scale=0.6]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: P23 -> P24
+  \draw [->] (27.0bp,273.41bp) .. controls (27.0bp,261.76bp) and (27.0bp,246.05bp)  .. (27.0bp,221.35bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (46.5bp,247.25bp) node {7 ? ack};
+  % Edge: F00 -> F02
+  \draw [->] (163.75bp,552.68bp) .. controls (158.12bp,545.99bp) and (152.42bp,537.69bp)  .. (149.5bp,529.0bp) .. controls (146.63bp,520.45bp) and (146.19bp,510.74bp)  .. (148.12bp,490.45bp);
+  \draw (168.25bp,520.75bp) node {4 ? req};
+  % Edge: F00 -> F01
+  \draw [->] (185.51bp,547.49bp) .. controls (189.85bp,533.83bp) and (195.6bp,515.7bp)  .. (203.7bp,490.19bp);
+  \draw (214.55bp,520.75bp) node {0 ? req};
+  % Edge: F11 -> F13
+  \draw [->] (309.26bp,647.53bp) .. controls (304.38bp,641.32bp) and (299.22bp,633.51bp)  .. (296.5bp,625.5bp) .. controls (293.62bp,617.02bp) and (292.5bp,607.4bp)  .. (292.34bp,587.21bp);
+  \draw (315.25bp,617.25bp) node {3 ! ack};
+  % Edge: F02 -> F04
+  \draw [->] (145.21bp,455.74bp) .. controls (139.43bp,442.32bp) and (131.01bp,422.79bp)  .. (119.85bp,396.89bp);
+  \draw (153.59bp,424.25bp) node {5 ! ack};
+  % Edge: P21 -> P22
+  \draw [->] (27.0bp,454.05bp) .. controls (27.0bp,441.53bp) and (27.0bp,424.37bp)  .. (27.0bp,398.4bp);
+  \draw (46.5bp,424.25bp) node {5 ? ack};
+  % Edge: P1dummy -> P10
+  \draw [->] (494.0bp,643.9bp) .. controls (494.0bp,631.26bp) and (494.0bp,613.55bp)  .. (494.0bp,587.42bp);
+  % Edge: F10 -> F11
+  \draw [->] (347.8bp,494.92bp) .. controls (347.12bp,524.61bp) and (344.41bp,579.76bp)  .. (334.0bp,625.5bp) .. controls (333.39bp,628.17bp) and (332.63bp,630.9bp)  .. (328.0bp,644.39bp);
+  \draw (363.84bp,569.0bp) node {2 ? req};
+  % Edge: F10 -> F12
+  \draw [->] (328.44bp,461.89bp) .. controls (317.28bp,455.28bp) and (304.21bp,445.37bp)  .. (297.5bp,432.5bp) .. controls (293.87bp,425.54bp) and (292.43bp,417.31bp)  .. (292.34bp,398.17bp);
+  \draw (316.25bp,424.25bp) node {6 ? req};
+  % Edge: P15 -> P16
+  \draw [->] (494.0bp,96.051bp) .. controls (494.0bp,84.609bp) and (494.0bp,69.297bp)  .. (494.0bp,44.218bp);
+  \draw (510.5bp,70.25bp) node {2 ! rel};
+  % Edge: F14 -> F10
+  \draw [->] (329.0bp,308.61bp) .. controls (331.27bp,314.45bp) and (333.57bp,321.18bp)  .. (335.0bp,327.5bp) .. controls (343.53bp,365.15bp) and (346.5bp,409.54bp)  .. (347.83bp,450.24bp);
+  \draw (362.3bp,380.0bp) node {6 ? rel};
+  % Edge: P11 -> P12
+  \draw [->] (494.0bp,454.05bp) .. controls (494.0bp,441.53bp) and (494.0bp,424.37bp)  .. (494.0bp,398.4bp);
+  \draw (513.5bp,424.25bp) node {3 ? ack};
+  % Edge: P10 -> P11
+  \draw [->] (494.0bp,550.67bp) .. controls (494.0bp,537.08bp) and (494.0bp,517.89bp)  .. (494.0bp,490.72bp);
+  \draw (512.0bp,520.75bp) node {2 ! req};
+  % Edge: P12 -> P13
+  \draw [->] (494.0bp,361.91bp) .. controls (494.0bp,350.26bp) and (494.0bp,334.55bp)  .. (494.0bp,309.85bp);
+  \draw (512.0bp,335.75bp) node {0 ! req};
+  % Edge: F12 -> F14
+  \draw [->] (293.48bp,361.86bp) .. controls (293.15bp,351.62bp) and (293.73bp,338.51bp)  .. (297.5bp,327.5bp) .. controls (299.0bp,323.12bp) and (301.22bp,318.8bp)  .. (310.27bp,305.48bp);
+  \draw (316.25bp,335.75bp) node {7 ! ack};
+  % Edge: F1dummy -> F10
+  \draw [->] (418.03bp,553.23bp) .. controls (405.14bp,538.56bp) and (385.13bp,515.78bp)  .. (362.27bp,489.75bp);
+  % Edge: P13 -> P14
+  \draw [->] (494.0bp,273.41bp) .. controls (494.0bp,261.76bp) and (494.0bp,246.05bp)  .. (494.0bp,221.35bp);
+  \draw (513.5bp,247.25bp) node {1 ? ack};
+  % Edge: F04 -> F00
+  \draw [->] (104.36bp,396.04bp) .. controls (92.695bp,418.48bp) and (75.05bp,461.59bp)  .. (90.5bp,494.5bp) .. controls (102.62bp,520.33bp) and (128.78bp,540.22bp)  .. (159.49bp,558.47bp);
+  \draw (107.75bp,472.5bp) node {4 ? rel};
+  % Edge: P24 -> P25
+  \draw [->] (27.0bp,184.91bp) .. controls (27.0bp,173.26bp) and (27.0bp,157.55bp)  .. (27.0bp,132.85bp);
+  \draw (43.5bp,158.75bp) node {4 ! rel};
+  % Edge: F01 -> F03
+  \draw [->] (208.36bp,454.32bp) .. controls (208.29bp,443.26bp) and (208.85bp,428.65bp)  .. (211.5bp,416.0bp) .. controls (212.1bp,413.16bp) and (212.89bp,410.24bp)  .. (217.7bp,396.7bp);
+  \draw (230.25bp,424.25bp) node {1 ! ack};
+  % Edge: F03 -> F00
+  \draw [->] (236.67bp,393.95bp) .. controls (241.48bp,400.16bp) and (246.51bp,407.98bp)  .. (249.0bp,416.0bp) .. controls (263.95bp,464.24bp) and (263.45bp,485.98bp)  .. (237.0bp,529.0bp) .. controls (230.4bp,539.73bp) and (219.62bp,548.17bp)  .. (199.3bp,559.73bp);
+  \draw (276.13bp,472.5bp) node {0 ? rel};
+  % Edge: P14 -> P15
+  \draw [->] (494.0bp,184.91bp) .. controls (494.0bp,173.26bp) and (494.0bp,157.55bp)  .. (494.0bp,132.85bp);
+  \draw (510.5bp,158.75bp) node {0 ! rel};
+  % Edge: P2dummy -> P20
+  \draw [->] (27.0bp,643.9bp) .. controls (27.0bp,631.26bp) and (27.0bp,613.55bp)  .. (27.0bp,587.42bp);
+  % Edge: P25 -> P26
+  \draw [->] (27.0bp,96.051bp) .. controls (27.0bp,84.609bp) and (27.0bp,69.297bp)  .. (27.0bp,44.218bp);
+  \draw (43.5bp,70.25bp) node {6 ! rel};
+  % Edge: P20 -> P21
+  \draw [->] (27.0bp,550.67bp) .. controls (27.0bp,537.08bp) and (27.0bp,517.89bp)  .. (27.0bp,490.72bp);
+  \draw (45.0bp,520.75bp) node {4 ! req};
+  % Edge: F0dummy -> F00
+  \draw [->] (179.0bp,643.9bp) .. controls (179.0bp,632.34bp) and (179.0bp,616.54bp)  .. (179.0bp,591.29bp);
+  % Edge: F13 -> F10
+  \draw [->] (292.37bp,550.99bp) .. controls (292.04bp,539.46bp) and (293.14bp,524.25bp)  .. (299.5bp,512.5bp) .. controls (304.18bp,503.85bp) and (311.66bp,496.43bp)  .. (328.69bp,483.88bp);
+  \draw (316.75bp,520.75bp) node {2 ? rel};
+  % Edge: P22 -> P23
+  \draw [->] (27.0bp,361.91bp) .. controls (27.0bp,350.26bp) and (27.0bp,334.55bp)  .. (27.0bp,309.85bp);
+  \draw (45.0bp,335.75bp) node {6 ! req};
+  % Node: P23
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,291.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,291.5bp) node {3};
+\end{scope}
+  % Node: P24
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,203.0bp) node {4};
+\end{scope}
+  % Node: F00
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (179.0bp,569.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (179.0bp,569.0bp) ellipse (22.0bp and 22.0bp);
+  \draw (179.0bp,569.0bp) node {0};
+\end{scope}
+  % Node: F02
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (152.0bp,472.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (152.0bp,472.5bp) node {2};
+\end{scope}
+  % Node: F01
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (209.0bp,472.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (209.0bp,472.5bp) node {1};
+\end{scope}
+  % Node: F11
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (321.0bp,661.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (321.0bp,661.5bp) node {1};
+\end{scope}
+  % Node: F13
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (294.0bp,569.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (294.0bp,569.0bp) node {3};
+\end{scope}
+  % Node: F04
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (113.0bp,380.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (113.0bp,380.0bp) node {4};
+\end{scope}
+  % Node: P21
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,472.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,472.5bp) node {1};
+\end{scope}
+  % Node: P22
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,380.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,380.0bp) node {2};
+\end{scope}
+  % Node: P1dummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,661.5bp) ellipse (27.0bp and 18.0bp);
+  \draw (494.0bp,661.5bp) node {P1};
+\end{scope}
+  % Node: P10
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,569.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,569.0bp) node {0};
+\end{scope}
+  % Node: F10
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (348.0bp,472.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (348.0bp,472.5bp) ellipse (22.0bp and 22.0bp);
+  \draw (348.0bp,472.5bp) node {0};
+\end{scope}
+  % Node: F12
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (295.0bp,380.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (295.0bp,380.0bp) node {2};
+\end{scope}
+  % Node: P15
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,114.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,114.5bp) node {5};
+\end{scope}
+  % Node: P16
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+  \draw (494.0bp,22.0bp) node {6};
+\end{scope}
+  % Node: F14
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (322.0bp,291.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (322.0bp,291.5bp) node {4};
+\end{scope}
+  % Node: P11
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,472.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,472.5bp) node {1};
+\end{scope}
+  % Node: P12
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,380.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,380.0bp) node {2};
+\end{scope}
+  % Node: P13
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,291.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,291.5bp) node {3};
+\end{scope}
+  % Node: P26
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+  \draw (27.0bp,22.0bp) node {6};
+\end{scope}
+  % Node: F1dummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (431.0bp,569.0bp) ellipse (27.0bp and 18.0bp);
+  \draw (431.0bp,569.0bp) node {F1};
+\end{scope}
+  % Node: P14
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (494.0bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (494.0bp,203.0bp) node {4};
+\end{scope}
+  % Node: P25
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,114.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,114.5bp) node {5};
+\end{scope}
+  % Node: F03
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (225.0bp,380.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (225.0bp,380.0bp) node {3};
+\end{scope}
+  % Node: P2dummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,661.5bp) ellipse (27.0bp and 18.0bp);
+  \draw (27.0bp,661.5bp) node {P2};
+\end{scope}
+  % Node: P20
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,569.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,569.0bp) node {0};
+\end{scope}
+  % Node: F0dummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (179.0bp,661.5bp) ellipse (27.0bp and 18.0bp);
+  \draw (179.0bp,661.5bp) node {F0};
+\end{scope}
+%
+\end{tikzpicture}
+    \caption{SCM automata representation of the Example~\ref{exm:philo}.}
+    \label{fig:philo}
+\end{figure}
+
+\newpage
+
+\subsection*{Figures for Example~\ref{exm:loop}}\label{apx:loop}
+
+\begin{figure}[!ht]
+    \centering
+
+\begin{tikzpicture}[>=latex',line join=bevel,scale=0.5]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: A3B3 -> A1B4
+  \draw [->] (27.548bp,105.03bp) .. controls (18.113bp,97.729bp) and (7.1099bp,87.181bp)  .. (1.8895bp,74.762bp) .. controls (-3.8439bp,61.122bp) and (6.0577bp,48.005bp)  .. (26.676bp,31.31bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (33.39bp,66.512bp) node {A$\to$B:v};
+  % Edge: A0B0 -> A1B1
+  \draw [->] (86.89bp,281.93bp) .. controls (86.89bp,270.28bp) and (86.89bp,254.57bp)  .. (86.89bp,229.87bp);
+  \draw (118.39bp,255.77bp) node {A$\to$B:v};
+  % Edge: start_node -> A0B0
+  \draw [->] (86.89bp,355.2bp) .. controls (86.89bp,347.59bp) and (86.89bp,338.37bp)  .. (86.89bp,318.47bp);
+  % Edge: A1B1 -> A3B3
+  \draw [->] (70.499bp,202.98bp) .. controls (59.926bp,197.13bp) and (47.04bp,187.93bp)  .. (40.89bp,175.52bp) .. controls (36.728bp,167.13bp) and (36.008bp,157.18bp)  .. (38.379bp,136.75bp);
+  \draw (72.39bp,167.27bp) node {A$\to$B:v};
+  % Edge: A1B1 -> A2B2
+  \draw [->] (96.475bp,195.86bp) .. controls (100.28bp,189.71bp) and (104.54bp,182.41bp)  .. (107.89bp,175.52bp) .. controls (111.69bp,167.71bp) and (115.29bp,159.06bp)  .. (122.42bp,140.17bp);
+  \draw (146.28bp,167.27bp) node {A$\to$B:v};
+  % Edge: A1B4 -> A3B3
+  \draw [->] (55.235bp,36.979bp) .. controls (59.096bp,43.289bp) and (62.929bp,50.814bp)  .. (64.89bp,58.262bp) .. controls (67.676bp,68.85bp) and (64.837bp,80.229bp)  .. (55.255bp,99.999bp);
+  \draw (97.489bp,66.512bp) node {A$\to$B:v};
+  % Node: A3B3
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,1.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (43.89bp,116.89bp) ellipse (20.13bp and 20.13bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (43.89bp,116.89bp) node {15};
+\end{scope}
+  % Node: A1B4
+\begin{scope}
+  \definecolor{strokecol}{rgb}{1.0,1.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (43.89bp,20.13bp) ellipse (20.13bp and 20.13bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (43.89bp,20.131bp) node {17};
+\end{scope}
+  % Node: A2B2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (129.89bp,116.89bp) ellipse (20.13bp and 20.13bp);
+  \draw (129.89bp,116.89bp) ellipse (24.13bp and 24.13bp);
+  \draw (129.89bp,116.89bp) node {10};
+\end{scope}
+  % Node: A0B0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (86.89bp,300.02bp) ellipse (18.0bp and 18.0bp);
+  \draw (86.89bp,300.02bp) node {0};
+\end{scope}
+  % Node: A1B1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (86.89bp,211.52bp) ellipse (18.0bp and 18.0bp);
+  \draw (86.89bp,211.52bp) node {5};
+\end{scope}
+  % Node: start_node
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (86.89bp,373.02bp) node {start};
+\end{scope}
+%
+\end{tikzpicture}
+
+    \caption{Synchronous Product of the Loop example}
+    \label{fig:loop-sync}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+\begin{tikzpicture}[>=latex',line join=bevel,scale=0.5]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: B3 -> B4
+  \draw [->] (144.22bp,96.57bp) .. controls (135.94bp,85.51bp) and (126.9bp,69.041bp)  .. (131.56bp,54.0bp) .. controls (132.92bp,49.613bp) and (135.04bp,45.286bp)  .. (143.89bp,31.954bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (145.06bp,62.25bp) node {1 ? v};
+  % Edge: B4 -> B3
+  \draw [->] (157.32bp,36.071bp) .. controls (157.82bp,41.766bp) and (158.31bp,48.151bp)  .. (158.56bp,54.0bp) .. controls (158.94bp,62.881bp) and (158.66bp,72.558bp)  .. (157.33bp,92.502bp);
+  \draw (172.23bp,62.25bp) node {1 ? v};
+  % Edge: Bdummy -> B0
+  \draw [->] (186.56bp,346.67bp) .. controls (186.56bp,339.06bp) and (186.56bp,329.85bp)  .. (186.56bp,309.95bp);
+  % Edge: A3 -> A1
+  \draw [->] (24.844bp,127.99bp) .. controls (29.004bp,140.98bp) and (34.892bp,159.35bp)  .. (43.239bp,185.4bp);
+  \draw (49.406bp,158.75bp) node {1 ! v};
+  % Edge: B0 -> B1
+  \draw [->] (186.56bp,273.41bp) .. controls (186.56bp,261.76bp) and (186.56bp,246.05bp)  .. (186.56bp,221.35bp);
+  \draw (200.06bp,247.25bp) node {0 ? v};
+  % Edge: A1 -> A2
+  \draw [->] (56.87bp,186.65bp) .. controls (63.703bp,174.03bp) and (73.577bp,155.79bp)  .. (87.333bp,130.39bp);
+  \draw (88.742bp,158.75bp) node {0 ! v};
+  % Edge: A1 -> A3
+  \draw [->] (32.341bp,194.41bp) .. controls (21.881bp,188.55bp) and (9.1337bp,179.34bp)  .. (3.0583bp,167.0bp) .. controls (-1.7681bp,157.2bp) and (0.47788bp,145.72bp)  .. (9.7171bp,125.67bp);
+  \draw (15.808bp,158.75bp) node {1 ! v};
+  % Edge: A0 -> A1
+  \draw [->] (48.558bp,273.41bp) .. controls (48.558bp,261.76bp) and (48.558bp,246.05bp)  .. (48.558bp,221.35bp);
+  \draw (61.308bp,247.25bp) node {0 ! v};
+  % Edge: B1 -> B3
+  \draw [->] (176.88bp,187.53bp) .. controls (173.18bp,181.42bp) and (169.2bp,174.08bp)  .. (166.56bp,167.0bp) .. controls (163.37bp,158.46bp) and (161.05bp,148.82bp)  .. (157.5bp,128.65bp);
+  \draw (180.06bp,158.75bp) node {1 ? v};
+  % Edge: B1 -> B2
+  \draw [->] (191.51bp,185.4bp) .. controls (195.04bp,173.56bp) and (199.9bp,157.28bp)  .. (207.41bp,132.12bp);
+  \draw (215.17bp,158.75bp) node {0 ? v};
+  % Edge: Adummy -> A0
+  \draw [->] (48.558bp,346.67bp) .. controls (48.558bp,339.06bp) and (48.558bp,329.85bp)  .. (48.558bp,309.95bp);
+  % Node: A2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (97.56bp,110.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (97.56bp,110.5bp) ellipse (22.0bp and 22.0bp);
+  \draw (97.558bp,110.5bp) node {2};
+\end{scope}
+  % Node: B3
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (155.56bp,110.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (155.56bp,110.5bp) node {3};
+\end{scope}
+  % Node: B4
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (155.56bp,18.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (155.56bp,18.0bp) node {4};
+\end{scope}
+  % Node: Bdummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (186.56bp,364.5bp) ellipse (27.0bp and 18.0bp);
+  \draw (186.56bp,364.5bp) node {B};
+\end{scope}
+  % Node: B0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (186.56bp,291.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (186.56bp,291.5bp) node {0};
+\end{scope}
+  % Node: A3
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (19.56bp,110.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (19.558bp,110.5bp) node {3};
+\end{scope}
+  % Node: A1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (48.56bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (48.558bp,203.0bp) node {1};
+\end{scope}
+  % Node: B1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (186.56bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (186.56bp,203.0bp) node {1};
+\end{scope}
+  % Node: B2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (213.56bp,110.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (213.56bp,110.5bp) ellipse (22.0bp and 22.0bp);
+  \draw (213.56bp,110.5bp) node {2};
+\end{scope}
+  % Node: A0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (48.56bp,291.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (48.558bp,291.5bp) node {0};
+\end{scope}
+  % Node: Adummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (48.56bp,364.5bp) ellipse (27.0bp and 18.0bp);
+  \draw (48.558bp,364.5bp) node {A};
+\end{scope}
+%
+\end{tikzpicture}
+    \caption{SCM automata representation of the Example~\ref{exm:loop}.}
+    \label{fig:loop}
+\end{figure}
+
+\end{appendices}

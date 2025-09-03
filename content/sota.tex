@@ -1,0 +1,215 @@
+\section{State of the art}\label{sec:sota}
+% In this section, I provide an overview of existing research on the 
+% implementability problem, 
+% a topic primarily investigated in Message Sequence 
+% Charts (MSC), Choreographies, and Multiparty Session Types (MPST).
+
+\subsection{Message Sequence Charts}
+Message Sequence Charts (MSCs) are a standardized graphical formalism,
+introduced in 1992 \cite{MSCStandard}, used to describe trace languages for specifying
+communication behavior. Thanks to their simplicity and intuitive
+semantics, MSCs have been widely adopted in industry.
+Figure~\ref{fig:msc-cli-ser} illustrates a simple example based on a
+minimal client–server architecture. An extension of this formalism,
+known as High-Level Message Sequence Charts (HMSCs), was later
+introduced \cite{HMSCStandard}. HMSCs enable the definition of
+MSCs as nodes connected by transitions and are used to model more
+complex patterns of message flows by capturing sequences, alternatives,
+or iterations of atomic MSC scenarios.
+
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{Client}{}
+	\declinst{P2}{Server}{}
+
+	\mess{request}{P1}{P2}
+	\nextlevel
+	\mess{answer}{P2}{P1}
+\end{msc}
+\caption{Simple example of a client-server architecture.}
+\label{fig:msc-cli-ser}
+\end{figure}
+
+The \emph{realizability problem} was first introduced for MSC languages 
+in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
+implementation that can realize all behaviors of a finite set of MSCs 
+without introducing additional ones. A stronger variant, called 
+\emph{safe realizability}, requires the implementation to also be \textbf{deadlock-free}. 
+% In this setting, distributed implementations are defined using communicating 
+% automata with explicit accepting states, and deadlock-freedom corresponds 
+% to the ability to reach an accepting state from any reachable configuration. 
+For finite sets of MSCs, weakly realizability is \verb|coNP|-complete and safe 
+realizability is shown to be decidable in P-time~\cite{alur2005realizability}.
+The problem was subsequently studied for infinite MSC languages, defined 
+as MSC-Graphs (MSGs). For bounded MSGs, safe realizability 
+remains decidable, but weak realizability 
+is undecidable~\cite{alur2005realizability}. Extensions of these results to non-FIFO 
+semantics were investigated in~\cite{morin2002recognizable}, corresponding 
+to bag semantics under peer-to-peer communication. 
+Later, Lohrey proved that in the general case, safe realizability 
+is undecidable~\cite{lohrey2003realizability}, though it is decidable (and 
+EXPSPACE-complete) for globally cooperative MSGs.
+Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
+a new class of HMSCs that allows unbounded channels while maintaining implementability.
+% A summary of the main complexity resuluts is given in Table~\ref{tab:realizability}.
+
+% \begin{table}[!ht]
+% 	\centering
+% 	\begin{tabular}{|l|c|c|c|}
+% 		\hline
+% 		& \textbf{Finite set} & \textbf{Bounded graphs} & \textbf{Unbounded} \\
+% 		\hline
+% 		\textbf{Weak} & coNP-complete & undecidable & undecidable \\
+% 		\hline
+% 		\textbf{Safe} & P-time & EXPSPACE-complete & undecidable \\
+% 		\hline
+% 	\end{tabular}
+% 	\caption{Summary of results on realizability.}
+% 	\label{tab:realizability}
+% \end{table}
+
+% \subsection{Choreographies}
+% Choreographies \cite{montesi2014choreographic} are another formalism to describe  
+% distributed communication protocols. Unlike MSCs or MPST, which focus either on 
+% trace-based semantics or type systems, choreographies emphasize the 
+% global specification of interactions as a high-level description of the 
+% intended message exchanges. Their goal is to ensure that a distributed 
+% implementation can be derived in which each participant follows a local 
+% behavior consistent with the global description. This setting naturally 
+% connects to the realizability problem, since the key question is whether 
+% a choreography can be faithfully implemented by a system of local 
+% processes.
+
+% Early work~\cite{fu2004conversation} introduced \emph{synchronizability} 
+% as a criterion for checking realizability of choreographies. Later work 
+% by Basu and Bultan~\cite{basu2011choreography} refined this notion and 
+% established connections between synchronizability and decidability of 
+% verification tasks. However, synchronizability itself was shown to be 
+% undecidable in general~\cite{finkel2023synchronizability}, limiting its 
+% applicability.  
+% An alternative line of work, pioneered by Barbanera et 
+% al.~\cite{barbanera2020choreography,barbanera2022formal}, introduced 
+% syntactic well-formedness conditions on choreographies. Well-formed 
+% choreographies are guaranteed to be both safe and realizable, since 
+% their projection onto communicating automata preserves language 
+% equivalence and ensures deadlock-freedom.
+
+\subsection{Multiparty Session Types}
+Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
+provide a type-theoretic framework to specify and verify communication 
+protocols among multiple participants. They ensure that communication 
+follows a predefined structure, preventing errors such as deadlocks, 
+orphan messages, and unspecified receptions. The 
+\textbf{global specification} describes the overall communication 
+protocol. From this, one derives the \textbf{local behaviors} of each 
+participant via a \emph{projection} operation. The system's 
+\textbf{processes} form the \emph{implementation}, defining how 
+participants interact. With the definition of a \emph{typing system} 
+and suitable \emph{type-checking rules}, one ensures that the 
+implementation conforms to the local specification, thereby 
+guaranteeing properties such as \emph{well-formedness}.  
+
+% In this setting, the analogue of realizability is often called 
+% \emph{session fidelity}: a property ensuring that the combined local 
+% types behave exactly according to the global type. When the global 
+% type satisfies syntactic restrictions, its projection is guaranteed 
+% to be both realizable and deadlock-free, which corresponds to safe 
+% realizability in the MSC setting.  
+
+\subsubsection{Projectability}
+A central notion in MPST is \emph{projectability}, which asks whether 
+a global type can be faithfully projected into local specifications for 
+each participant. If projection succeeds, the resulting local types 
+interact without mismatches or unintended behaviors, effectively 
+bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
+Projection algorithms, however, often reject natural protocols that 
+fail to meet restrictive syntactic conditions. This tension between 
+expressivity and safety has motivated extensions of the theory, with 
+\cite{castagna2012global} being the only algorithm aiming for full 
+completeness.
+
+Recent work has focused on strengthening the connection between MPST 
+and automata-theoretic formalisms. Stutz and Zufferey 
+showed that implementability is decidable by encoding global types 
+into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
+Building on this, Li et al.~\cite{li2023complete} proposed a complete 
+projection function for MPST, guaranteeing that every implementable 
+global type admits a correct distributed implementation.
+
+\subsubsection{Mixed and Sender driven choice}
+A key restriction appears in branching. In the original framework \cite{honda2008multiparty,carbone2012structured}, 
+choice is \textbf{sender-driven}: the first sender dictates the branch, 
+ensuring safety but excluding many common patterns where multiple 
+participants influence the decision~\cite{carbone2012structured}.  
+Allowing \textbf{mixed choice} increases expressivity by permitting 
+several initiators, but it also makes the implementability problem 
+undecidable in general~\cite{barbanera2020choreography}.  
+
+\paragraph{Generalized projection operators}
+Stutz’s thesis~\cite{stutz2024implementability} connects MPST to 
+High-level MSCs (HMSCs), introducing a generalized projection operator 
+for sender-driven choice where a sender may branch towards different 
+receivers. This captures patterns beyond classical MPST projection.  
+He also proves that while syntactic projection is incomplete, 
+an automata-theoretic encoding into HMSCs yields decidability for 
+sender-driven choice, with implementability shown to be in 
+\verb|PSPACE|-the first precise complexity bound for this fragment.
+
+\paragraph{Protocol State Machines}
+Later, \cite{stutz2025automata} proposed \emph{Protocol State Machines} 
+(PSMs), an automata-based formalism subsuming both MPST and HMSCs. 
+PSMs show that many syntactic restrictions of global types are not 
+true expressivity limits. Yet, the implementability problem for PSMs 
+with unrestricted mixed choice remains undecidable, resolving the 
+open question that mixed-choice global types are undecidable in general.  
+
+In summary, projectability is well understood for sender-driven choice, 
+where decidability and complexity bounds are established, but moving 
+towards mixed choice inevitably leads to undecidability. Automata-based 
+techniques such as HMSCs and PSMs provide the most powerful tools for 
+extending the theory while preserving decidability in restricted cases.
+
+\subsection{Reduction to synchronous semantic}
+The main idea of this work is that reasoning about implementability 
+becomes more tractable under \emph{synchronous} 
+semantics for automata-based solutions to the implementability problem. 
+In synchronous communication, send and receive actions 
+are tightly coupled, effectively removing nondeterminism 
+caused by asynchronous message buffering. Several results exploit this 
+observation by reducing the implementability problem under richer 
+communication models (e.g.\ asynchronous or peer-to-peer FIFO) to the 
+simpler synchronous case~\cite{alur2005realizability,di2023partial}.
+
+Formally, one can show that if a global type is implementable in 
+synchronous semantics, then under certain conditions it is also 
+implementable in more general models such as peer-to-peer or mailbox 
+semantics. This reduction requires constraints such as 
+\emph{orphan-freedom} (no message is left unmatched) and
+\emph{deadlock-freedom}.
+The following theorem, currently a work in progress by my supervisors \cite{di2025realisability}, 
+provides a characterization of a connection between 
+peer-to-peer semantics and synchronous semantics:
+
+\begin{theorem}
+	A global type $G$ is implementable in \verb|p2p| iff:
+	\begin{enumerate}
+		\item $L_{\text{p2p}}(proj(G))$ is a set of sync MSCs;
+		\item $proj(G)$ is orphan-free in p2p;
+		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free;
+		\item $G$ is implementable in sync.
+	\end{enumerate}
+\end{theorem}
+
+This result highlights the central role of synchronous semantics as a 
+\emph{core model}: implementability in peer-to-peer systems 
+can be reduced to the synchronous case provided the additional safety 
+conditions are met. My own contribution focuses on the last item of the 
+theorem, namely the problem of checking whether a given global type is 
+implementable in synchronous semantics. This question is at the heart 
+of the undecidability results presented in Section~\ref{sec:proof}, 
+and motivates the need for the identification of new subclasses that 
+enable new verification techniques along with tool support.
+
+% aggiungere una comparazione sulle varie nozioni di implementabilità:
+% dire quali sono uguali e quali diverse

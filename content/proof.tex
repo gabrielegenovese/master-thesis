@@ -1,0 +1,380 @@
+\section{Weak-Realizability is Undecidable for Synch Global Types}\label{sec:proof}
+
+As already mentioned, the first contribution is Theorem~\ref{thm:main},
+which states that Weak-realizability is undecidable for synchronous global types. 
+To understand this result, I have already covered the basic notions in 
+Section~\ref{sec:pre} on MSCs, Global Types, and Weak-realizability. 
+These concepts are general and align 
+closely with definitions used in previously established works. 
+We now introduce the main objects employed in the proof of Theorem~\ref{thm:main}. 
+The proof itself is adapted from the work of 
+Alur et~al.~\cite{alur2005realizability}. 
+% TODO: dare skatch idea della prova prima di presentare formalmente tutte queste definitoni
+
+\subsection{Definitions}
+The proof is carried out by reduction from the RPCP problem, which I now recall.  
+The Relaxed Post Correspondence Problem (RPCP) is a variant of the 
+classical Post Correspondence Problem (PCP). RPCP was shown to be 
+undecidable by Alur~et~al.~\cite{alur2005realizability}, via reduction 
+from PCP.
+
+\begin{definition}[Relaxed Post Correspondence Problem]
+	Given a set of tiles $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, 
+	determine whether there exist indices $i_1, ..., i_m$ such that
+	$$x_{i_1}\cdots x_{i_m} = y_{i_1}\cdots y_{i_m},$$
+	where $x_{i_j}, y_{i_j} \in \{v_{i_j}, w_{i_j}\}$, such that:
+	\begin{itemize}
+		\item there exists at least one index $i_\ell$ for which $x_{i_\ell}\neq y_{i_\ell}$, and
+		\item for all $j \leq m$, $y_{i_1}\cdots y_{i_j}$ is a prefix of $x_{i_1}\cdots x_{i_j}$.
+	\end{itemize}
+\end{definition}
+
+Intuitively, RPCP requires that the concatenation on the left-hand side always 
+grows at least as fast as the right-hand side, while ensuring that at least one 
+chosen tile differs between the two sequences. Moreover, in constructing the 
+strings, we may freely choose which element of each tile (either $v_i$ or $w_i$) 
+contributes to the left or right sequence.
+
+With this definition in place, I now introduce the main objects used 
+in the proof. Specifically, I begin by showing how a Global Type can 
+represent a single \verb|synch| MSC.
+
+\begin{definition}[$G_M$]\label{def:gm}
+	Given an MSC $M\in \mscsetofmodel{\synchmodel}$, there exists a
+	global type $G_M$ such that $\{M\} = \existentialmsclanguageof{\gt}$.
+\end{definition}
+
+We now define a particular Global Type that will be useful in the reduction.
+
+\begin{definition}[$G_S$]\label{def:gs}
+	Given a string $S\in\Sigma^*$, and two integers $i, n$,
+	the global type $G_S$ is the global type composed of:
+	\begin{itemize}
+		\item $\mathbb{P}=\{p,q,r,s\}$;
+		\item $\mathbb{M}=\{m_1,m_2,m_3,m_{S_1},...,m_{S_c}\}$ where
+		      $m_1 = (i,n), m_2 = i, m_3 = (i,n),\\ m_{S_1} = S_1,...,m_{S_c} = S_c$ 
+		      with $c = |S|$;
+		\item Arr $=\{$\arrmess{p}{q}{m_1}, \arrmess{p}{s}{m_2}, \arrmess{s}{r}{m_3},
+		      \arrmess{q}{r}{m_{S_1}}, ..., \arrmess{q}{r}{m_{S_c}}$\}$ where each arrow
+		      denotes a synchronous message accompanied by an acknowledgment.
+	\end{itemize}
+	This global type is depicted in Figure~\ref{fig:gtype}.
+	
+	\begin{figure}[!ht]
+		\centering
+		\begin{tikzpicture}[->, node distance=24mm, on grid, auto]
+			\node[state] (q0) {$q_0$};
+			\node[state] (q1) [right=of q0] {$q_1$};
+			\node[state] (q2) [right=of q1] {$q_2$};
+			\node[state] (q3) [below left=of q0] {$q_3$};
+			\node[state] (q4) [right=of q3] {$q_4$};
+			\node[state] (q5) [right=of q4] {$q_x$};
+			\node[state] (q6) [right=of q5] {$q_y$};
+
+			\path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
+			\path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
+			\path (q2) edge[] node[above left] {\arrmess{s}{r}{(i,n)}} (q3.45);
+			\path (q3) edge[] node[above] {\arrmess{q}{r}{S_1}} (q4);
+			\path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
+			\path (q5) edge[] node[above] {\arrmess{q}{r}{S_c}} (q6);
+		\end{tikzpicture}
+		\caption{The global type $G_S$.}
+		\label{fig:gtype}
+	\end{figure}
+
+\end{definition}
+
+Now, let's generalize Definition~\ref{def:gm} to include a set of MSCs.
+
+\begin{definition}[$G^*$]\label{def:gstar}
+	Given a set of MSCs $\mathcal{M} =\{M\ |\ \mscsetofmodel{\synchmodel}\}$,
+	$G^*$ is the set of global types such that $G^*=\{G_M\ |\ M \in \setmsc\}$,
+	where $G_M$ is built using Definition~\ref{def:gm}.
+\end{definition}
+
+Informally, for every MSC $M\in\setmsc$ there exists a global type $G\in G^*$ that
+captures the language of $M$. 
+
+\begin{definition}[The $L^*$ global type]\label{def:lstar}
+	Assume a finite set $\setmsc$ of MSCs, where
+	$\setmsc = \{m\ |\ m \in \mscsetofmodel{\synchmodel}\}$. Let $G^*$
+	be defined as in Definition~\ref{def:gstar}.
+	We define the global type $L^*_{N}$ as the automaton
+	$\mathcal A = (Q,\Sigma, \delta, l_0, F)$ where:
+	\begin{itemize}
+		\item $Q = \{v_I,v_T\}\cup \bigcup_{G\in G^*} Q^G$;
+		\item $\Sigma = \{\epsilon\}\cup\bigcup_{G\in G^*} \Sigma^G$;
+		\item $\delta: Q \times \Sigma \rightarrow 2^Q$ is defined by:
+			      \begin{enumerate}
+				       \item $\forall G \in G^*,\ \delta(v_I, \varepsilon) = q_0^G$ where $q_0^G$ is the initial state of $G$,
+				       \item $\forall G \in G^*,\ \forall q_f^G \in F^G,\ \delta(q_f^G, \varepsilon) = v_T$,
+				       \item $\forall G, G' \in G^*,\ \forall q_f^G \in F^G,\ \delta(q_f^G, \varepsilon) = q_0^{G'}$.
+			      \end{enumerate}
+		\item $l_0 = v_I$ is the initial state;
+		\item $F = v_T$ is the accepting state.
+	\end{itemize}
+	Finally, $L^*$ is obtained by determinizing $L^*_{N}$.
+\end{definition}
+
+Informally, $L^*$ represents all the
+possible executions of a set of MSCs. To complete the set of definitions,
+let's define a particular MSC corresponding to Definition~\ref{def:gs}.
+
+\begin{definition}[$M^n_i$]\label{def:mni}
+	For a string $u$, let $u^l$ denote the $l$-th character of the string.
+	In the MSC $M^n_i$, process~1 synchronously sends the label
+	$m_1 = (i, n)$ to process~2, then transmits the index $m_2=i$
+	to process~4. Subsequently, process~4 sends $m_3 = (i, n)$
+	synchronously to process~3. After these control messages, process~2
+	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
+	synchronously to process~3 (where $c$ is the length of $x_i$).
+	This MSC is depicted in Figure~\ref{fig:mni}, where $n\in\{0,1\}$ and:
+	if $n=0$, then $x_i=v_i$; if $n=1$, then $x_i=w_i$.
+
+	\begin{figure}[!ht]
+		\centering
+		\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+			\declinst{P1}{P1}{}
+			\declinst{P2}{P2}{}
+			\declinst{P3}{P3}{}
+			\declinst{P4}{P4}{}
+
+			\syncmscmess{$(i,n)$}{P1}{P2}
+			\syncmscmess{$i$}{P1}{P4}
+			\syncmscmess{$(i,n)$}{P4}{P3}
+			\syncmscmess{$x_i^1$}{P2}{P3}
+			\syncmscmess{...}{P2}{P3}
+			\syncmscmess{$x_i^c$}{P2}{P3}
+		\end{msc}
+		\caption{The $M_i^n$ MSC.}
+		\label{fig:mni}
+	\end{figure}
+
+\end{definition}
+
+Finally, let's state the lemmas and main theorem of this work, 
+along with all the proofs. 
+
+\subsection{Lemmas and main proof}
+
+Before presenting the main undecidability result, we first establish two
+auxiliary lemmas that characterize the behavior of the MSCs used in the
+reduction. These lemmas will serve as building blocks for the proof of
+Theorem~\ref{thm:main}.
+
+\begin{lemma}\label{lemma:minsynch}
+	The MSC $M_i^n$ belongs to $\mscsetofmodel{\synchmodel}$.
+\end{lemma}
+
+\begin{proof}
+	By Definition~\ref{def:linearisable-msc} and Definition~\ref{def:synch},
+	we need to show a linearization with all send operations
+	followed by their corresponding receive operations:
+	$$
+		\{~!m_1?m_1\ !m_2?m_2\ !m_3?m_3\ !m_i^1?m_i^1 \ldots !m_i^c?m_i^c~\}.
+	$$
+	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
+\end{proof}
+
+\begin{lemma}\label{lemma:msgs}
+	The MSC $M^n_i$ (Def.~\ref{def:mni}) is included in $L(G_S)$, where $G_S$
+	is the global type defined in Def.~\ref{def:gs}.
+\end{lemma}
+
+\begin{proof}
+	Both $M^n_i$ and $G_S$ describe the same communication structure:
+	process $p$ sends $(i,n)$ to $q$ and $i$ to $s$;
+	process $s$ relays $(i,n)$ to $r$;
+	process $q$ then sends the characters of $S$ (here matching $x_i$) to $r$.
+	If $i,n$ and $S$ are the same, the sequence of messages is identical in both 
+	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
+	their linearizations coincide. Hence, $M^n_i \in L(G_S)$.
+\end{proof}
+
+\begin{theorem}\label{thm:main}
+	Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
+\end{theorem}
+
+\begin{proof}
+	The proof proceeds via a reduction from the RPCP problem. Let's define some useful
+	elements for the proof.
+
+	Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of RPCP, we
+	construct a set $L$ of MSCs over four processes as follows. For each pair
+	$(v_i, w_i)$, we define two MSCs, $M^0_i$ and $M^1_i$, as illustrated in
+	Figure~\ref{fig:mni}.
+	Observe that the communication graph of each MSC is strongly connected and
+	involves all four processes. Therefore, the MSC represented from
+	$L^*$ and derived from $L$ is bounded.
+	With the set $L$, and following the Definition~\ref{def:lstar},
+	we can construct the global type $L^*$.
+
+	We need to prove:
+	\begin{center}
+		$\Delta \in \text{RPCP}$ if and only if the global type $L^*$ is not weakly-realizable.
+	\end{center}
+
+	\begin{itemize}
+		\item[$\Rightarrow$]
+		      Let's assume that
+		      $R = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
+		      for a solution to a generic RPCP problem instance, and the bits $a_j$ and
+		      $b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into
+		      the two (left and right)
+		      long strings. Consider the new MSCs $M$ and $M'$ obtained from the sequences
+		      $M = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M' = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
+		      Executions of both of these (sequences of) MSCs must exist in any
+		      realization of $L^*$. Additionally, these MSCs are in $\mscsetofmodel{\synchmodel}$
+		      because they are sequence of $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
+		      $M$ corresponds to the construction of the left side of equation (1) of the RPCP
+		      problem, and, instead, $M'$ represents the construction of the right side.
+		      We then look at the projections $M|_1$, $M|_2$, $M|_3$,
+		      and $M|_4$ of $M$, and $M'|_1$, $M'|_2$, $M'|_3$, $M'|_4$ of $M'$ onto the
+		      4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
+		      $M|_3$, and $M|_4$. This MSC represent the construction of the solution to
+		      the problem. Processes 1 and 2 construct the right part ($y_{i_1}...y_{i_m}$)
+		      and processes 3 and 4 construct the left part ($x_{i_1}...x_{i_m}$).
+		      The claim is that the combined MSC $M''$ is weakly
+		      implied by $L^*$. By definition, the only thing to establish is that $M''$
+		      is indeed an MSC, in the sense that it is acyclic, well-formed, complete
+		      and synchronous.
+		      The only new situation in terms of communication in $M''$ is the
+		      communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+		      But the communication between $P_1$ and $P_4$ is consistent in
+		      $M'|_1$ and $M|_4$ (i.e., the sequence of messages sent from $P_1$ to
+		      $P_4$ in $M'|_1$ is equal to the sequence of messages received in $M|_4$),
+		      and the communication between $P_2$ and $P_3$ is consistent in
+		      $M'|_2$ and $M|_3$ because $R$ is a solution to the RPCP.
+		      Furthermore, the acyclicity of $M''$ follows from the property of the
+		      solution that the string formed by the first $j$ words on processes 1
+		      and 2 is always a prefix of the string formed by the first $j$ words
+		      on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
+		      is sent before it needs to be received.
+
+		      Finally, we prove that $M'' \in \mscsetofmodel{\synchmodel}$.
+		      Assume, for contradiction, that $M'' \notin \mscsetofmodel{\synchmodel}$.
+		      Then, there should be a cycle of dependencies in the communication pattern.
+		      There are no communication between $P_2$ and $P_4$, and between $P_1$
+		      and $P_3$. Therefore, this cycle must involve all processes, starting
+		      for example from $P_1$ and having this dependency graph
+		      $P_1\leftrightarrow P_2\leftrightarrow P_3\leftrightarrow P_4\leftrightarrow P_1$.
+		      The only new situation that we now that can cause a cycle are the communication
+		      between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+		      We don't need to analyze the new communication between $P_1$ and $P_4$ because
+		      it's not feasible in any communication model, but we need to analyze the one
+		      between $P_2$ and $P_3$ because it's feasible in FIFO.
+
+		      % For the fist comunication, the only possible cycle pattern is depicted
+		      % in Fig.~\ref{fig:cycle1}
+
+		      % \begin{figure}[!ht]
+		      %  \centering
+		      %  \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+		      %   \declinst{P1}{P1}{}
+		      %   \declinst{P2}{P2}{}
+		      %   \declinst{P3}{P3}{}
+		      %   \declinst{P4}{P4}{}
+
+		      %   \mess[label position=above right,pos=0.45]{$i_z$}{P1}{P4}[8]
+		      %   \nextlevel
+		      %   \nextlevel
+		      %   \nextlevel
+		      %   \syncmscmess{($i_k,n_k)$}{P1}{P2}
+		      %   \mess[label position=above,pos=0.62]{$i_k$}{P1}{P4}
+		      %   \mess{}{P4}{P1}
+		      %   \nextlevel
+		      %   \syncmscmess{$(i_k,n_j)$}{P3}{P4}
+		      %   \nextlevel
+		      %   \nextlevel
+		      %   \mess{}{P4}{P1}[-8]
+		      %  \end{msc}
+		      %  \caption{The $M_i^n$ MSC.}
+		      %  \label{fig:cycle1}
+		      % \end{figure}
+
+		      % This cycle is not possible because it does not represent a
+		      % solution to the RPCP problem:
+		      % $x_1...x_{i_k}...x_{i_z}...x_m \neq y_1...y_{i_z}...y_{i_k}...y_m$.
+
+		      \begin{figure}[!ht]
+			      \centering
+			      \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+				      \declinst{P1}{P1}{}
+				      \declinst{P2}{P2}{}
+				      \declinst{P3}{P3}{}
+				      \declinst{P4}{P4}{}
+
+				      \mess[label position=above right, pos=0.3]{$c$}{P2}{P3}[4]%
+				      \nextlevel
+				      \syncmscmess{($i_k,n_k)$}{P1}{P2}
+				      \mess[pos=0.62]{$i_k$}{P1}{P4}%
+				      \mess{}{P4}{P1}
+				      \nextlevel
+				      \syncmscmess{$(i_k,n_j)$}{P3}{P4}
+				      \mess{}{P3}{P2}[-4]
+			      \end{msc}
+			      \caption{The $M_i^n$ MSC.}
+			      \label{fig:cycle2}
+		      \end{figure}
+
+		      For the communication between $P_2$ and $P_3$, the only possible cycle
+		      pattern is depicted in Fig.~\ref{fig:cycle2}.
+		      Suppose $P_2$ wants to send a character $c$, but $P_3$
+		      is not expecting any further characters. In order for
+		      $P_3$ to resume receiving, it must first receive an index
+		      from $P_4$. However, $P_4$ can only send this index
+		      after receiving it from $P_1$, which in turn must first
+		      communicate the index to $P_2$.
+		      At this point, $P_2$ needs to receive the index from
+		      $P_1$, but it cannot do so until it finishes sending
+		      character $c$. This creates a circular dependency among the
+		      processes, making the communication pattern impossible.
+		      This cycle would break the prefix property as
+		      $x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
+		      in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
+		      assumption that $y_1...y_{k-1} \leq x_1...x_{k-1}$.
+		      Therefore, we conclude that $M'' \in \mscsetofmodel{\synchmodel}$.
+
+		      Note that $M''$ cannot itself be in $L^*$ because there must be
+		      some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
+		      after $P_1$ announces the index, what $P_2$ sends is not
+		      identical to what $P_3$ receives.
+
+		\item[$\Leftarrow$]
+		      Suppose there is some MSC $M^@$ which
+		      exists in any realization of $L^*$, but is not in $L^*$ itself. We want
+		      to derive a solution to $\Delta$ from $M^@$.
+		      First, it is clear that the projection $M^@|_1$ must consist of a sequence
+		      of pairs of messages (the first of each pair acknowledged), sent from
+		      process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
+		      Likewise, it is clear that, in order for process 2 to receive those messages,
+		      $M^@|_2$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
+		      each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
+		      $b = 0$ or $b = 1$, before the next index pair is received.
+		      Likewise, $M^@|_4$ consists of a sequence of receipts of index $i$ from
+		      process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
+		      $M^@|_3$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
+		      by receipt of $v_i$ or $w_i$, respectively.
+		      Now, since $M^@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
+		      $w_i$ must differ on process 2 and process 3. (Note, we are assuming that
+		      the buffers between processes are FIFO.)
+		      Furthermore, because of the precedences, the prefix formed by the first
+		      $j$ words on process 2 must precede the $(j + 1)$-th message from
+		      process 1 to process 4, which in turn precedes the $(j + 1)$-th message
+		      from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
+		      string formed by the first $j$ words on process 2 is a prefix of the string
+		      formed by the first $j$ words on process 3. Therefore, we can readily
+		      build a solution for $\Delta$ from $M^@$ by building the strings of the solution
+		      taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds $y$ and $P_4$
+		      builds $y$.
+
+	\end{itemize}
+
+\end{proof}
+
+The sequence of lemmas and the main theorem collectively establish the
+undecidability of weak-realizability for global types.
+% Having developed the
+% theoretical foundation, we now move to the next section, where we focus on the
+% practical aspects of analyzing realizability, and introduce the \textsc{ReSCu}
+% tool.

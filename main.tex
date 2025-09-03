@@ -1,0 +1,175 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{indentfirst}
+\usepackage{newlfont}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{stmaryrd}
+\usepackage{listings}
+\usepackage{xcolor, colortbl}
+\usepackage{pgfgantt}
+\usepackage{dirtree}
+\usepackage{todonotes}
+\usepackage{bussproofs}
+\usepackage{mathtools}
+\usepackage{msc}
+\usepackage{subcaption}
+\usepackage{macros}
+\usepackage[toc,page]{appendix}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}{Example}
+
+\usetikzlibrary{automata,arrows,positioning}
+\pgfmathtruncatemacro\distance{1}
+
+\definecolor{green}{rgb}{0,0.5,0}
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{yellow}{rgb}{0.5,0.5,0}
+\definecolor{codeashgrey}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{ashgrey}{rgb}{0.7, 0.75, 0.71}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codeashgrey},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}[section]
+
+\title{On the Implementability of Global Types}
+\author{Student: Gabriele Genovese Supervisor: Cinzia Di Giusto}
+\date{\today}
+
+\begin{document}
+
+\begin{titlepage}
+    \pagenumbering{roman} 
+	\begin{center}
+        \vspace{20mm}
+        \begin{minipage}[t]{0.48\textwidth}
+            \includegraphics[width=0.8\textwidth]{pres/unica.png}
+        \end{minipage}%
+        \hfill
+        \begin{minipage}[t]{0.52\textwidth}\raggedleft
+            \includegraphics[width=0.5\textwidth]{pres/i3s.png}
+        \end{minipage}
+        \\
+        \vspace{35mm}
+		{
+        {\huge{\textbf{TER Final Report}}}
+        }
+	\end{center}
+	\vspace{10mm}
+	\begin{center}
+        \par\noindent\rule{\textwidth}{0.8pt}
+        \vspace{5mm}
+		{\LARGE{\textbf{On the Implementability of\\Global Types}}}%\\ \LARGE{Subtitle}}
+        \par\noindent\rule{\textwidth}{0.8pt}
+        \vspace{5mm}
+	\end{center}
+	\vspace{30mm}
+	\par
+	\noindent
+	\begin{minipage}[t]{0.47\textwidth}
+		{\Large{Supervisors:\\
+				\textsc{Cinzia Di Giusto}\\
+				\textsc{Étienne Lozes}}}\\
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.47\textwidth}\raggedleft
+		{\Large{Student:\\
+				\textsc{Gabriele Genovese}\\
+	}}
+    \end{minipage}
+	\vspace{25mm}
+	\begin{center}
+		{\large{Academic Year 2024/25\\Master in Computer Science / Ubinet Track}}
+	\end{center}
+\end{titlepage}
+
+\pagenumbering{arabic} 
+% \setcounter{page}{2}
+\begin{center}
+    \Large{\textbf{Abstract}}
+\end{center}
+Behavioral types define how information is exchanged in distributed systems.
+An example are Multiparty Session Types (MPST), which describe interactions between multiple participants
+using global protocols and their local counterparts. Ensuring correct implementation,
+including deadlock freedom and session conformance, is a central concern in MPST.
+While most research targets peer-to-peer communication, real-world systems often
+use different communication models such as mailbox-based or causally ordered messaging.
+A key challenge is that protocols valid in one model may fail in another.
+In this work, we develop a flexible MPST framework parameterized by different network
+semantics, including asynchronous, peer-to-peer, causal ordering, and synchronous.
+We study the implementability problem from a broad semantic perspective, aiming to
+understand its fundamental limits. My contributions include a survey
+of related work, a proof of undecidability for weak implementability under synchronous
+semantics, and enhancements to the \textsc{ReSCu} tool for checking deadlock freedom in
+synchronous systems. This approach embeds communication models as a parameter, and it
+provides a basis for verifying distributed systems beyond classical settings.
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\input{content/introduction}
+
+\input{content/sota}
+
+\input{content/preliminary}
+
+\input{content/proof}
+
+\input{content/rescu}
+
+\input{content/conclusion}
+
+\newpage
+
+\phantomsection
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\newpage
+
+\input{content/appendix}
+
+\end{document}
