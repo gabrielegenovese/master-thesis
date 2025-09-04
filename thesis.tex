@@ -1,10 +1,9 @@
-\documentclass{article}
+\documentclass[12pt,a4paper,twoside]{book}
 \usepackage{graphicx}
+\usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{hyperref}
-\usepackage{fancyhdr}
 \usepackage{indentfirst}
-\usepackage{newlfont}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{latexsym}
@@ -24,7 +23,27 @@
 \usepackage{msc}
 \usepackage{subcaption}
 \usepackage{macros}
-\usepackage[toc,page]{appendix}
+\usepackage[a4paper,inner=3.5cm,outer=2.5cm]{geometry}
+\usepackage[titletoc,title,toc,page]{appendix}
+\usepackage{verbatim}
+\usepackage{placeins}
+\usepackage{parskip}
+\usepackage{blindtext}
+\usepackage{chngcntr}
+\counterwithin{table}{chapter}
+\usepackage{newlfont}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{soul}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+\usepackage{multirow}
+\usepackage{hyphenat}
+\hyphenation{mate-mati-ca recu-perare}
+\usepackage{pdfpages}
+
+\newcommand{\rom}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -78,55 +97,66 @@
 \begin{document}
 
 \begin{titlepage}
-    \pagenumbering{roman} 
-	\begin{center}
-        \vspace{20mm}
-        \begin{minipage}[t]{0.48\textwidth}
-            \includegraphics[width=0.8\textwidth]{pres/unica.png}
-        \end{minipage}%
-        \hfill
-        \begin{minipage}[t]{0.52\textwidth}\raggedleft
-            \includegraphics[width=0.5\textwidth]{pres/i3s.png}
-        \end{minipage}
-        \\
-        \vspace{35mm}
-		{
-        {\huge{\textbf{TER Final Report}}}
-        }
-	\end{center}
-	\vspace{10mm}
-	\begin{center}
-        \par\noindent\rule{\textwidth}{0.8pt}
-        \vspace{5mm}
-		{\LARGE{\textbf{On the Implementability of\\Global Types}}}%\\ \LARGE{Subtitle}}
-        \par\noindent\rule{\textwidth}{0.8pt}
-        \vspace{5mm}
-	\end{center}
-	\vspace{30mm}
-	\par
-	\noindent
-	\begin{minipage}[t]{0.47\textwidth}
-		{\Large{Supervisors:\\
-				\textsc{Cinzia Di Giusto}\\
-				\textsc{Étienne Lozes}}}\\
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.47\textwidth}\raggedleft
-		{\Large{Student:\\
-				\textsc{Gabriele Genovese}\\
-	}}
-    \end{minipage}
-	\vspace{25mm}
-	\begin{center}
-		{\large{Academic Year 2024/25\\Master in Computer Science / Ubinet Track}}
-	\end{center}
+\begin{center}
+    \includegraphics[width=6.5cm,height=4.7cm]{img/unibo.png}
+    
+    \vspace{10mm}
+   
+    {\large{\bf{Dipartimento di Informatica - Scienza e Ingegneria}}} 
+    
+    \vspace{5mm}
+    
+    {\Large{\bf{Corso di Laurea Magistrale in Informatica}}}
+    
+    \vspace{15mm}
+    
+    {\Huge{\bf On the Implementability }}\\
+    
+    \vspace{3mm}
+    
+    {\Huge{\bf of Global Types}}\\
+   
+    \vspace{3mm}
+\end{center}
+
+\vspace{10mm}
+
+\begin{minipage}[t]{0.45\textwidth}
+    
+    {\Large{\bf Relatore: \\ Prof. Ivan Lanese}}
+    \vspace{3mm}
+    {\Large{\bf Correlatore:\\Prof. Cinzia Di Giusto\\Prof. Étienne Lozes}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.37\textwidth}\raggedleft
+    {\Large{\bf Presentata da: \\ Gabriele Genovese}}\\
+    {\Large{\bf Contro-relatore: \\ Luca Padovani}}
+\end{minipage}
+
+\vspace{25mm}
+\rule[0.5cm]{15.8cm}{0.6mm}
+
+\begin{center}
+    {\large{\bf Sessione II Ottobre 2025 \\}}
+    {\large{\bf Anno Accademico 2024/2025\\}}
+\end{center}
+
 \end{titlepage}
 
-\pagenumbering{arabic} 
-% \setcounter{page}{2}
-\begin{center}
-    \Large{\textbf{Abstract}}
-\end{center}
+\thispagestyle{plain}
+\restoregeometry
+\topmargin=6.5cm
+\begin{flushright}
+\emph{
+\LARGE{Il diavolo sta nei dettagli}%\\\vspace{2mm}
+% \LARGE{su più righe}
+}
+\end{flushright}
+
+\newpage~\thispagestyle{plain}~\newpage
+\pagenumbering{gobble}
+
+\chapter*{Abstract}
 Behavioral types define how information is exchanged in distributed systems.
 An example are Multiparty Session Types (MPST), which describe interactions between multiple participants
 using global protocols and their local counterparts. Ensuring correct implementation,
@@ -143,11 +173,21 @@ semantics, and enhancements to the \textsc{ReSCu} tool for checking deadlock fre
 synchronous systems. This approach embeds communication models as a parameter, and it
 provides a basis for verifying distributed systems beyond classical settings.
 
-\newpage
-
+\topmargin=-1cm
 \tableofcontents
+\thispagestyle{empty}
+\listoftables
+\thispagestyle{empty}
+\listoffigures
+\thispagestyle{empty}
+\lstlistoflistings
+\thispagestyle{empty}
+\newpage~\newpage
 
-\newpage
+
+\pagenumbering{arabic}
+% \setcounter{chapter}{-1}
+\raggedbottom
 
 \input{content/introduction}
 
@@ -164,12 +204,11 @@ provides a basis for verifying distributed systems beyond classical settings.
 \newpage
 
 \phantomsection
-\addcontentsline{toc}{section}{References}
+\addcontentsline{toc}{chapter}{References}
 \bibliographystyle{plain}
 \bibliography{ref}
 
-\newpage
-
-\input{content/appendix}
+% \newpage
+% \input{content/appendix}
 
 \end{document}

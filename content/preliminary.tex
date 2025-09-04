@@ -1,4 +1,4 @@
-\section{Preliminaries}\label{sec:pre}
+\chapter{Preliminaries}\label{sec:pre}
 In this section, the fundamental concepts and definitions necessary 
 to contextualize the main contributions of this work are presented. 
 I, first, introduce Message Sequence Charts (MSC), followed by 
@@ -45,7 +45,7 @@ as the set of events executed by $p$.
 \end{definition}
 
 
-\subsection{Communication Models}
+\section{Communication Models}
 
 With MSCs, \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few of them informally, using examples to
@@ -252,7 +252,7 @@ Finally, let's formally define what is a \verb|synch|-MSCs in this context.
 In other words, an MSC $M$ belongs to $\mscsetofmodel{\synchmodel}$ if
 all send events are immediately followed by their corresponding receive events.
 
-\subsection{Basic notions for Global Types}
+\section{Basic notions for Global Types}
 This part will further highlight the basic notion to understand the formal proof 
 for the theorem presented in Section~\ref{sec:proof} and, in particular, Global Type
 and Weakly-realizable. We begin by extending the definition of linearisability so 

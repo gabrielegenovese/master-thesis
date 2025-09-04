@@ -13,6 +13,8 @@ images/.DS_Store
 *.fls
 *.out
 *.nav
+*.lot
+*.lof
 *.snm
 *.toc
 *.vrb
@@ -39,3 +41,5 @@ semantics/semantics.log
 semantics/semantics.out
 semantics/semantics.synctex.gz
 .vscode
+prova.tex
+prova.pdf
