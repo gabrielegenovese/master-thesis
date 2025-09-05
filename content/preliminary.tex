@@ -10,6 +10,7 @@ elements required to understand the theoretical contributions.
 % First, I introduce a formal definition of MSCs, as this will serve as
 % a foundation for establishing their connection with Global Types in
 % one of the main contributions of this work.
+\section{MSCs and Communication Models}
 
 \begin{definition}[Message Sequence Chart]
 Let $\mathbb{P}$ be a finite set of processes and $\mathbb{M}$ a set of messages.  
@@ -45,8 +46,6 @@ as the set of events executed by $p$.
 \end{definition}
 
 
-\section{Communication Models}
-
 With MSCs, \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few of them informally, using examples to
 highlight the differences from the main semantics considered in this work,
@@ -57,7 +56,7 @@ are really part of the corresponding communication semantics with an online
 tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows a hierarchy
 of the communication semantics defined.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \begin{tikzpicture}[scale=0.6]
   % list of labels in order (from smallest to largest)
@@ -401,7 +400,7 @@ at each process projection we recover the same behavior in one of
 them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
 Figure~\ref{fig:weak-impl} illustrates the three MSCs.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \begin{tabular}{ccc}
 \begin{minipage}{0.32\textwidth}
