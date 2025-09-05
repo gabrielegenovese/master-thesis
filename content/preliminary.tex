@@ -54,7 +54,23 @@ which is \verb|synch|, that is also the only one formally defined in
 Definition~\ref{def:synch}. Some examples are
 shown in Figure~\ref{fig:msc_examples}. These examples can be verified that 
 are really part of the corresponding communication semantics with an online
-tool for MSC~\cite{MSCTool}.
+tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows a hierarchy
+of the communication semantics defined.
+
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.6]
+  % list of labels in order (from smallest to largest)
+%   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
+  % loop to draw nested squares
+  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
+    \draw (0,0) rectangle (\i+1,\i);
+    \node[anchor=north east] at (\i+1,\i) {\lab};
+  }
+\end{tikzpicture}
+\caption{Hierarchy of communication model semantics.}
+\label{fig:coms}
+\end{figure}
 
 First, we introduce the definition of a linearization of an MSC. A
 linearization represents a possible ordering of the events in the distributed
@@ -196,11 +212,11 @@ In Figure~\ref{fig:msc_examples}.c, an example for this communication model is s
 % $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
-% \paragraph{FIFO 1-n}
-% This model is the dual of \verb|mb|, it coordinates a sender with all the 
-% receivers. Any two messages sent by a process must be received in the same 
-% order as they are sent. These two messages might be received by different 
-% processes and the two receive events might be concurrent.
+\paragraph{FIFO 1-n}
+This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
+receivers. Any two messages sent by a process must be received in the same 
+order as they are sent. These two messages might be received by different 
+processes and the two receive events might be concurrent.
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
 % $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
@@ -210,12 +226,12 @@ In Figure~\ref{fig:msc_examples}.c, an example for this communication model is s
 % $r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
-% \paragraph{FIFO n-n}
-% In this model, messages are globally ordered and delivered according to 
-% their emission order. Any two messages must be received in the same order 
-% as they are sent. These two messages might be sent or receives by any process 
-% and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-% coordinates all the senders with all the receivers.
+\paragraph{FIFO n-n}
+In this model (\verb|nn|), messages are globally ordered and delivered according to 
+their emission order. Any two messages must be received in the same order 
+as they are sent. These two messages might be sent or receives by any process 
+and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
+coordinates all the senders with all the receivers.
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
 % $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
@@ -364,7 +380,95 @@ To formalize it, we first define the notions of
 	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
 	$L(\prod_i A_i)$ then so is $M$ in $L(\prod_i A_i)$.
 \end{definition}
-%% TODO: AGGIUNGERE ESEMPIO?
+
+In order to understand the meaning of \emph{weak implication},
+consider the following example.
+
+\begin{example}
+Define two MSCs, MSC1 and MSC2. Both perform the same four
+communications, but in different orders.  
+MSC1 first sends message $a$ from P1 to P2, then from P1 to P3, 
+then sends $b$ from P4 to P2, and finally from P4 to P3.  
+MSC2 instead starts with P4 sending $b$ to P2, then to P3, 
+followed by P1 sending $a$ to P2 and then to P3.  
+
+Now define a third MSC $M$ with the same four messages but in a
+different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends 
+$b$ to P3, and finally P1 sends $a$ to P3.  
+
+We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
+at each process projection we recover the same behavior in one of
+them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
+Figure~\ref{fig:weak-impl} illustrates the three MSCs.
+
+\begin{figure}[!h]
+\centering
+\begin{tabular}{ccc}
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+	\nextlevel
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+\end{msc}
+} 
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\nextlevel
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage} \\
+MSC1 & MSC2 & $M$
+\end{tabular}
+\caption{The MSC $M$ is weakly implied by MSC1 and MSC2}
+\label{fig:weak-impl}
+\end{figure}
+\end{example}
 
 \begin{definition}[Weakly-closure $\setmsc^w$]
 	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
