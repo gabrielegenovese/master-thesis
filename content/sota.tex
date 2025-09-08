@@ -1,4 +1,9 @@
 \chapter{State of the art}\label{sec:sota}
+
+% TODO: creare una sezione related work alla fine
+% spostare parte corposa dello "stato dell'arte" in fondo
+% lasciare solo intuizioni e robe di base
+
 % In this section, I provide an overview of existing research on the 
 % implementability problem, 
 % a topic primarily investigated in Message Sequence 
@@ -30,6 +35,11 @@ or iterations of atomic MSC scenarios.
 \caption{Simple example of a client-server architecture.}
 \label{fig:msc-cli-ser}
 \end{figure}
+
+% TODO: rimanere ad alto livello
+% ma aggiungere reference alle definizioni formali 
+% nella parte di definizioni formali fare un confronto.
+% citare il confronto qua e rimandare dopo
 
 The \emph{realizability problem} was first introduced for MSC languages 
 in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
@@ -69,31 +79,42 @@ A summary of the main complexity results is given in Table~\ref{tab:realizabilit
 	\label{tab:realizability}
 \end{table}
 
-\section{Choreographies}
-Choreographies \cite{montesi2014choreographic} are another formalism to describe  
-distributed communication protocols. Unlike MSCs or MPST, which focus either on 
-trace-based semantics or type systems, choreographies emphasize the 
-global specification of interactions as a high-level description of the 
-intended message exchanges. Their goal is to ensure that a distributed 
-implementation can be derived in which each participant follows a local 
-behavior consistent with the global description. This setting naturally 
-connects to the realizability problem, since the key question is whether 
-a choreography can be faithfully implemented by a system of local 
-processes.
+% TODO: CONFRONTO di def implementability
+% ALUR/LOHREY e STUTZ (sender-driven) e EMILIO (da riguardare)
+% con esempi
 
-Early work~\cite{fu2004conversation} introduced \emph{synchronizability} 
-as a criterion for checking realizability of choreographies. Later work 
-by Basu and Bultan~\cite{basu2011choreography} refined this notion and 
-established connections between synchronizability and decidability of 
-verification tasks. However, synchronizability itself was shown to be 
-undecidable in general~\cite{finkel2023synchronizability}, limiting its 
-applicability.  
-An alternative line of work, pioneered by Barbanera et 
-al.~\cite{barbanera2020choreography,barbanera2022formal}, introduced 
-syntactic well-formedness conditions on choreographies. Well-formed 
-choreographies are guaranteed to be both safe and realizable, since 
-their projection onto communicating automata preserves language 
-equivalence and ensures deadlock-freedom.
+%% Sezione da rifare meglio
+
+% TODO: dal nostro punto di vista un global type è molto simile a una
+% coreografia, quindi riguardare e riscrivere meglio. Ci sta parlare 
+% di coreografie, ma prima penso a MPST.
+
+% \section{Choreographies}
+% Choreographies \cite{montesi2014choreographic} are another formalism to describe  
+% distributed communication protocols. Unlike MSCs or MPST, which focus either on 
+% trace-based semantics or type systems, choreographies emphasize the 
+% global specification of interactions as a high-level description of the 
+% intended message exchanges. Their goal is to ensure that a distributed 
+% implementation can be derived in which each participant follows a local 
+% behavior consistent with the global description. This setting naturally 
+% connects to the realizability problem, since the key question is whether 
+% a choreography can be faithfully implemented by a system of local 
+% processes.
+
+% Early work~\cite{fu2004conversation} introduced \emph{synchronizability} 
+% as a criterion for checking realizability of choreographies. Later work 
+% by Basu and Bultan~\cite{basu2011choreography} refined this notion and 
+% established connections between synchronizability and decidability of 
+% verification tasks. However, synchronizability itself was shown to be 
+% undecidable in general~\cite{finkel2023synchronizability}, limiting its 
+% applicability.  
+% An alternative line of work, pioneered by Barbanera et 
+% al.~\cite{barbanera2020choreography,barbanera2022formal}, introduced 
+% syntactic well-formedness conditions on choreographies. Well-formed 
+% choreographies are guaranteed to be both safe and realizable, since 
+% their projection onto communicating automata preserves language 
+% equivalence and ensures deadlock-freedom.
+
 
 \section{Multiparty Session Types}
 Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
@@ -211,5 +232,5 @@ of the undecidability results presented in Section~\ref{sec:proof},
 and motivates the need for the identification of new subclasses that 
 enable new verification techniques along with tool support.
 
-% aggiungere una comparazione sulle varie nozioni di implementabilità:
+% TODO: aggiungere una comparazione sulle varie nozioni di implementabilità:
 % dire quali sono uguali e quali diverse

@@ -1,0 +1,73 @@
+
+\paragraph{Realizability for MSCs}
+
+For finite sets of MSCs, weakly realizability is \verb|coNP|-complete and safe 
+realizability is shown to be decidable in \verb|P|-time~\cite{alur2005realizability}.
+The problem was subsequently studied for infinite MSC languages, defined 
+as MSC-Graphs (MSGs). For bounded MSGs, safe realizability 
+remains decidable, but weak realizability 
+is undecidable~\cite{alur2005realizability}. Extensions of these results to non-FIFO 
+semantics were investigated in~\cite{morin2002recognizable}, corresponding 
+to bag semantics under peer-to-peer communication. 
+Later, Lohrey proved that in the general case, safe realizability 
+is undecidable~\cite{lohrey2003realizability}, though it is decidable (and 
+EXPSPACE-complete) for MSGs. %for globally cooperative MSGs.
+Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
+a new class of HMSCs that allows unbounded channels while maintaining implementability.
+A summary of the main complexity results is given in Table~\ref{tab:realizability}.
+
+\begin{table}[!ht]
+	\centering
+	\begin{tabular}{|l|c|c|c|}
+		\hline
+		& \textbf{Finite set} & \textbf{Bounded graphs} & \textbf{Unbounded} \\
+		\hline
+		\textbf{Weak} & coNP-complete & undecidable & undecidable \\
+		\hline
+		\textbf{Safe} & P-time & EXPSPACE-complete & undecidable \\
+		\hline
+	\end{tabular}
+	\caption{Summary of results on realizability.}
+	\label{tab:realizability}
+\end{table}
+
+\paragraph{Realizability for MPST}
+
+Recent work has focused on strengthening the connection between MPST 
+and automata-theoretic formalisms. Stutz and Zufferey 
+showed that implementability is decidable by encoding global types 
+into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
+Building on this, Li et al.~\cite{li2023complete} proposed a complete 
+projection function for MPST, guaranteeing that every implementable 
+global type admits a correct distributed implementation.
+
+Stutz’s thesis~\cite{stutz2024implementability} connects MPST to 
+High-level MSCs (HMSCs), introducing a generalized projection operator 
+for sender-driven choice where a sender may branch towards different 
+receivers. This captures patterns beyond classical MPST projection.  
+He also proves that while syntactic projection is incomplete, 
+an automata-theoretic encoding into HMSCs yields decidability for 
+sender-driven choice, with implementability shown to be in 
+\verb|PSPACE|-the first precise complexity bound for this fragment.
+
+
+\paragraph{Protocol State Machines}
+Stutz et al.~\cite{stutz2025automata} proposed \emph{Protocol State Machines} 
+(PSMs), an automata-based formalism subsuming both MPST and HMSCs. 
+PSMs show that many syntactic restrictions of global types are not 
+true expressivity limits. Yet, the implementability problem for PSMs 
+with unrestricted mixed choice remains undecidable, resolving the 
+open question that mixed-choice global types are undecidable in general.  
+
+In summary, projectability is well understood for sender-driven choice, 
+where decidability and complexity bounds are established, but moving 
+towards mixed choice inevitably leads to undecidability. Automata-based 
+techniques such as HMSCs and PSMs provide the most powerful tools for 
+extending the theory while preserving decidability in restricted cases.
+
+\paragraph{Choreographies}
+%TODO
+
+
+\paragraph{Pomsets}
+%TODO: citare il paper di Emilio

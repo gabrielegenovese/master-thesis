@@ -2,7 +2,7 @@
 In this section, the fundamental concepts and definitions necessary 
 to contextualize the main contributions of this work are presented. 
 I, first, introduce Message Sequence Charts (MSC), followed by 
-an examination of communication models that are particularly interesting. 
+an examination of communication model's semantics that are particularly interesting. 
 Then, the notions of Global Type and Realizability are 
 defined within the scope of this work, along with the foundational 
 elements required to understand the theoretical contributions.
@@ -10,7 +10,7 @@ elements required to understand the theoretical contributions.
 % First, I introduce a formal definition of MSCs, as this will serve as
 % a foundation for establishing their connection with Global Types in
 % one of the main contributions of this work.
-\section{MSCs and Communication Models}
+\section{MSCs and the Synchronous Communication Model}
 
 \begin{definition}[Message Sequence Chart]
 Let $\mathbb{P}$ be a finite set of processes and $\mathbb{M}$ a set of messages.  
@@ -45,31 +45,7 @@ as the set of events executed by $p$.
 \end{enumerate}
 \end{definition}
 
-
-With MSCs, \cite{di2023partial} presents some interesting communication
-semantics. I will describe a few of them informally, using examples to
-highlight the differences from the main semantics considered in this work,
-which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synch}. Some examples are
-shown in Figure~\ref{fig:msc_examples}. These examples can be verified that 
-are really part of the corresponding communication semantics with an online
-tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows the hierarchy
-of the communication semantics defined.
-
-\begin{figure}[!ht]
-\centering
-\begin{tikzpicture}[scale=0.6]
-  % list of labels in order (from smallest to largest)
-%   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
-  % loop to draw nested squares
-  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
-    \draw (0,0) rectangle (\i+1,\i);
-    \node[anchor=north east] at (\i+1,\i) {\lab};
-  }
-\end{tikzpicture}
-\caption{Hierarchy of communication model semantics.}
-\label{fig:coms}
-\end{figure}
+% TODO: Esempio
 
 First, we introduce the definition of a linearization of an MSC. A
 linearization represents a possible ordering of the events in the distributed
@@ -82,168 +58,7 @@ system, that is, a way to schedule the events of an MSC.
 	$\leq_{hb} \subseteq \rightsquigarrow$.
 \end{definition}
 
-\begin{figure}[!ht]
-    \centering
-    \begin{tabular}{cc}
-        \scalebox{0.6}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-
-            \mess[pos=0.2]{$m_1$}{p}{q}[2]
-            \nextlevel
-            \mess[pos=0.8]{$m_2$}{p}{q}
-        \end{msc}%
-        } &
-        \scalebox{0.5}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-
-            \mess[pos=0.15]{$m_1$}{p}{r}[3]
-            \nextlevel
-            \mess[pos=0.8]{$m_2$}{p}{q}
-            \nextlevel
-            \mess[pos=0.8]{$m_3$}{q}{r}
-        \end{msc}%
-        } \\
-        (a) asynchronous (\verb|asy|) & (b) peer-to-peer (\verb|p2p|) \\
-        \scalebox{0.5}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-            \declinst{s}{s}{}
-
-            \mess[pos=0.1]{$m_4$}{p}{s}[4]
-            \nextlevel
-            \mess[pos=0.8]{$m_1$}{p}{q}
-            \nextlevel
-            \mess[pos=0.2]{$m_2$}{r}{q}
-            \nextlevel
-            \mess[pos=0.8]{$m_3$}{r}{s}
-        \end{msc}%
-        } &
-        \scalebox{0.6}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-
-            \mess{$m_1$}{p}{q}
-            \nextlevel
-            \mess{$m_2$}{q}{r}
-        \end{msc}%
-        } \\
-        (c) mailbox (\verb|mb|) & (d) synchronous (\verb|synch|)
-    \end{tabular}
-    \caption{MSCs' Examples for various communication models.}
-    \label{fig:msc_examples}
-\end{figure}
-
-\paragraph{Fully asynchronous}
-
-In the fully asynchronous communication model (\verb|asy|), messages can be 
-received at any time after they have been sent, and send events are 
-non-blocking. This model can be viewed as an unordered ``bag'' in which 
-all messages are stored and retrieved by processes when needed. It is also 
-referred to as \emph{non-FIFO}. The formal definition coincides with that of 
-an MSC. Figure~\ref{fig:msc_examples}.a illustrates an example of asynchronous 
-communication.
-
-\paragraph{Peer-to-peer} 
-In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
-process to another are always received in the same order as they are sent.
-Alternative names are FIFO. An example is shown in Figure~\ref{fig:msc_examples}.b.
-
-% A p2p-MSC is an MSC $M = (E,\to, \lhd, \lambda)$ where, for any two send events $s$ 
-% and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
-% and $s \to^+ s'$, one of the following holds:
-% - either $s, s' \in \text{matched}(M)$ with $s \lhd r$ and $s' \lhd r'$ and 
-% $r \to^+ r'$,
-% - or $s' \in \text{unmatched}(M)$.
-% Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, 
-% in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
-% message $m 1$ excludes the reception of any later message.
-
-\paragraph{Causally ordered}
-In the causally ordered (\verb|co|) communication model, messages are delivered 
-to a process in accordance with the causal dependencies of their emissions. 
-In other words, if there are two messages $m_1$ and $m_2$ with the same recipient, 
-such that there exists a causal path from $m_1$ to $m_2$, then $m_1$ must be received 
-before $m_2$. This notion of causal ordering was first introduced by Lamport under the 
-name ``happened-before'' relation. In Figure~\ref{fig:msc_examples}.b, this 
-causality is violated: $m_1$ should be received before $m_3$. Causal delivery 
-is commonly implemented using Lamport's logical clock algorithm \cite{lamport2019time}.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
-% $s'$, such that $\lambda(s) \in \text{send}(\_, q, \_), \lambda(s') \in \text{send}(\_, q, \_)$, and 
-% $s \leq_{\text{hb}} s'$:
-% - either $s, s' \in \text{matched}(M)$ and $r \to^* r'$, with $r$ and $r'$ receive 
-% events such that $s \lhd r$ and $s' \lhd r'$.
-% - or $s' \in \text{unmatched}(M)$.
-
-% Note that in a \verb|co|-MSC we cannot have two send events $s$ and $s'$ addressed 
-% to the same process, such that $s$ is unmatched, $s'$ is matched, and 
-% $s \leq_{\text{hb}} s'$.
-
-\paragraph{Mailbox}
-In this model, any two messages sent to the same process, regardless of the sender, 
-must be received in the same order as they are sent. If a process receives $m_1$ 
-before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
-the senders of a single receiver. This model is also called FIFO $n-1$.
-In Figure~\ref{fig:msc_examples}.c, an example for this communication model is shown.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(\_,q,\_), \lambda (s') \in \text{send}(\_,q,\_)$, and 
-% $s \rightsquigarrow s'$
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, where 
-% $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-\paragraph{FIFO 1-n}
-This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
-receivers. Any two messages sent by a process must be received in the same 
-order as they are sent. These two messages might be received by different 
-processes and the two receive events might be concurrent.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(p,\_,\_), \lambda (s') \in \text{send}(p,\_,\_)$ and 
-% $s \to^+ s'$ (which implies $s \rightsquigarrow s'$)
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with 
-% $r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-\paragraph{FIFO n-n}
-In this model (\verb|nn|), messages are globally ordered and delivered according to 
-their emission order. Any two messages must be received in the same order 
-as they are sent. These two messages might be sent or receives by any process 
-and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-coordinates all the senders with all the receivers.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $s \rightsquigarrow s'$
-% - either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
-% and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-\paragraph{Synchronous}
-The synchronous (\verb|synch|) communication model imposes 
-the existence of a scheduling such that any send event is 
-immediately followed by its corresponding receive event. 
-An example for this communication model is shown in Figure~\ref{fig:msc_examples}.d.
+% TODO: dare più contesto ed esempio
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
 % send events and there is a linearization $\rightsquigarrow$ where any 
@@ -257,12 +72,15 @@ An example for this communication model is shown in Figure~\ref{fig:msc_examples
 \end{definition}
 
 Finally, let's formally define what is a \verb|synch|-MSCs in this context.
+% TODO: dare più contesto 
 
 \begin{definition}[Synchronous execution]\label{def:synch}
 	An execution $\execution=(w,\source) \in \executionsofmodel{\synchmodel}$
 	if for all send event $s\in\sendeventsof{e}$, $s+1$ is a receive event
 	of $e$ and $\source(s+1)=s$.
 \end{definition}
+
+% TODO: dare più contesto ed esempio
 
 In other words, an MSC $M$ belongs to $\mscsetofmodel{\synchmodel}$ if
 all send events are immediately followed by their corresponding receive events.
@@ -281,6 +99,7 @@ In our setting, Global Types are automata that describe a language of MSCs.
 	A Global Type $\gt$ is a deterministic finite state automaton over the 
 	alphabet $\labelalphabet$.
 \end{definition}
+% TODO: dare più contesto ad esempio
 
 \begin{example}
 An example of a Global Type expressed as an automaton is the following.
@@ -374,6 +193,9 @@ given MSC $M$, $L(\prod_i A_i)$ either contains all linearizations
 of $M$, or none.
 \end{definition}
 
+% TODO: dare più contesto ed esempio
+
+
 % --------------relationship between MSCs and Global Types--------------
 
 I can now formally define the relationship between MSCs and Global Types. 
@@ -408,6 +230,7 @@ $\labellanguageof{\gt}$:
 		[w] \subseteq \labellanguageof{\gt}\}.
 	$$
 \end{definition}
+% TODO: dare più contesto ed esempio
 
 \begin{definition}[Commutation-closed]
     A global type $\gt$ is \emph{commutation-closed} if
@@ -526,6 +349,8 @@ MSC1 & MSC2 & $M$
 	$\setmsc$ weakly implies.
 \end{definition}
 
+% todo: esempio
+
 \begin{definition}[Weakly-realizable]
 	An MSC $M$ is said to be weakly-realizable if the set of MSCs
 	$L(M)$ is weakly realizable. A set of MSCs $\setmsc$ is said to be weakly
@@ -534,11 +359,13 @@ MSC1 & MSC2 & $M$
 It is important to note that this definition does not include the
 property of deadlock-freedom. 
 
+% todo: esempio
+
 % CINZIA, X TESI:
 % sarebbe interessante mettere la definizione di PPDP e mostrare 
 % l'equivalenza tra le due
 
-% VERSIONE ALTERNATIVA
+% VERSIONE ALTERNATIVA VECCHIA
 % \begin{definition}[Projection]
 % For an MSC $M$ and a process $P_i$, let $M|_i$ denote the sequence of events be
 % belonging to the process $P_i$ in $M$.
