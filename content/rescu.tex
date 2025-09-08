@@ -71,26 +71,9 @@ fundamental correctness properties of distributed systems: \emph{progress} and
 system using the synchronous product whenever the input SCM is recognized as an
 RSC. These two verification routines are triggered only after another check: 
 once the system is proven to be RSC, we can safely construct a well-formed 
-synchronous product from it. Let's first define basic notion to understand this operation.
-
-I assume standard notations for automata, words, and languages. 
-\begin{definition}[NFA]
-    A nondeterministic finite automaton (NFA) is a tuple 
-    $\mathcal A = (Q, \Sigma, \delta, l_0, F)$, where $Q$ is the set of states, 
-    $\Sigma$ the alphabet, $\delta : Q \times \Sigma \to 2^Q$ the transition relation, 
-    $l_0$ the initial state, and $F \subseteq Q$ the set of accepting states. 
-    We denote by $\languageofnfa{\mathcal A}$ the language of $\mathcal A$. 
-    Deterministic automata and $\varepsilon$-transitions are defined in the standard way.  
-\end{definition}
-
-\begin{definition}[CFSM] \label{def:cfsm}
-    A \emph{communicating finite state machine} (CFSM) is an NFA with 
-    $\varepsilon$-transitions $\acfsm$ over the alphabet $\Act$.  
-    A system of CFSMs is a tuple $\cfsms = (\acfsm_p)_{p \in \Procs}$.
-\end{definition}
-
-This definition corresponds to the concept of an SCM. We now present the
-definition of the Synchronous Product, which has been implemented in the
+synchronous product from it. We consider the definitions given in Chapter~\ref{sec:pre}.
+Definition~\eqref{def:cfsm} corresponds to the concept of an SCM. We now present the
+definition of the Synchronous Product for CFSMs, which has been implemented in the
 tool and serves as a key component for analyzing.
 
 \begin{definition}[Synchronous Product]

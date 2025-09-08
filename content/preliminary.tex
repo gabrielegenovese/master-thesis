@@ -53,7 +53,7 @@ which is \verb|synch|, that is also the only one formally defined in
 Definition~\ref{def:synch}. Some examples are
 shown in Figure~\ref{fig:msc_examples}. These examples can be verified that 
 are really part of the corresponding communication semantics with an online
-tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows a hierarchy
+tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows the hierarchy
 of the communication semantics defined.
 
 \begin{figure}[!ht]
@@ -308,62 +308,114 @@ Global Type in Figure~\ref{fig:gt-exm}.
 	\end{figure}
 \end{example}
 
-%% TODO: scrivere per bene definizione di automi A e cosa vuol dire il prod
+Let's continue defining the basic notions of
+automaton and communicating finite state machines.
+I assume standard notations for automata, words, and languages. 
+\begin{definition}[NFA]
+    A nondeterministic finite automaton (NFA) is a tuple 
+    $\mathcal A = (Q, \Sigma, \delta, l_0, F)$, where $Q$ is the set of states, 
+    $\Sigma$ the alphabet, $\delta : Q \times \Sigma \to 2^Q$ the transition relation, 
+    $l_0$ the initial state, and $F \subseteq Q$ the set of accepting states. 
+    The language $\languageofnfa{\mathcal A}$ of an NFA $\mathcal A$ and the notion of deterministic
+    finite state automaton (DFA) or $\varepsilon$ transitions are defined as usual.
+    We denote by $\languageofnfa{\mathcal A}$ the language of $\mathcal A$. 
+    We write $\acceptcompletion{\mathcal A}{}$ for the automaton obtained from $\mathcal A$ by setting $F=Q$.
+    Deterministic automata and $\varepsilon$-transitions are defined in the standard way.  
+\end{definition}
 
-% \begin{definition}[Product $L(\prod_i A_i)$]
-% We associate with $A=\prod_i A_i$ the language of possible executions of
-% the automaton $A$, denoted $L(A)$. For any set of concurrent automata $A_i$,
-% the language $L(\prod_i A_i)$ of the product of the automata contains
-% only complete and well-formed words. Furthermore, for a given MSC $M$,
-% the language $L(\prod_i A_i)$ either contains all linearization of
-% $M$ or it contains none.
-% \end{definition}
+We recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
 
-% ------------------------existential MSC language------------------------
+\begin{definition}[CFSM] \label{def:cfsm}
+    A \emph{communicating finite state machine} (CFSM) is an NFA with 
+    $\varepsilon$-transitions $\acfsm$ over the alphabet $\Act$.  
+    A system of CFSMs is a tuple $\cfsms = (\acfsm_p)_{p \in \Procs}$.
+\end{definition}
 
-% A Global Type defines a language of MSCs in two different ways, one
-% existential and one universal. Let $\labellanguageof{\gt}$ be the set of
-% sequences of arrows $w$ accepted by $\gt$. Note that for $w \in \Arrows^*$,
-% the function $w \mapsto \labeltomsc{w}$ with
-% $\labeltomsc{w} \in \mscsetofmodel{\synchmodel}$ is not injective, as two
-% arrows with disjoint pairs of processes commute. We write $w_1 \sim w_2$ if
-% $\labeltomsc{w_1} = \labeltomsc{w_2}$, and $[w]$ for the equivalence class
-% of $w$ with respect to $\sim$.
+These definitions will later be used also for Chapter~\ref{sec:rescu}.
+Let's now define the asynchronous product of an automaton
+
+\begin{definition}[Asynchronous product automaton]
+Let $\{A_i\}_{i=1}^n$ be a set of automata. For each ordered pair 
+$(i,j)$ of process indices, we use two buffers: $B^s_{i,j}$ 
+(pending messages sent by $P_i$ but not yet accessible by $P_j$) 
+and $B^r_{i,j}$ (messages delivered to $P_j$ but not yet consumed). 
+All buffers are words over the alphabet $\Sigma$.
+
+The asynchronous product automaton 
+$A = \prod_{i=1}^n A_i$ over $\hat{\Sigma}$ is given by:
+
+\begin{itemize}
+  \item \textbf{States:} A state $q$ consists of the local states 
+  $q_i$ of each $A_i$, together with the buffer contents.
+  \item \textbf{Initial state:} $q_0$ has all components in their 
+  start states $q_i^0$ and all buffers empty.
+  \item \textbf{Transitions:} $\delta \subseteq Q \times 
+  (\hat{\Sigma} \cup \{\tau\}) \times Q$.
+    \begin{enumerate}
+      \item For $x \in \hat{\Sigma}_i$, $(q,x,q') \in \delta$ iff:  
+      (a) states of all other processes $k \neq i$ are unchanged,  
+      (b) $(q_i,x,q'_i) \in \delta_i$,  
+      (c) if $x = receive(j,i,a)$ then $B^r_{j,i}$ loses $a$,  
+      (d) if $x = send(i,j,a)$ then $B^s_{i,j}$ gains $a$,  
+      (e) all other buffers remain unchanged.
+      \item There is a $\tau$-transition $(q,\tau,q')$ if $q$ and 
+      $q'$ differ only in that one buffer $B^s_{i,j}$ loses its 
+      head symbol $a$, and $B^r_{i,j}$ appends $a$.
+    \end{enumerate}
+  \item \textbf{Accepting states:} $q$ is accepting if all $q_i$ 
+  are accepting and all buffers are empty.
+\end{itemize}
+
+The language $L(A)$ of $A$ consists of all words in $\hat{\Sigma}^*$ 
+taking $q_0$ to an accepting state, interpreting $\tau$ as 
+$\varepsilon$. For any set of automata $\{A_i\}$, the language 
+$L(\prod_i A_i)$ contains only complete, well-formed words. For a 
+given MSC $M$, $L(\prod_i A_i)$ either contains all linearizations 
+of $M$, or none.
+\end{definition}
+
+% --------------relationship between MSCs and Global Types--------------
 
 I can now formally define the relationship between MSCs and Global Types. 
 Intuitively, Global Types represent a set of MSCs, allowing us to reason 
-about multiple message sequence scenarios. To obtain this result, let's 
-define what is the existential MSC language $\existentialmsclanguageof{\gt}{}$ 
-of a Global Type. Let $\labellanguageof{\gt}$ be the set of
-sequences of arrows $w$ accepted by $\gt$.
+about multiple message sequence scenarios. 
+
+A Global Type defines a language of MSCs in two different ways, one
+existential and one universal. Let $\labellanguageof{\gt}$ be the set of
+sequences of arrows $w$ accepted by $\gt$. Note that for $w \in \Arrows^*$,
+the function $w \mapsto \labeltomsc{w}$ with
+$\labeltomsc{w} \in \mscsetofmodel{\synchmodel}$ is not injective, as two
+arrows with disjoint pairs of processes commute. We write $w_1 \sim w_2$ if
+$\labeltomsc{w_1} = \labeltomsc{w_2}$, and $[w]$ for the equivalence class
+of $w$ with respect to $\sim$.
+
 Informally, the existential MSC language $\existentialmsclanguageof{\gt}{}$ of a 
 Global Type $\gt$ is the set of MSCs that admit at least one representation as a
-sequence of arrows in $\labellanguageof{\gt}$.
-% , and the universal MSC
-% language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
-% MSCs whose representations as sequences of arrows are all in
-% $\labellanguageof{\gt}$:
+sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC
+language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
+MSCs whose representations as sequences of arrows are all in
+$\labellanguageof{\gt}$:
 \begin{definition}[$\existentialmsclanguageof{\gt}$]
 	$$
 		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
-		w \in \labellanguageof{\gt}\} %% \qquad
-		% \universalmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
-		% [w] \subseteq \labellanguageof{\gt}\}.
+		w \in \labellanguageof{\gt}\}
+  $$
+\end{definition}
+
+\begin{definition}[$\universalmsclanguageof{\gt}$]
+  $$
+		\universalmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
+		[w] \subseteq \labellanguageof{\gt}\}.
 	$$
 \end{definition}
 
-There is also the universal MSC language $\universalmsclanguageof{\gt}$ 
-of a Global Type $\gt$, defined as the set of MSCs whose arrow-sequence 
-representations all belong to $\labellanguageof{\gt}$. However, a formal 
-definition is not necessary here. 
-
-% \begin{definition}[Commutation-closed]
-%     A Global Type $\gt$ is \emph{commutation-closed} if
-%     $$
-%     \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
-%     $$
-% \end{definition}
-% We write $\msclanguageofcc{\gt}$ for the common language.
+\begin{definition}[Commutation-closed]
+    A global type $\gt$ is \emph{commutation-closed} if
+    $$
+    \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
+    $$
+\end{definition}
+We write $\msclanguageofcc{\gt}$ for the common language.
 
 I now introduce the definition of implementability following the one given 
 by Alur, et al. \cite{alur2005realizability}, referred to as 
