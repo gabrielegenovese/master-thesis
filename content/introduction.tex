@@ -11,14 +11,12 @@ common problem. For example, a client-server application can be seen
 as a form of distributed system, where the shared objective is to provide 
 services to an end user.
 
-Distributed systems address a wide range of challenges which are 
-difficult to solve without such an architecture, for example reliability
-under failures safety in critical systems, and consistency of data.
-% Being able to \textbf{scale} to handle large volumes of incoming requests 
-% would be nearly impossible without distributed systems. Likewise, achieving 
-% \textbf{fault-tolerant} and high-performance applications would be 
-% extremely difficult without them. 
-% For these reasons,
+Distributed systems make it possible to address challenges that are
+hard to solve without such an architecture, such as high availability
+and elastic scalability. However, these benefits come with their own
+set of difficulties that computer scientists have long sought to
+overcome-for example, ensuring reliability in the presence of failures
+in critical systems, and maintaining data consistency.
 Distributed systems are 
 widely adopted in domains such as \textit{cloud computing}, critical 
 infrastructures, and telecommunication-oriented applications (i.e.\ 
@@ -61,7 +59,7 @@ the described protocol, therefore ensuring certain properties,
 such as deadlock-freedom, at compile time. 
 The implementability problem in MPST is comparable to verifying 
 whether a given global type can be correctly projected into local 
-types, preserving the intended behavior.
+types, preserving the intended behaviour.
 
 \section{Goal}
 The goal of this work is to study the \textbf{implementability
@@ -69,7 +67,7 @@ problem}, which concerns whether a global specification can be
 faithfully realized by a set of \textit{local processes} in a
 distributed system.
 In essence, it asks: does an implementation really \textbf{respect}
-the behavior described by a given specification model?
+the behaviour described by a given specification model?
 
 To illustrate the relevance of this problem, consider the following
 example.
@@ -101,17 +99,17 @@ information is not locally available to $C$.
 This problem is examined from a theoretical
 perspective to provide a more formal and precise understanding of
 the fundamental limits that exist and why syntactical constrains
-of certain models works.
+of certain models work.
 In this work, we use an \textit{automata-based} approach to Global Types. 
 This formalism is designed to be highly modular, 
 incorporating various \textit{network semantics} (such as asynchronous, 
 peer-to-peer, causal ordering, and synchronous semantics) as explicit 
-parameters of the framework. This parameterization allows flexible 
+parameters of the framework. This parameterisation allows flexible 
 analysis of different communication models within a unified setting.
 
 The main contributions of this work are: 
 \begin{itemize}
-    \item a \textbf{state-of-the-art} review, highlighting
+    \item a review, highlighting
     existing research and results in this particular domain and giving
     perspective to our work;
     \item we prove \textbf{undecidability} of the \textit{weak implementability} 
@@ -131,15 +129,15 @@ this work. Finally, Chapter~\ref{sec:end} presents concluding
 remarks and outlines possible directions for future research and
 development.
 
-\section{Brief overview}\label{sec:sota}
+\chapter{Background}\label{sec:sota}
 In this overview, we give a brief understanding of the
 state of the art regarding MSCs and the implementability 
 (or realizability) problem.
 
-\subsection{Message Sequence Charts}
+\section{Message Sequence Charts}
 Message Sequence Charts (MSCs) are a standardized graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages for specifying
-communication behavior. Thanks to their simplicity and intuitive
+communication behaviour. Thanks to their simplicity and intuitive
 semantics, MSCs have been widely adopted in industry.
 Figure~\ref{fig:msc-cli-ser} illustrates a simple example based on a
 minimal client–server architecture. An extension of this formalism,
@@ -168,26 +166,26 @@ or iterations of atomic MSC scenarios.
 % nella parte di definizioni formali fare un confronto.
 % citare il confronto qua e rimandare dopo
 
-\subsubsection{The realizability problem for MSCs}
+\subsection{The realizability problem for MSCs}
 
 The \emph{realizability problem} was first introduced for MSC languages 
 in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
-implementation that can realize all behaviors of a finite set of MSCs 
+implementation that can realize all behaviours of a finite set of MSCs 
 without introducing additional ones. A stronger variant, called 
 \emph{safe realizability}, requires the implementation to also be \textbf{deadlock-free}. 
 % In this setting, distributed implementations are defined using communicating 
 % automata with explicit accepting states, and deadlock-freedom corresponds 
 % to the ability to reach an accepting state from any reachable configuration. 
 
-\subsubsection{Hierarchy of communication model's semantics}
+\subsection{Hierarchy of communication model's semantics}
 With MSCs, \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few of them informally, using examples to
 highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synch}. Some examples are
-shown in Figure~\ref{fig:msc_examples}. These examples can be verified that 
-are really part of the corresponding communication semantics with an online
-tool for MSC~\cite{MSCTool}. Figure~\ref{fig:coms} shows the hierarchy
+Definition~\ref{def:synch}. Some examples are shown in 
+Figure~\ref{fig:msc_examples}, whose \emph{membership} 
+can be verified with an online tool for MSCs~\cite{MSCTool}. 
+Figure~\ref{fig:coms} shows the hierarchy
 of the communication semantics defined. % TODO: dare più contesto alla figura
 
 % TODO: rsc =/= sync (messaggi orfani)
@@ -292,7 +290,7 @@ communication.
 \paragraph{Peer-to-peer} 
 In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
 process to another are always received in the same order as they are sent.
-Alternative names are FIFO. An example is shown in Figure~\ref{fig:msc_examples}.b.
+An alternative name is FIFO. An example is shown in Figure~\ref{fig:msc_examples}.b.
 
 % A p2p-MSC is an MSC $M = (E,\to, \lhd, \lambda)$ where, for any two send events $s$ 
 % and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
@@ -340,6 +338,8 @@ In Figure~\ref{fig:msc_examples}.c, an example for this communication model is s
 % $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
+%% TODO: Esistono nella pratica? forse si possono togliere?
+
 \paragraph{FIFO 1-n}
 This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
 receivers. Any two messages sent by a process must be received in the same 
@@ -375,20 +375,22 @@ immediately followed by its corresponding receive event.
 An example for this communication model is shown in Figure~\ref{fig:msc_examples}.d.
 A formal definition is given later for this semantic (Definition~\ref{def:synch}).
 
-\subsection{Multiparty Session Types}
+\section{Multiparty Session Types}
 Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
 provide a type-theoretic framework to specify and verify communication 
 protocols among multiple participants. They ensure that communication 
 follows a predefined structure, preventing errors such as deadlocks, 
 orphan messages, and unspecified receptions. The 
 \textbf{global specification} describes the overall communication 
-protocol. From this, one derives the \textbf{local behaviors} of each 
+protocol. From this, one derives the \textbf{local behaviours} of each 
 participant via a \emph{projection} operation. The system's 
 \textbf{processes} form the \emph{implementation}, defining how 
 participants interact. With the definition of a \emph{typing system} 
 and suitable \emph{type-checking rules}, one ensures that the 
 implementation conforms to the local specification, thereby 
 guaranteeing properties such as \emph{well-formedness}.  
+
+% TODO: esempio semplice, schema
 
 % In this setting, the analogue of realizability is often called 
 % \emph{session fidelity}: a property ensuring that the combined local 
@@ -397,11 +399,11 @@ guaranteeing properties such as \emph{well-formedness}.
 % to be both realizable and deadlock-free, which corresponds to safe 
 % realizability in the MSC setting.  
 
-\subsubsection{Projectability}
+\subsection{Projectability}
 A central notion in MPST is \emph{projectability}, which asks whether 
 a global type can be faithfully projected into local specifications for 
 each participant. If projection succeeds, the resulting local types 
-interact without mismatches or unintended behaviors, effectively 
+interact without mismatches or unintended behaviours, effectively 
 bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
 Projectability is, therefore, comparable to the implementability
 problem as have the same aim.
@@ -411,20 +413,21 @@ expressivity and safety has motivated extensions of the theory, with
 \cite{castagna2012global} being the only algorithm aiming for full 
 completeness.
 
-\subsubsection{Mixed and Sender driven choice}
-A key restriction appears in branching. In the original framework \cite{honda2008multiparty,carbone2012structured}, 
+\subsection{Mixed and Sender driven choice}
+A key restriction in the definition of MPST appears in branching. 
+In the original framework \cite{honda2008multiparty,carbone2012structured}, 
 choice is \textbf{sender-driven}: the first sender dictates the branch, 
 ensuring safety but excluding many common patterns where multiple 
 participants influence the decision~\cite{carbone2012structured}.  
 Allowing \textbf{mixed choice} increases expressivity by permitting 
 several initiators, but it also makes the implementability problem 
-undecidable in general~\cite{barbanera2020choreography}.  
+undecidable in general~\cite{stutz2024implementability}.  
 
-\subsection{Choreographies}
+\section{Choreographies}
 %todo
 
 
-\subsection{Reduction to synchronous semantic}
+\section{Reduction to synchronous semantic}
 The main idea of this work is that reasoning about implementability 
 becomes more tractable under \emph{synchronous} 
 semantics for automata-based solutions to the implementability problem. 

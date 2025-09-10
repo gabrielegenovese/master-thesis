@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper,twoside]{book}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
+\usepackage[british]{babel}
 \usepackage{hyperref}
 \usepackage{indentfirst}
 \usepackage{amssymb}
@@ -38,9 +38,9 @@
 \usepackage{soul}
 \usepackage[font=footnotesize,labelfont=bf]{caption}
 \usepackage{multirow}
-\usepackage{hyphenat}
-\hyphenation{mate-mati-ca recu-perare}
 \usepackage{pdfpages}
+% \usepackage{hyphenat}
+% \hyphenation{mate-mati-ca recu-perare}
 
 \newcommand{\rom}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
 
@@ -151,15 +151,18 @@
 \topmargin=6.5cm
 \begin{flushright}
 \emph{
-\LARGE{Il diavolo sta nei dettagli}%\\\vspace{2mm}
+\LARGE{Qualcosa}%\\\vspace{2mm}
+% \LARGE{Il diavolo sta nei dettagli}%\\\vspace{2mm}
 % \LARGE{su più righe}
 }
 \end{flushright}
 
 \newpage~\thispagestyle{plain}~\newpage
 
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
 \chapter*{Abstract}
-Behavioral types define how information is exchanged in distributed systems.
+Behavioural types define how information is exchanged in distributed systems.
 An example are Multiparty Session Types (MPST), which describe interactions between multiple participants
 using global protocols and their local counterparts. Ensuring correct implementation,
 including deadlock freedom and session conformance, is a central concern in MPST.
@@ -177,16 +180,27 @@ provides a basis for verifying distributed systems beyond classical settings.
 
 \thispagestyle{plain}
 \topmargin=-1cm
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Contents}
 \tableofcontents
 \thispagestyle{empty}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Tables}
 \listoftables
 \thispagestyle{empty}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
 \thispagestyle{empty}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Listings}
 \lstlistoflistings
 \thispagestyle{empty}
 \newpage~\newpage
-
 
 \pagenumbering{arabic}
 % \setcounter{chapter}{-1}

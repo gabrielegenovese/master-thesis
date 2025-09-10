@@ -10,6 +10,7 @@ We now introduce the main objects employed in the proof of Theorem~\ref{thm:main
 The proof itself is adapted from the work of 
 Alur et~al.~\cite{alur2005realizability}. 
 % TODO: dare skatch idea della prova prima di presentare formalmente tutte queste definitoni
+% TODO: dire come è cambiata la prof in questo skatch
 
 \section{Definitions}
 The proof is carried out by reduction from the RPCP problem, which I now recall.  
@@ -29,6 +30,8 @@ from PCP.
 	\end{itemize}
 \end{definition}
 
+% TODO: dare esempio
+
 Intuitively, RPCP requires that the concatenation on the left-hand side always 
 grows at least as fast as the right-hand side, while ensuring that at least one 
 chosen tile differs between the two sequences. Moreover, in constructing the 
@@ -39,6 +42,7 @@ With this definition in place, I now introduce the main objects used
 in the proof. Specifically, I begin by showing how a Global Type can 
 represent a single \verb|synch| MSC.
 
+% TODO ivan: non sembra una def, più un lemma
 \begin{definition}[$G_M$]\label{def:gm}
 	Given an MSC $M\in \mscsetofmodel{\synchmodel}$, there exists a
 	global type $G_M$ such that $\{M\} = \existentialmsclanguageof{\gt}$.
@@ -56,10 +60,11 @@ We now define a particular Global Type that will be useful in the reduction.
 		      with $c = |S|$;
 		\item Arr $=\{$\arrmess{p}{q}{m_1}, \arrmess{p}{s}{m_2}, \arrmess{s}{r}{m_3},
 		      \arrmess{q}{r}{m_{S_1}}, ..., \arrmess{q}{r}{m_{S_c}}$\}$ where each arrow
-		      denotes a synchronous message accompanied by an acknowledgment.
+		      denotes a synchronous message accompanied by an acknowledgment. % TODO: definisci/formalizza questa doppia freccia
 	\end{itemize}
 	This global type is depicted in Figure~\ref{fig:gtype}.
 	
+	% TODO: fixa immagine
 	\begin{figure}[!ht]
 		\centering
 		\begin{tikzpicture}[->, node distance=24mm, on grid, auto]
@@ -158,7 +163,7 @@ along with all the proofs.
 \section{Lemmas and main proof}
 
 Before presenting the main undecidability result, we first establish two
-auxiliary lemmas that characterize the behavior of the MSCs used in the
+auxiliary lemmas that characterize the behaviour of the MSCs used in the
 reduction. These lemmas will serve as building blocks for the proof of
 Theorem~\ref{thm:main}.
 
@@ -211,7 +216,7 @@ Theorem~\ref{thm:main}.
 
 	We need to prove:
 	\begin{center}
-		$\Delta \in \text{RPCP}$ if and only if the global type $L^*$ is not weakly-realizable.
+		$\Delta \in \text{RPCP}$ iff the global type $L^*$ is not weakly-realizable.
 	\end{center}
 
 	\begin{itemize}
@@ -328,7 +333,7 @@ Theorem~\ref{thm:main}.
 		      At this point, $P_2$ needs to receive the index from
 		      $P_1$, but it cannot do so until it finishes sending
 		      character $c$. This creates a circular dependency among the
-		      processes, making the communication pattern impossible.
+		      processes, making the communication pattern impossible. % TODO: chiarire che non è come un caso di deadlock
 		      This cycle would break the prefix property as
 		      $x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
 		      in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
@@ -365,16 +370,16 @@ Theorem~\ref{thm:main}.
 		      string formed by the first $j$ words on process 2 is a prefix of the string
 		      formed by the first $j$ words on process 3. Therefore, we can readily
 		      build a solution for $\Delta$ from $M^@$ by building the strings of the solution
-		      taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds $y$ and $P_4$
-		      builds $y$.
+		      taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds 
+			  $y_{i_1}\cdots y_{i_m},$ and $P_4$ builds $x_{i_1}\cdots x_{i_m}$.
 
 	\end{itemize}
 
 \end{proof}
 
+% TODO: dare un esempietto per far vedere che la prova regge
+
 The sequence of lemmas and the main theorem collectively establish the
-undecidability of weak-realizability for global types.
-% Having developed the
-% theoretical foundation, we now move to the next section, where we focus on the
-% practical aspects of analyzing realizability, and introduce the \textsc{ReSCu}
-% tool.
+undecidability of weak-realizability for global types. Having developed the
+theoretical foundation, we now move to the next section, where we focus on the
+practical aspects of analysing realizability, and introduce the \textsc{ReSCu} tool.

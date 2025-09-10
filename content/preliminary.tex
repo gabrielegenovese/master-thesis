@@ -13,7 +13,9 @@ elements required to understand the theoretical contributions.
 \section{MSCs and the Synchronous Communication Model}
 
 \begin{definition}[Message Sequence Chart]
-Let $\mathbb{P}$ be a finite set of processes and $\mathbb{M}$ a set of messages.  
+Let $\mathbb{P}$ be a finite set of processes and $\mathbb{M}$ a set of messages.
+Let $\Sigma$ be a set of send and receive actions denoted as $\mathrm{send}(p,q,m)$
+and $\mathrm{rec}(p,q,m)$, where $p,q \in \mathbb{P}$ and $m\in \mathbb{M}$.
 An MSC over $(\mathbb{P}, \mathbb{M})$ is a tuple
 $M = (\mathcal{E}, \rightarrow, \vartriangleleft, \lambda)$ where:
 $\mathcal{E}$ is a finite (possibly empty) set of \emph{events};
@@ -55,7 +57,7 @@ system, that is, a way to schedule the events of an MSC.
 	Let $M = (\mathcal{E}, \Rightarrow, \triangleleft, \lambda)$ be an MSC.
 	A \emph{linearization} of $M$ is a (reflexive) total order
 	$\rightsquigarrow \subseteq \mathcal{E} \times \mathcal{E}$ such that
-	$\leq_{hb} \subseteq \rightsquigarrow$.
+	$\leq_{hb} \subseteq \rightsquigarrow$. 
 \end{definition}
 
 % TODO: dare più contesto ed esempio
@@ -66,7 +68,7 @@ system, that is, a way to schedule the events of an MSC.
 	
 \begin{definition}[$\acommunicationmodel$-linearisable MSC]\label{def:linearisable-msc}
 	An MSC $\mmsc$ is \textit{linearisable} in a communication model $\acommunicationmodel$
-	if $\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$.
+	if $\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$. % TODO: trova definizione nel paper di cinzia
 	We write $\mscsetofmodel{\acommunicationmodel}$ for the set of all MSCs 
 	linearisable in $\acommunicationmodel$.
 \end{definition}
@@ -74,6 +76,7 @@ system, that is, a way to schedule the events of an MSC.
 Finally, let's formally define what is a \verb|synch|-MSCs in this context.
 % TODO: dare più contesto 
 
+%% TODO: per ivan è un po' criptica
 \begin{definition}[Synchronous execution]\label{def:synch}
 	An execution $\execution=(w,\source) \in \executionsofmodel{\synchmodel}$
 	if for all send event $s\in\sendeventsof{e}$, $s+1$ is a receive event
@@ -86,12 +89,15 @@ In other words, an MSC $M$ belongs to $\mscsetofmodel{\synchmodel}$ if
 all send events are immediately followed by their corresponding receive events.
 
 \section{Basic notions for Global Types}
-This part will further highlight the basic notion to understand the formal proof 
+This part will further highlight the basic notions to understand the formal proof 
 for the theorem presented in Section~\ref{sec:proof} and, in particular, Global Type
 and Weakly-realizable. We begin by extending the definition of linearisability so 
 that it applies to all communication models.
 In our setting, Global Types are automata that describe a language of MSCs.
 
+%% TODO: commenti di ivan: non è proprio un type, lui definisce 
+%% così i choreography automata, magari specificare che le definizioni corrispondono
+%% e citare il paper che usa questa nozione
 \begin{definition}[Global Type]
 	An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ 
 	with $p\ne q$; we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and 
@@ -129,7 +135,7 @@ Global Type in Figure~\ref{fig:gt-exm}.
 
 Let's continue defining the basic notions of
 automaton and communicating finite state machines.
-I assume standard notations for automata, words, and languages. 
+% I assume standard notations for automata, words, and languages.  % TODO rifrasa? definisci?
 \begin{definition}[NFA]
     A nondeterministic finite automaton (NFA) is a tuple 
     $\mathcal A = (Q, \Sigma, \delta, l_0, F)$, where $Q$ is the set of states, 
@@ -139,7 +145,7 @@ I assume standard notations for automata, words, and languages.
     finite state automaton (DFA) or $\varepsilon$ transitions are defined as usual.
     We denote by $\languageofnfa{\mathcal A}$ the language of $\mathcal A$. 
     We write $\acceptcompletion{\mathcal A}{}$ for the automaton obtained from $\mathcal A$ by setting $F=Q$.
-    Deterministic automata and $\varepsilon$-transitions are defined in the standard way.  
+    % Deterministic automata and $\varepsilon$-transitions are defined in the standard way.   % TODO rifrasa? definisci?
 \end{definition}
 
 We recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
@@ -161,7 +167,7 @@ and $B^r_{i,j}$ (messages delivered to $P_j$ but not yet consumed).
 All buffers are words over the alphabet $\Sigma$.
 
 The asynchronous product automaton 
-$A = \prod_{i=1}^n A_i$ over $\hat{\Sigma}$ is given by:
+$A = \prod_{i=1}^n A_i$ over $\hat{\Sigma}$ is given by: % TODO: capire cos'è \hat{\Sigma}
 
 \begin{itemize}
   \item \textbf{States:} A state $q$ consists of the local states 
@@ -174,8 +180,9 @@ $A = \prod_{i=1}^n A_i$ over $\hat{\Sigma}$ is given by:
       \item For $x \in \hat{\Sigma}_i$, $(q,x,q') \in \delta$ iff:  
       (a) states of all other processes $k \neq i$ are unchanged,  
       (b) $(q_i,x,q'_i) \in \delta_i$,  
-      (c) if $x = receive(j,i,a)$ then $B^r_{j,i}$ loses $a$,  
-      (d) if $x = send(i,j,a)$ then $B^s_{i,j}$ gains $a$,  
+		% TODO: capire semantica dei buffer dal paper di Alur
+      (c) if $x = receive(j,i,a)$ then the buffer $B^r_{j,i}$ consume the message $a$ (if present),  
+      (d) if $x = send(i,j,a)$ then the message $a$ is appended in the buffer $B^s_{i,j}$,  
       (e) all other buffers remain unchanged.
       \item There is a $\tau$-transition $(q,\tau,q')$ if $q$ and 
       $q'$ differ only in that one buffer $B^s_{i,j}$ loses its 
@@ -217,6 +224,7 @@ sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC
 language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
 MSCs whose representations as sequences of arrows are all in
 $\labellanguageof{\gt}$:
+% TODO: ivan dice di controllare? la def di chor automata (o forse hanno una roba simile)
 \begin{definition}[$\existentialmsclanguageof{\gt}$]
 	$$
 		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
@@ -238,6 +246,7 @@ $\labellanguageof{\gt}$:
     \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
     $$
 \end{definition}
+% TODO: togliere exist e forall dalla nozione
 We write $\msclanguageofcc{\gt}$ for the common language.
 
 I now introduce the definition of implementability following the one given 
@@ -249,10 +258,10 @@ To formalize it, we first define the notions of
 %% TODO: Spiegare meglio con intuizioni
 
 \begin{definition}[Weakly-imply]
-	Let $\setmsc$ be a set of MSCs and $M$ another MSC. $\setmsc$
+	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
 	\textit{weakly implies} $M$, if for any sequence of automata
 	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
-	$L(\prod_i A_i)$ then so is $M$ in $L(\prod_i A_i)$.
+	$L(\prod_i A_i)$ then $M \in L(\prod_i A_i)$.
 \end{definition}
 
 In order to understand the meaning of \emph{weak implication},
@@ -271,7 +280,7 @@ different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends
 $b$ to P3, and finally P1 sends $a$ to P3.  
 
 We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
-at each process projection we recover the same behavior in one of
+at each process projection we recover the same behaviour in one of
 them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
 Figure~\ref{fig:weak-impl} illustrates the three MSCs.
 
@@ -346,7 +355,7 @@ MSC1 & MSC2 & $M$
 
 \begin{definition}[Weakly-closure $\setmsc^w$]
 	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
-	$\setmsc$ weakly implies.
+	weakly implied by $\setmsc$.
 \end{definition}
 
 % todo: esempio
