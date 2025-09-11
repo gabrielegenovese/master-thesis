@@ -50,7 +50,9 @@
 \theoremstyle{definition}
 \newtheorem{example}{Example}
 
-\usetikzlibrary{automata,arrows,positioning}
+\usetikzlibrary{automata,arrows,positioning,shapes,snakes}
+\usetikzlibrary{calc,matrix,decorations.pathmorphing}
+\usetikzlibrary{shapes.geometric,arrows.meta}
 \pgfmathtruncatemacro\distance{1}
 
 \definecolor{green}{rgb}{0,0.5,0}
@@ -215,6 +217,8 @@ provides a basis for verifying distributed systems beyond classical settings.
 \input{content/proof}
 
 \input{content/rescu}
+
+\input{content/related}
 
 \input{content/conclusion}
 

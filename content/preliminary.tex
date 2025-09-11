@@ -9,7 +9,8 @@ elements required to understand the theoretical contributions.
 
 \section{MSCs and the Synchronous Communication Model}
 
-\begin{definition}[Message Sequence Chart]
+% TODO: check definizione del paper PPDP
+\begin{definition}[Message Sequence Chart]\label{def:msc}
 Let $\mathbb{P}$ be a finite set of processes and $\mathbb{M}$ a set of messages.
 Let $\Sigma$ be a set of send and receive actions denoted as $\mathrm{send}(p,q,m)$
 and $\mathrm{rec}(p,q,m)$, where $p,q \in \mathbb{P}$ and $m\in \mathbb{M}$.
@@ -170,11 +171,14 @@ This part will further highlight the basic notions to understand the formal proo
 for the theorem presented in Section~\ref{sec:proof} and, in particular, Global Type
 and Weakly-realizable. We begin by extending the definition of linearisability so 
 that it applies to all communication models.
-In our setting, Global Types are automata that describe a language of MSCs.
+In our setting, Global Types are automata that describe a language of MSCs, 
+as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability}.
 
 %% TODO: commenti di ivan: non è proprio un type, lui definisce 
-%% così i choreography automata, magari specificare che le definizioni corrispondono
+%% così i choreography automata , magari specificare che le definizioni corrispondono
 %% e citare il paper che usa questa nozione
+
+%% !! CA da citare nei related 
 
 \bigskip
 
@@ -197,7 +201,7 @@ Global Type in Figure~\ref{fig:gt-exm}.
 
 \begin{figure}[!ht]
 	\centering
-	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.7]
+	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.8]
 		\node[state, initial, initial text={}] (s0) {1};
 			\node[state] (s1) [above right=of s0] {2};
 			\node[state] (s2) [below right=of s0] {3};
@@ -344,7 +348,7 @@ $\labellanguageof{\gt}$:
     $$
 \end{definition}
 % TODO: togliere exist e forall dalla nozione
-We write $\msclanguageofcc{\gt}$ for the common language.
+% We write $\msclanguageofcc{\gt}$ for the common language. % TODO: mi serve?
 
 I now introduce the definition of implementability following the one given 
 by Alur, et al. \cite{alur2005realizability}, referred to as 

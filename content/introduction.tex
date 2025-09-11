@@ -104,12 +104,12 @@ In this work, we use an \textit{automata-based} approach to Global Types.
 This formalism is designed to be highly modular, 
 incorporating various \textit{network semantics} (such as asynchronous, 
 peer-to-peer, causal ordering, and synchronous semantics) as explicit 
-parameters of the framework. This parameterisation allows flexible 
+parameters of the framework. This parameterization allows flexible 
 analysis of different communication models within a unified setting.
 
 The main contributions of this work are: 
 \begin{itemize}
-    \item a review, highlighting
+    \item a related-work overview, highlighting
     existing research and results in this particular domain and giving
     perspective to our work;
     \item we prove \textbf{undecidability} of the \textit{weak implementability} 
@@ -119,7 +119,7 @@ The main contributions of this work are:
     for synchronous systems.
 \end{itemize}
 The thesis begins with a brief overview of the background
-in Chapter~\ref{sec:sota}, presented in a general and accessible manner, avoiding
+in Section~\ref{sec:sota}, presented in a general and accessible manner, avoiding
 formal definitions and proofs. Chapters~\ref{sec:pre} and
 \ref{sec:proof} then introduce the necessary formal definitions,
 followed by the main theoretical contribution and in 
@@ -128,12 +128,14 @@ this work. Finally, Chapter~\ref{sec:end} presents concluding
 remarks and outlines possible directions for future research and
 development.
 
-\chapter{Background}\label{sec:sota}
+% discorso più ampio sulla roadmap e sulla struttura della tesi, e su cosa di basa etc...
+
+\section{Background}\label{sec:sota}
 In this overview, we give a brief understanding of the
 state of the art regarding MSCs and the implementability 
 (or realizability) problem.
 
-\section{Message Sequence Charts}
+\subsection{Message Sequence Charts}
 Message Sequence Charts (MSCs) are a standardized graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages for specifying
 communication behaviour. Thanks to their simplicity and intuitive
@@ -160,12 +162,98 @@ or iterations of atomic MSC scenarios.
 \label{fig:msc-cli-ser}
 \end{figure}
 
+With MSCs, \cite{di2023partial} presents some interesting communication
+semantics. I will describe a few them informally, using examples to
+highlight the differences from the main semantics considered in this work,
+which is \verb|synch|, that is also the only one formally defined in 
+Definition~\ref{def:synch}. In Section~\ref{sec:rel}, the discussion
+continue presenting other communication semantics, and summarizing
+the relevance of the work by Di Giusto, et al.~\cite{di2023partial}.
+Some examples are shown in 
+Figure~\ref{fig:asy},~\ref{fig:p2p}~and~\ref{fig:sync},
+whose \emph{membership} 
+can be verified with an online tool for MSCs~\cite{MSCTool}. 
+
+\paragraph{Fully asynchronous}
+
+In the fully asynchronous communication model (\verb|asy|), messages can be 
+received at any time after they have been sent, and send events are 
+non-blocking. This model can be viewed as an unordered ``bag'' in which 
+all messages are stored and retrieved by processes when needed. It is also 
+referred to as \emph{non-FIFO}. The formal definition coincides with that of 
+an MSC (Definition~\ref{def:msc}). Figure~\ref{fig:asy} illustrates an example of asynchronous 
+communication.
+
+\begin{figure}[!ht]
+    \centering
+      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+                  head height=0px, label distance=0.5ex, 
+                  foot height=0px, foot distance=0px]{}
+          \declinst{p}{p}{}
+          \declinst{q}{q}{}
+
+          \mess[pos=0.2]{$m_1$}{p}{q}[2]
+          \nextlevel
+          \mess[pos=0.8]{$m_2$}{p}{q}
+      \end{msc}
+  \caption{Asynchronous semantic example.}
+  \label{fig:asy}
+\end{figure}
+
+\paragraph{Peer-to-peer} 
+In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
+process to another are always received in the same order as they are sent.
+An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
+
+\begin{figure}[!ht]
+    \centering
+      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+                    head height=0px, label distance=0.5ex, 
+                    foot height=0px, foot distance=0px]{}
+            \declinst{p}{p}{}
+            \declinst{q}{q}{}
+            \declinst{r}{r}{}
+
+            \mess[pos=0.15]{$m_1$}{p}{r}[3]
+            \nextlevel
+            \mess[pos=0.8]{$m_2$}{p}{q}
+            \nextlevel
+            \mess[pos=0.8]{$m_3$}{q}{r}
+        \end{msc}
+  \caption{Peer-to-peer semantic example.}
+  \label{fig:p2p}
+\end{figure}
+
+\paragraph{Synchronous}
+The synchronous (\verb|synch|) communication model imposes 
+the existence of a scheduling such that any send event is 
+immediately followed by its corresponding receive event. 
+An example for this communication model is shown in Figure~\ref{fig:sync}.c.
+A formal definition is given later for this semantic (Definition~\ref{def:synch}).
+
+\begin{figure}[!ht]
+    \centering
+      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+                  head height=0px, label distance=0.5ex, 
+                  foot height=0px, foot distance=0px]{}
+          \declinst{p}{p}{}
+          \declinst{q}{q}{}
+          \declinst{r}{r}{}
+
+          \mess{$m_1$}{p}{q}
+          \nextlevel
+          \mess{$m_2$}{q}{r}
+      \end{msc}
+  \caption{Synchronous semantic example.}
+  \label{fig:sync}
+\end{figure}
+
 % TODO: rimanere ad alto livello
 % ma aggiungere reference alle definizioni formali 
 % nella parte di definizioni formali fare un confronto.
 % citare il confronto qua e rimandare dopo
 
-\subsection{The implementability problem for MSCs}
+\subsubsection{The implementability problem for MSCs}
 
 The \emph{implementability problem} was first introduced for MSC languages 
 in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
@@ -178,207 +266,8 @@ but it can be called also realizability and projectability.
 % automata with explicit accepting states, and deadlock-freedom corresponds 
 % to the ability to reach an accepting state from any reachable configuration. 
 
-\subsection{Hierarchy of communication model's semantics}
-With MSCs, \cite{di2023partial} presents some interesting communication
-semantics. I will describe  them informally, using examples to
-highlight the differences from the main semantics considered in this work,
-which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synch}. Some examples are shown in 
-Figure~\ref{fig:msc_examples}, whose \emph{membership} 
-can be verified with an online tool for MSCs~\cite{MSCTool}. 
-\cite{di2023partial} also introduces a hierarchy of communication
-semantics, illustrated in Figure~\ref{fig:coms}. The main objective of
-this work was to establish a hierarchy that preserves monotonic
-properties: if a property holds for a given communication semantic, it
-should also hold for all semantics contained within it. However, it was
-shown that this monotonicity only applies to specific properties, such
-as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
-extend to the implementability problem.
 
-% TODO: rsc =/= sync (messaggi orfani)
-
-\begin{figure}[!ht]
-\centering
-\begin{tikzpicture}[scale=0.6]
-  % list of labels in order (from smallest to largest)
-%   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
-  % loop to draw nested squares
-  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
-    \draw (0,0) rectangle (\i+1,\i);
-    \node[anchor=north east] at (\i+1,\i) {\lab};
-  }
-\end{tikzpicture}
-\caption{Hierarchy of communication model semantics.}
-\label{fig:coms}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{tabular}{cc}
-        \scalebox{0.6}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-
-            \mess[pos=0.2]{$m_1$}{p}{q}[2]
-            \nextlevel
-            \mess[pos=0.8]{$m_2$}{p}{q}
-        \end{msc}%
-        } &
-        \scalebox{0.5}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-
-            \mess[pos=0.15]{$m_1$}{p}{r}[3]
-            \nextlevel
-            \mess[pos=0.8]{$m_2$}{p}{q}
-            \nextlevel
-            \mess[pos=0.8]{$m_3$}{q}{r}
-        \end{msc}%
-        } \\
-        (a) asynchronous (\verb|asy|) & (b) peer-to-peer (\verb|p2p|) \\
-        \scalebox{0.5}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-            \declinst{s}{s}{}
-
-            \mess[pos=0.1]{$m_4$}{p}{s}[4]
-            \nextlevel
-            \mess[pos=0.8]{$m_1$}{p}{q}
-            \nextlevel
-            \mess[pos=0.2]{$m_2$}{r}{q}
-            \nextlevel
-            \mess[pos=0.8]{$m_3$}{r}{s}
-        \end{msc}%
-        } &
-        \scalebox{0.6}{%
-        \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-
-            \mess{$m_1$}{p}{q}
-            \nextlevel
-            \mess{$m_2$}{q}{r}
-        \end{msc}%
-        } \\
-        (c) mailbox (\verb|mb|) & (d) synchronous (\verb|synch|)
-    \end{tabular}
-    \caption{MSCs' Examples for various communication models.}
-    \label{fig:msc_examples}
-\end{figure}
-
-\paragraph{Fully asynchronous}
-
-In the fully asynchronous communication model (\verb|asy|), messages can be 
-received at any time after they have been sent, and send events are 
-non-blocking. This model can be viewed as an unordered ``bag'' in which 
-all messages are stored and retrieved by processes when needed. It is also 
-referred to as \emph{non-FIFO}. The formal definition coincides with that of 
-an MSC. Figure~\ref{fig:msc_examples}.a illustrates an example of asynchronous 
-communication.
-
-\paragraph{Peer-to-peer} 
-In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
-process to another are always received in the same order as they are sent.
-An alternative name is FIFO. An example is shown in Figure~\ref{fig:msc_examples}.b.
-
-% A p2p-MSC is an MSC $M = (E,\to, \lhd, \lambda)$ where, for any two send events $s$ 
-% and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
-% and $s \to^+ s'$, one of the following holds:
-% - either $s, s' \in \text{matched}(M)$ with $s \lhd r$ and $s' \lhd r'$ and 
-% $r \to^+ r'$,
-% - or $s' \in \text{unmatched}(M)$.
-% Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, 
-% in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
-% message $m 1$ excludes the reception of any later message.
-
-\paragraph{Causally ordered}
-In the causally ordered (\verb|co|) communication model, messages are delivered 
-to a process in accordance with the causal dependencies of their emissions. 
-In other words, if there are two messages $m_1$ and $m_2$ with the same recipient, 
-such that there exists a causal path from $m_1$ to $m_2$, then $m_1$ must be received 
-before $m_2$. This notion of causal ordering was first introduced by Lamport under the 
-name ``happened-before'' relation. In Figure~\ref{fig:msc_examples}.b, this 
-causality is violated: $m_1$ should be received before $m_3$. Causal delivery 
-is commonly implemented using Lamport's logical clock algorithm \cite{lamport2019time}.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
-% $s'$, such that $\lambda(s) \in \text{send}(\_, q, \_), \lambda(s') \in \text{send}(\_, q, \_)$, and 
-% $s \leq_{\text{hb}} s'$:
-% - either $s, s' \in \text{matched}(M)$ and $r \to^* r'$, with $r$ and $r'$ receive 
-% events such that $s \lhd r$ and $s' \lhd r'$.
-% - or $s' \in \text{unmatched}(M)$.
-
-% Note that in a \verb|co|-MSC we cannot have two send events $s$ and $s'$ addressed 
-% to the same process, such that $s$ is unmatched, $s'$ is matched, and 
-% $s \leq_{\text{hb}} s'$.
-
-\paragraph{Mailbox}
-In this model, any two messages sent to the same process, regardless of the sender, 
-must be received in the same order as they are sent. If a process receives $m_1$ 
-before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
-the senders of a single receiver. This model is also called FIFO $n-1$.
-In Figure~\ref{fig:msc_examples}.c, an example for this communication model is shown.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(\_,q,\_), \lambda (s') \in \text{send}(\_,q,\_)$, and 
-% $s \rightsquigarrow s'$
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, where 
-% $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-%% TODO: Esistono nella pratica? forse si possono togliere?
-
-\paragraph{FIFO 1-n}
-This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
-receivers. Any two messages sent by a process must be received in the same 
-order as they are sent. These two messages might be received by different 
-processes and the two receive events might be concurrent.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(p,\_,\_), \lambda (s') \in \text{send}(p,\_,\_)$ and 
-% $s \to^+ s'$ (which implies $s \rightsquigarrow s'$)
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with 
-% $r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-\paragraph{FIFO n-n}
-In this model (\verb|nn|), messages are globally ordered and delivered according to 
-their emission order. Any two messages must be received in the same order 
-as they are sent. These two messages might be sent or receives by any process 
-and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-coordinates all the senders with all the receivers.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $s \rightsquigarrow s'$
-% - either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
-% and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
-
-\paragraph{Synchronous}
-The synchronous (\verb|synch|) communication model imposes 
-the existence of a scheduling such that any send event is 
-immediately followed by its corresponding receive event. 
-An example for this communication model is shown in Figure~\ref{fig:msc_examples}.d.
-A formal definition is given later for this semantic (Definition~\ref{def:synch}).
-
-\section{Multiparty Session Types}
+\subsection{Multiparty Session Types}
 Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
 provide a type-theoretic framework to specify and verify communication 
 protocols among multiple participants. They ensure that communication 
@@ -392,8 +281,51 @@ participants interact. With the definition of a \emph{typing system}
 and suitable \emph{type-checking rules}, one ensures that the 
 implementation conforms to the local specification, thereby 
 guaranteeing properties such as \emph{well-formedness}.  
+Figure~\ref{fig:mpstschema} show a schema summarizing the principal
+part of the framework. 
 
-% TODO: esempio semplice, schema
+% TODO: esempio semplice
+
+\begin{figure}[!ht]
+\centering
+\begin{tikzpicture}[
+      node distance=1.2cm,
+      every node/.style={font=\sffamily},
+      rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
+      circ/.style={circle, draw=black, minimum size=1cm},
+      arrow/.style={-{Stealth[scale=1.1]}, thick}
+  ]
+
+  % Nodes
+  \node[rect] (G) {\textcolor{red}{$\mathcal{G}$}};
+  \node[circ, below=of G] (TB) {\textcolor{blue}{$L_\text{B}$}};
+  \node[circ, left=of TB] (TA) {\textcolor{blue}{$L_\text{A}$}};
+  \node[circ, right=of TB] (TC) {\textcolor{blue}{$L_\text{C}$}};
+
+  \node[rect, below=of TA] (PA) {\textcolor{brown}{$P_\text{A}$}};
+  \node[rect, below=of TB] (PB) {\textcolor{brown}{$P_\text{B}$}};
+  \node[rect, below=of TC] (PC) {\textcolor{brown}{$P_\text{C}$}};
+
+  \node[rect,draw=none,right=of TC] (LC) {\textbf{\textcolor{blue}{2. Local type}}};
+  \node[rect,draw=none,above=of LC] (LG) {\textbf{\textcolor{red}{1. Global type}}};
+  \node[rect,draw=none,below=of LC] (LG) {\textbf{\textcolor{brown}{3. Processes}}};
+
+  % Arrows
+  \draw[arrow] (G) -- (TA) node[midway, left] {Projection};
+  \draw[arrow] (G) -- (TB);
+  \draw[arrow] (G) -- (TC);
+
+  \draw[arrow] (PA) -- (TA) node[midway, left] {Type checking};
+  \draw[arrow] (PB) -- (TB);
+  \draw[arrow] (PC) -- (TC);
+  \draw[arrow] (TC) -- (PC);
+  \draw[arrow] (TB) -- (PB);
+  \draw[arrow] (TA) -- (PA);
+
+\end{tikzpicture}
+\caption{Intuitive schema of MPST framework}
+\label{fig:mpstschema}
+\end{figure}
 
 % In this setting, the analogue of realizability is often called 
 % \emph{session fidelity}: a property ensuring that the combined local 
@@ -402,7 +334,7 @@ guaranteeing properties such as \emph{well-formedness}.
 % to be both realizable and deadlock-free, which corresponds to safe 
 % realizability in the MSC setting.  
 
-\subsection{Projectability}
+\subsubsection{Projectability}
 A central notion in MPST is \emph{projectability}, which asks whether 
 a global type can be faithfully projected into local specifications for 
 each participant. If projection succeeds, the resulting local types 
@@ -416,7 +348,7 @@ expressivity and safety has motivated extensions of the theory, with
 \cite{castagna2012global} being the only algorithm aiming for full 
 completeness.
 
-% \subsection{Mixed and Sender driven choice}
+% \subsubsection{Mixed and Sender driven choice}
 A key restriction in the definition of MPST appears in branching. 
 In the original framework \cite{honda2008multiparty,carbone2012structured}, 
 choice is \textbf{sender-driven}: the first sender dictates the branch, 
@@ -426,25 +358,7 @@ Allowing \textbf{mixed choice} increases expressivity by permitting
 several initiators, but it also makes the implementability problem 
 undecidable in general~\cite{stutz2024implementability}.  
 
-\section{Choreographies}
-Choreographies \cite{montesi2014choreographic} are another formalism to describe  
-distributed communication protocols. Unlike MSCs or MPST, which focus either on 
-trace-based semantics or type systems, choreographies emphasize the 
-global specification of interactions as a high-level description of the 
-intended message exchanges. Similarly to MPST, their goal is to ensure that
-a distributed  implementation can be derived in which each participant 
-follows a local behaviour consistent with the global description, called
-respectively \emph{local} and \emph{global-view}. This setting naturally 
-connects to the realizability problem, since the key question is whether 
-a choreography can be faithfully implemented by a system of local 
-processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
-and it is derived throughout a projection operation from the global-view.
-The \emph{knowledge of choice} problem is similar to the implementability one,
-and explored also in choreographies,
-but it was first introduced by Castagna et al.~\cite{castagna2012global}.
-% https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
-
-\section{Reduction to synchronous semantic}
+\subsection{Reduction to synchronous semantic}
 The main idea of this work is that reasoning about implementability 
 becomes more tractable under \emph{synchronous} 
 semantics for automata-based solutions to the implementability problem. 
@@ -465,6 +379,7 @@ The following theorem, currently a work in progress by my supervisors \cite{di20
 provides a characterization of a connection between 
 peer-to-peer semantics and synchronous semantics:
 
+% TODO: citarlo e toglierlo come questo formato, basta solo raccontarlo
 \begin{theorem}
 	A global type $G$ is implementable in \verb|p2p| iff:
 	\begin{enumerate}
