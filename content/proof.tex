@@ -19,6 +19,8 @@ classical Post Correspondence Problem (PCP). RPCP was shown to be
 undecidable by Alur~et~al.~\cite{alur2005realizability}, via reduction 
 from PCP.
 
+\bigskip
+
 \begin{definition}[Relaxed Post Correspondence Problem]
 	Given a set of tiles $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, 
 	determine whether there exist indices $i_1, ..., i_m$ such that
@@ -42,6 +44,8 @@ With this definition in place, I now introduce the main objects used
 in the proof. Specifically, I begin by showing how a Global Type can 
 represent a single \verb|synch| MSC.
 
+\bigskip
+
 % TODO ivan: non sembra una def, più un lemma
 \begin{definition}[$G_M$]\label{def:gm}
 	Given an MSC $M\in \mscsetofmodel{\synchmodel}$, there exists a
@@ -49,6 +53,8 @@ represent a single \verb|synch| MSC.
 \end{definition}
 
 We now define a particular Global Type that will be useful in the reduction.
+
+\bigskip
 
 \begin{definition}[$G_S$]\label{def:gs}
 	Given a string $S\in\Sigma^*$, and two integers $i, n$,
@@ -91,6 +97,8 @@ We now define a particular Global Type that will be useful in the reduction.
 
 Now, let's generalize Definition~\ref{def:gm} to include a set of MSCs.
 
+\bigskip
+
 \begin{definition}[$G^*$]\label{def:gstar}
 	Given a set of MSCs $\mathcal{M} =\{M\ |\ \mscsetofmodel{\synchmodel}\}$,
 	$G^*$ is the set of global types such that $G^*=\{G_M\ |\ M \in \setmsc\}$,
@@ -99,6 +107,8 @@ Now, let's generalize Definition~\ref{def:gm} to include a set of MSCs.
 
 Informally, for every MSC $M\in\setmsc$ there exists a global type $G\in G^*$ that
 captures the language of $M$. 
+
+\bigskip
 
 \begin{definition}[The $L^*$ global type]\label{def:lstar}
 	Assume a finite set $\setmsc$ of MSCs, where
@@ -124,6 +134,8 @@ captures the language of $M$.
 Informally, $L^*$ represents all the
 possible executions of a set of MSCs. To complete the set of definitions,
 let's define a particular MSC corresponding to Definition~\ref{def:gs}.
+
+\bigskip
 
 \begin{definition}[$M^n_i$]\label{def:mni}
 	For a string $u$, let $u^l$ denote the $l$-th character of the string.
@@ -167,6 +179,8 @@ auxiliary lemmas that characterize the behaviour of the MSCs used in the
 reduction. These lemmas will serve as building blocks for the proof of
 Theorem~\ref{thm:main}.
 
+\bigskip
+
 \begin{lemma}\label{lemma:minsynch}
 	The MSC $M_i^n$ belongs to $\mscsetofmodel{\synchmodel}$.
 \end{lemma}
@@ -180,6 +194,8 @@ Theorem~\ref{thm:main}.
 	$$
 	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
 \end{proof}
+
+\bigskip
 
 \begin{lemma}\label{lemma:msgs}
 	The MSC $M^n_i$ (Def.~\ref{def:mni}) is included in $L(G_S)$, where $G_S$
@@ -195,6 +211,8 @@ Theorem~\ref{thm:main}.
 	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
 	their linearizations coincide. Hence, $M^n_i \in L(G_S)$.
 \end{proof}
+
+\bigskip
 
 \begin{theorem}\label{thm:main}
 	Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
@@ -265,8 +283,8 @@ Theorem~\ref{thm:main}.
 		      $P_1\leftrightarrow P_2\leftrightarrow P_3\leftrightarrow P_4\leftrightarrow P_1$.
 		      The only new situation that we now that can cause a cycle are the communication
 		      between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
-		      We don't need to analyze the new communication between $P_1$ and $P_4$ because
-		      it's not feasible in any communication model, but we need to analyze the one
+		      We don't need to analyse the new communication between $P_1$ and $P_4$ because
+		      it's not feasible in any communication model, but we need to analyse the one
 		      between $P_2$ and $P_3$ because it's feasible in FIFO.
 
 		      % For the fist comunication, the only possible cycle pattern is depicted

@@ -86,15 +86,15 @@ Figure~\ref{fig:msc-exmp} depicts the described example.
 \end{figure}
 \end{example}
 
-First, we introduce the definition of a linearization of an MSC. A
-linearization represents a possible ordering of the events in the distributed
+First, we introduce the definition of a linearisation of an MSC. A
+linearisation represents a possible ordering of the events in the distributed
 system, that is, a way to schedule the events of an MSC.
 
 \bigskip
 
-\begin{definition}[Linearization of a MSC]
+\begin{definition}[Linearisation of a MSC]
 	Let $M = (\mathcal{E}, \Rightarrow, \triangleleft, \lambda)$ be an MSC.
-	A \emph{linearization} of $M$ is a (reflexive) total order
+	A \emph{linearisation} of $M$ is a (reflexive) total order
 	$\rightsquigarrow \subseteq \mathcal{E} \times \mathcal{E}$ such that
 	$\leq_{hb} \subseteq \rightsquigarrow$. 
 \end{definition}
@@ -102,13 +102,13 @@ system, that is, a way to schedule the events of an MSC.
 % TODO: dare più contesto
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
-% send events and there is a linearization $\rightsquigarrow$ where any 
+% send events and there is a linearisation $\rightsquigarrow$ where any 
 % matched send event is immediately followed by its respective receive event.
 
 \bigskip
 
 \begin{example}\label{exmp:lin}
-Considering the Example~\ref{exmp:msc}, three possible linearization
+Considering the Example~\ref{exmp:msc}, three possible linearisation
 are 
 $$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_4
 \rightsquigarrow e_5 \rightsquigarrow e_6\ ;$$
@@ -118,11 +118,17 @@ $$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_5
 \rightsquigarrow e_6 \rightsquigarrow e_4.$$ 
 \end{example}
 
+We write $\linearisationsof{\mmsc}{}$ for the set of all linearisations of $\mmsc$.
+Given an MSC $\mmsc$, we write $\linearisationsof{\mmsc}{\acommunicationmodel}$ 
+to denote $\linearisationsof{\mmsc}{} \cap \mathcal{E}_{\text{com}}$;
+the executions of $\linearisationsof{\mmsc}{\acommunicationmodel}$ 
+are called the linearisations of $\mmsc$ in the communication model \verb|com|.
+
 \bigskip
 	
 \begin{definition}[$\acommunicationmodel$-linearisable MSC]\label{def:linearisable-msc}
 	An MSC $\mmsc$ is \textit{linearisable} in a communication model $\acommunicationmodel$
-	if $\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$. % TODO: trova definizione nel paper di cinzia
+	if $\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$.
 	We write $\mscsetofmodel{\acommunicationmodel}$ for the set of all MSCs 
 	linearisable in $\acommunicationmodel$.
 \end{definition}
@@ -147,7 +153,7 @@ all send events are immediately followed by their corresponding receive events.
 \bigskip
 
 \begin{example}
-Consider the Example~\ref{exmp:msc} and the respective linearization
+Consider the Example~\ref{exmp:msc} and the respective linearisation
 listed in  Example~\ref{exmp:lin}. 
 The MSC $\mmsc$ is \textit{linearisable} in the $\synchmodel$ communication 
 model because
@@ -169,6 +175,9 @@ In our setting, Global Types are automata that describe a language of MSCs.
 %% TODO: commenti di ivan: non è proprio un type, lui definisce 
 %% così i choreography automata, magari specificare che le definizioni corrispondono
 %% e citare il paper che usa questa nozione
+
+\bigskip
+
 \begin{definition}[Global Type]
 	An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ 
 	with $p\ne q$; we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and 
@@ -177,6 +186,8 @@ In our setting, Global Types are automata that describe a language of MSCs.
 	alphabet $\labelalphabet$.
 \end{definition}
 % TODO: dare più contesto ad esempio
+
+\bigskip
 
 \begin{example}
 An example of a Global Type expressed as an automaton is the following.
@@ -199,7 +210,7 @@ Global Type in Figure~\ref{fig:gt-exm}.
 			\draw[->] (s2) to node[above,sloped]{$\gtlabel{C}{D}{w}$}(s4);
 			
 		\end{tikzpicture}
-		\caption{A Global Type, which respects the specification given in Listing~\ref{lst:not-impl-exm}.}
+		\caption{An automaton representing the specification's global type given in Listing~\ref{lst:not-impl-exm}.}
 		\label{fig:gt-exm}
 	\end{figure}
 \end{example}
@@ -207,6 +218,9 @@ Global Type in Figure~\ref{fig:gt-exm}.
 Let's continue defining the basic notions of
 automaton and communicating finite state machines.
 % I assume standard notations for automata, words, and languages.  % TODO rifrasa? definisci?
+
+\bigskip
+
 \begin{definition}[NFA]
     A nondeterministic finite automaton (NFA) is a tuple 
     $\mathcal A = (Q, \Sigma, \delta, l_0, F)$, where $Q$ is the set of states, 
@@ -215,11 +229,14 @@ automaton and communicating finite state machines.
     The language $\languageofnfa{\mathcal A}$ of an NFA $\mathcal A$ and the notion of deterministic
     finite state automaton (DFA) or $\varepsilon$ transitions are defined as usual.
     We denote by $\languageofnfa{\mathcal A}$ the language of $\mathcal A$. 
-    We write $\acceptcompletion{\mathcal A}{}$ for the automaton obtained from $\mathcal A$ by setting $F=Q$.
+    % We write $\acceptcompletion{\mathcal A}{}$ for the automaton 
+	% obtained from $\mathcal A$ by setting $F=Q$. % TODO: lo uso?
     % Deterministic automata and $\varepsilon$-transitions are defined in the standard way.   % TODO rifrasa? definisci?
 \end{definition}
 
 Furthermore, we recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
+
+\bigskip
 
 \begin{definition}[CFSM] \label{def:cfsm}
     A \emph{communicating finite state machine} (CFSM) is an NFA with 
@@ -229,6 +246,8 @@ Furthermore, we recall the definition of communicating finite state machines~\ci
 
 These definitions will later be used also for Chapter~\ref{sec:rescu}.
 Let's now define the asynchronous product of an automaton
+
+\bigskip
 
 \begin{definition}[Asynchronous product automaton]
 Let $\{A_i\}_{i=1}^n$ be a set of automata. For each ordered pair 
@@ -267,7 +286,7 @@ The language $L(A)$ of $A$ consists of all words in $\hat{\Sigma}^*$
 taking $q_0$ to an accepting state, interpreting $\tau$ as 
 $\varepsilon$. For any set of automata $\{A_i\}$, the language 
 $L(\prod_i A_i)$ contains only complete, well-formed words. For a 
-given MSC $M$, $L(\prod_i A_i)$ either contains all linearizations 
+given MSC $M$, $L(\prod_i A_i)$ either contains all linearisations 
 of $M$, or none.
 \end{definition}
 
@@ -296,12 +315,17 @@ language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
 MSCs whose representations as sequences of arrows are all in
 $\labellanguageof{\gt}$:
 % TODO: ivan dice di controllare? la def di chor automata (o forse hanno una roba simile)
+
+\bigskip
+
 \begin{definition}[$\existentialmsclanguageof{\gt}$]
 	$$
 		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
 		w \in \labellanguageof{\gt}\}
   $$
 \end{definition}
+
+\bigskip
 
 \begin{definition}[$\universalmsclanguageof{\gt}$]
   $$
@@ -310,6 +334,8 @@ $\labellanguageof{\gt}$:
 	$$
 \end{definition}
 % TODO: dare più contesto ed esempio
+
+\bigskip
 
 \begin{definition}[Commutation-closed]
     A global type $\gt$ is \emph{commutation-closed} if
@@ -328,6 +354,8 @@ To formalize it, we first define the notions of
 
 %% TODO: Spiegare meglio con intuizioni
 
+\bigskip
+
 \begin{definition}[Weakly-imply]
 	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
 	\textit{weakly implies} $M$, if for any sequence of automata
@@ -337,6 +365,8 @@ To formalize it, we first define the notions of
 
 In order to understand the meaning of \emph{weak implication},
 consider the following example.
+
+\bigskip
 
 \begin{example}
 Define two MSCs, MSC1 and MSC2. Both perform the same four
@@ -424,12 +454,16 @@ MSC1 & MSC2 & $M$
 \end{figure}
 \end{example}
 
+\bigskip
+
 \begin{definition}[Weakly-closure $\setmsc^w$]
 	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
 	weakly implied by $\setmsc$.
 \end{definition}
 
 % todo: esempio
+
+\bigskip
 
 \begin{definition}[Weakly-realizable]
 	An MSC $M$ is said to be weakly-realizable if the set of MSCs
