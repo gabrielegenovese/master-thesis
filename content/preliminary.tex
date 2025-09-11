@@ -7,9 +7,6 @@ Then, the notions of Global Type and Realizability are
 defined within the scope of this work, along with the foundational 
 elements required to understand the theoretical contributions.
 
-% First, I introduce a formal definition of MSCs, as this will serve as
-% a foundation for establishing their connection with Global Types in
-% one of the main contributions of this work.
 \section{MSCs and the Synchronous Communication Model}
 
 \begin{definition}[Message Sequence Chart]
@@ -47,11 +44,53 @@ as the set of events executed by $p$.
 \end{enumerate}
 \end{definition}
 
-% TODO: Esempio
+\bigskip
+
+\begin{example}\label{exmp:msc}
+Consider the following example of an MSC.  
+It consists of three processes $P1,P2,P3$ and three messages $m_1,m_2,m_3$.  
+The set of events $\mathcal{E}$ is given by the following elements:  
+$\mathrm{send}(P1,P2,m_1)$ as $e_1$,  
+$\mathrm{rec}(P1,P2,m_1)$ as $e_2$,  
+$\mathrm{send}(P2,P1,m_2)$ as $e_3$,  
+$\mathrm{rec}(P2,P1,m_2)$ as $e_4$,  
+$\mathrm{send}(P2,P3,m_3)$ as $e_5$,  
+$\mathrm{rec}(P2,P3,m_3)$ as $e_6$.  
+The process relation $\rightarrow$ orders events along each process:  
+on $P1$: $e_1 \rightarrow e_4$;  
+on $P2$: $e_2 \rightarrow e_3 \rightarrow e_5$;  
+on $P3$: $e_6$.  
+The message relation $\vartriangleleft$ pairs $e_1 \vartriangleleft e_2$,  
+$e_3 \vartriangleleft e_4$, and $e_5 \vartriangleleft e_6$.  
+The happens-before relation $\le_{\mathrm{hb}}$ is the transitive closure  
+of these, yielding dependencies such as  
+$e_1 \le_{\mathrm{hb}} e_2 \le_{\mathrm{hb}} e_3 \le_{\mathrm{hb}} e_4$  
+and $e_3 \le_{\mathrm{hb}} e_5 \le_{\mathrm{hb}} e_6$.  
+Figure~\ref{fig:msc-exmp} depicts the described example.
+	
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+
+	\mess{$m_1$}{P1}{P2}
+	\nextlevel
+	\mess{$m_2$}{P2}{P1}
+	\nextlevel
+	\mess{$m_3$}{P2}{P3}
+\end{msc}
+\caption{Simple example with an exchange of three messages.}
+\label{fig:msc-exmp}
+\end{figure}
+\end{example}
 
 First, we introduce the definition of a linearization of an MSC. A
 linearization represents a possible ordering of the events in the distributed
 system, that is, a way to schedule the events of an MSC.
+
+\bigskip
 
 \begin{definition}[Linearization of a MSC]
 	Let $M = (\mathcal{E}, \Rightarrow, \triangleleft, \lambda)$ be an MSC.
@@ -60,11 +99,26 @@ system, that is, a way to schedule the events of an MSC.
 	$\leq_{hb} \subseteq \rightsquigarrow$. 
 \end{definition}
 
-% TODO: dare più contesto ed esempio
+% TODO: dare più contesto
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is an \verb|rsc|-MSC if it has no unmatched 
 % send events and there is a linearization $\rightsquigarrow$ where any 
 % matched send event is immediately followed by its respective receive event.
+
+\bigskip
+
+\begin{example}\label{exmp:lin}
+Considering the Example~\ref{exmp:msc}, three possible linearization
+are 
+$$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_4
+\rightsquigarrow e_5 \rightsquigarrow e_6\ ;$$
+$$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_5
+\rightsquigarrow e_4 \rightsquigarrow e_6$$ and
+$$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_5
+\rightsquigarrow e_6 \rightsquigarrow e_4.$$ 
+\end{example}
+
+\bigskip
 	
 \begin{definition}[$\acommunicationmodel$-linearisable MSC]\label{def:linearisable-msc}
 	An MSC $\mmsc$ is \textit{linearisable} in a communication model $\acommunicationmodel$
@@ -76,6 +130,8 @@ system, that is, a way to schedule the events of an MSC.
 Finally, let's formally define what is a \verb|synch|-MSCs in this context.
 % TODO: dare più contesto 
 
+\bigskip
+
 %% TODO: per ivan è un po' criptica
 \begin{definition}[Synchronous execution]\label{def:synch}
 	An execution $\execution=(w,\source) \in \executionsofmodel{\synchmodel}$
@@ -83,10 +139,25 @@ Finally, let's formally define what is a \verb|synch|-MSCs in this context.
 	of $e$ and $\source(s+1)=s$.
 \end{definition}
 
-% TODO: dare più contesto ed esempio
+% TODO: dare più contesto
 
 In other words, an MSC $M$ belongs to $\mscsetofmodel{\synchmodel}$ if
 all send events are immediately followed by their corresponding receive events.
+
+\bigskip
+
+\begin{example}
+Consider the Example~\ref{exmp:msc} and the respective linearization
+listed in  Example~\ref{exmp:lin}. 
+The MSC $\mmsc$ is \textit{linearisable} in the $\synchmodel$ communication 
+model because
+$\linearisationsof{\mmsc}{\synchmodel}\neq\emptyset$.
+The only element of $\linearisationsof{\mmsc}{\synchmodel}$ is
+$$e_1 \rightsquigarrow e_2 \rightsquigarrow e_3 \rightsquigarrow e_4
+\rightsquigarrow e_5 \rightsquigarrow e_6.$$
+All the send events ($e_1, e_3, e_5$) are followed by the respective
+receive events ($e_2, e_4, e_6$).
+\end{example}
 
 \section{Basic notions for Global Types}
 This part will further highlight the basic notions to understand the formal proof 
@@ -148,7 +219,7 @@ automaton and communicating finite state machines.
     % Deterministic automata and $\varepsilon$-transitions are defined in the standard way.   % TODO rifrasa? definisci?
 \end{definition}
 
-We recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
+Furthermore, we recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
 
 \begin{definition}[CFSM] \label{def:cfsm}
     A \emph{communicating finite state machine} (CFSM) is an NFA with 

@@ -118,9 +118,8 @@ The main contributions of this work are:
     enabling verification of \textit{deadlock-freedom} and \textit{progress} 
     for synchronous systems.
 \end{itemize}
-The thesis begins with a brief overview of the main objects and problem
-in Section~\ref{sec:sota} with a state-of-the-art
-overview, presented in a general and accessible manner, avoiding
+The thesis begins with a brief overview of the background
+in Chapter~\ref{sec:sota}, presented in a general and accessible manner, avoiding
 formal definitions and proofs. Chapters~\ref{sec:pre} and
 \ref{sec:proof} then introduce the necessary formal definitions,
 followed by the main theoretical contribution and in 
@@ -166,30 +165,37 @@ or iterations of atomic MSC scenarios.
 % nella parte di definizioni formali fare un confronto.
 % citare il confronto qua e rimandare dopo
 
-\subsection{The realizability problem for MSCs}
+\subsection{The implementability problem for MSCs}
 
-The \emph{realizability problem} was first introduced for MSC languages 
+The \emph{implementability problem} was first introduced for MSC languages 
 in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
 implementation that can realize all behaviours of a finite set of MSCs 
 without introducing additional ones. A stronger variant, called 
-\emph{safe realizability}, requires the implementation to also be \textbf{deadlock-free}. 
+\emph{safe implementability}, requires the implementation to also be \textbf{deadlock-free}. 
+This problem has some synonyms in the term, with slightly different definition,
+but it can be called also realizability and projectability.
 % In this setting, distributed implementations are defined using communicating 
 % automata with explicit accepting states, and deadlock-freedom corresponds 
 % to the ability to reach an accepting state from any reachable configuration. 
 
 \subsection{Hierarchy of communication model's semantics}
 With MSCs, \cite{di2023partial} presents some interesting communication
-semantics. I will describe a few of them informally, using examples to
+semantics. I will describe  them informally, using examples to
 highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
 Definition~\ref{def:synch}. Some examples are shown in 
 Figure~\ref{fig:msc_examples}, whose \emph{membership} 
 can be verified with an online tool for MSCs~\cite{MSCTool}. 
-Figure~\ref{fig:coms} shows the hierarchy
-of the communication semantics defined. % TODO: dare più contesto alla figura
+\cite{di2023partial} also introduces a hierarchy of communication
+semantics, illustrated in Figure~\ref{fig:coms}. The main objective of
+this work was to establish a hierarchy that preserves monotonic
+properties: if a property holds for a given communication semantic, it
+should also hold for all semantics contained within it. However, it was
+shown that this monotonicity only applies to specific properties, such
+as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
+extend to the implementability problem.
 
 % TODO: rsc =/= sync (messaggi orfani)
-
 
 \begin{figure}[!ht]
 \centering
@@ -205,9 +211,6 @@ of the communication semantics defined. % TODO: dare più contesto alla figura
 \caption{Hierarchy of communication model semantics.}
 \label{fig:coms}
 \end{figure}
-
-% TODO: dire che la proiezione non è monotona e che quindi non può essere
-% passata ad altre semantica (ma altre sì tipo weak-k-synchronizability)
 
 \begin{figure}[!ht]
     \centering
@@ -413,7 +416,7 @@ expressivity and safety has motivated extensions of the theory, with
 \cite{castagna2012global} being the only algorithm aiming for full 
 completeness.
 
-\subsection{Mixed and Sender driven choice}
+% \subsection{Mixed and Sender driven choice}
 A key restriction in the definition of MPST appears in branching. 
 In the original framework \cite{honda2008multiparty,carbone2012structured}, 
 choice is \textbf{sender-driven}: the first sender dictates the branch, 
@@ -424,8 +427,22 @@ several initiators, but it also makes the implementability problem
 undecidable in general~\cite{stutz2024implementability}.  
 
 \section{Choreographies}
-%todo
-
+Choreographies \cite{montesi2014choreographic} are another formalism to describe  
+distributed communication protocols. Unlike MSCs or MPST, which focus either on 
+trace-based semantics or type systems, choreographies emphasize the 
+global specification of interactions as a high-level description of the 
+intended message exchanges. Similarly to MPST, their goal is to ensure that
+a distributed  implementation can be derived in which each participant 
+follows a local behaviour consistent with the global description, called
+respectively \emph{local} and \emph{global-view}. This setting naturally 
+connects to the realizability problem, since the key question is whether 
+a choreography can be faithfully implemented by a system of local 
+processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
+and it is derived throughout a projection operation from the global-view.
+The \emph{knowledge of choice} problem is similar to the implementability one,
+and explored also in choreographies,
+but it was first introduced by Castagna et al.~\cite{castagna2012global}.
+% https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
 
 \section{Reduction to synchronous semantic}
 The main idea of this work is that reasoning about implementability 
