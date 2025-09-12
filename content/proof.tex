@@ -9,13 +9,81 @@ closely with definitions used in previously established works.
 We now introduce the main objects employed in the proof of Theorem~\ref{thm:main}. 
 The proof itself is adapted from the work of 
 Alur et~al.~\cite{alur2005realizability}. 
-% TODO: dare skatch idea della prova prima di presentare formalmente tutte queste definitoni
-% TODO: dire come è cambiata la prof in questo skatch
+I will first give a sketch of the proof, to also highlight the 
+differences with the original one.
+
+\begin{proof}[Sketch of Proof]
+The proof is carried out by a \emph{reduction} from the
+\textbf{Relaxed Post Correspondence Problem (RPCP)}, a variant of
+the classical Post Correspondence Problem (PCP).
+The main idea is to encode the existence of a
+solution to an RPCP instance into the (non-)realizability of a
+\emph{global type} $L^*$ built from synchronous MSCs. 
+In the original proof, $L^*$ is not a global type, but an MSC.
+Therefore, we changed the base definitions of the original paper
+to fit the model. 
+
+\bigskip
+
+\textbf{Step 1: Construction.}
+Given an RPCP instance $\Delta = \{(v_1,w_1),\ldots,(v_m,w_m)\}$,
+we associate to each pair $(v_i,w_i)$ two MSCs $M^0_i,M^1_i$,
+following Def.~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
+(Lemma~\ref{lemma:minsynch}) and belongs to the language of the
+global type $G_S$ (Lemma~\ref{lemma:msgs}). From all such MSCs we
+build $L^*$ (Def.~\ref{def:lstar}), which represents all possible
+concatenations of the $M^n_i$.
+
+\bigskip
+
+\textbf{Step 2: Direction ``$\Rightarrow$''.}
+Assume $\Delta$ has a solution $R=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$.
+From this, construct two MSC sequences:
+\[
+M = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad
+M' = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
+\]
+Both $M,M'$ are synchronous concatenations of synchronous MSCs.
+Consider now a third MSC $M''$ obtained by taking the projections
+$M'|_1,M'|_2$ and $M|_3,M|_4$. Intuitively, processes $P_1,P_2$
+construct the \emph{right string} $y_{i_1}\cdots y_{i_m}$, while
+processes $P_3,P_4$ construct the \emph{left string}
+$x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP ensures that
+$M''$ is acyclic and \emph{synchronous}. 
+The $M''$ synchrony is not trivial, therefore we need to prove it.
+This part was not present in the original proof.
+By construction, $L^*$ weakly
+implies $M''$, but $M'' \notin L^*$, since at least one tile
+differs. Hence, $L^*$ is \emph{not realizable}.
+
+\bigskip
+
+\textbf{Step 3: Direction ``$\Leftarrow$''.}
+Suppose $L^*$ is not realizable: then there exists some MSC $M^@$
+weakly implied by $L^*$ but not in $L^*$. Analysing the projections
+of $M^@$ on each process, we recover two sequences of words, one
+built along processes $P_1,P_2$ and the other along $P_3,P_4$. The
+fact that $M^@ \notin L^*$ implies that these two sequences must
+differ at some tile, and the prefix property ensures that the word
+on $P_2$ is always a prefix of the word on $P_3$. This yields a
+\emph{solution to the RPCP instance} $\Delta$.
+
+\bigskip
+
+\textbf{Step 4: Conclusion.}
+We have shown the equivalence:
+\[
+\Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realizable}.
+\]
+Since RPCP is known to be \textbf{undecidable}, it follows that
+\emph{checking weak realizability of a global type is also
+undecidable}.
+\end{proof}
+
+Let's first define the main objects used in the proof.
 
 \section{Definitions}
-The proof is carried out by reduction from the RPCP problem, which I now recall.  
-The Relaxed Post Correspondence Problem (RPCP) is a variant of the 
-classical Post Correspondence Problem (PCP). RPCP was shown to be 
+RPCP was shown to be 
 undecidable by Alur~et~al.~\cite{alur2005realizability}, via reduction 
 from PCP.
 
@@ -70,7 +138,6 @@ We now define a particular Global Type that will be useful in the reduction.
 	\end{itemize}
 	This global type is depicted in Figure~\ref{fig:gtype}.
 	
-	% TODO: fixa immagine
 	\begin{figure}[!ht]
 		\centering
 		\begin{tikzpicture}[->, node distance=30mm, on grid, auto]
@@ -186,7 +253,7 @@ Theorem~\ref{thm:main}.
 \end{lemma}
 
 \begin{proof}
-	By Definition~\ref{def:linearisable-msc} and ù
+	By Definition~\ref{def:linearisable-msc} and
 	Definition~\ref{def:synchronous},
 	we need to show a linearization with all send operations
 	followed by their corresponding receive operations:
