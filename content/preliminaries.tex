@@ -1,0 +1,823 @@
+\chapter{Preliminaries}\label{sec:pre}
+In this section, the fundamental concepts and definitions necessary 
+to contextualize the main contributions of this work are presented. 
+I, first, introduce automaton, executions, and
+Message Sequence Charts (MSC), followed by 
+an examination of communication model's semantics that are particularly 
+interesting. 
+Then, the notions of Global Type and Realizability are 
+defined within the scope of this work, along with the foundational 
+elements required to understand the theoretical contributions.
+
+\section{Standard notions on automata}
+
+\bigskip
+
+\begin{definition}[NFA]\label{def:nfa}
+A non-deterministic finite automaton (NFA) is a tuple  
+$\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$, where $Q$ is a finite set of  
+states, $\Sigma$ is a finite alphabet,  
+$\delta : Q \times (\Sigma \cup \{\varepsilon\}) \to Q$ is the transition  
+relation, $q_0 \in Q$ is the initial state, and $F \subseteq Q$ is the set  
+of accepting states.  
+
+We write $\delta^*(s,w)$ to denote the set of states $s'$ reachable from  
+$s$ along a path labelled with $w$. The language accepted by $\mathcal{A}$,  
+denoted $\mathcal{L}_{\text{words}}(\mathcal{A})$, is the set of words  
+$w \in \Sigma^*$ such that $\delta^*(q_0,w) \cap F \neq \emptyset$.  
+\end{definition}
+
+\bigskip
+
+\begin{definition}[DFA]\label{def:dfa}
+A deterministic finite automaton (DFA) is an NFA where the transition  
+relation $\delta$ is a partial function  
+$\delta : Q \times \Sigma \to Q$. The DFA is complete if $\delta$ is  
+total.  
+
+% Every DFA $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$ accepts the same  
+% language as the complete DFA $\mathcal{A}' = (Q \cup \{\perp\}, \Sigma,  
+% \delta', q_0, F)$, where $\delta'(q,a) = \perp$ if $\delta(q,a)$ is  
+% undefined, and $\delta'(\perp,a) = \perp$.  
+\end{definition}
+
+\bigskip
+
+\begin{definition}[Determinization]\label{def:det}
+To every NFA $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$, we associate  
+the DFA $\text{det}(\mathcal{A}) = (Q', \Sigma, \delta', q'_0, F')$,  
+where $Q' = 2^Q$, $q'_0 = \{q_0\}$, $F'$ is the set of subsets of $Q$  
+that contain at least one accepting state, and $\delta'$ is defined by  
+$\delta'(S,a) = \bigcup\{\delta^*(s,a) \mid s \in S\}$ for all  
+$S \in Q'$, $a \in \Sigma$.  
+\end{definition}
+
+We write $\acceptcompletion{\mathcal A}{}$ for the automaton obtained
+from $\mathcal A$ by setting $F=Q$.
+
+% \begin{definition}[Product NFA]\label{def:product-nfa}
+% Given two NFAs $\mathcal{A}_1 = (Q_1, \Sigma, \delta_1, q_{0,1}, F_1)$ and  
+% $\mathcal{A}_2 = (Q_2, \Sigma, \delta_2, q_{0,2}, F_2)$, the product NFA is  
+% defined as  
+% \[
+% \mathcal{A}_1 \otimes \mathcal{A}_2 \stackrel{\text{def}}{=}  
+% (Q_1 \times Q_2, \Sigma, \delta, (q_{0,1}, q_{0,2}), F_1 \times F_2),
+% \]  
+% where the transition relation $\delta$ is defined as follows:  
+
+% \begin{itemize}  
+%   \item for all $(s_1,s_2) \in Q_1 \times Q_2$, $a \in \Sigma$,  
+%   $(s'_1,s'_2) \in Q_1 \times Q_2$:  
+%   $((s_1,s_2),a,(s'_1,s'_2)) \in \delta$  
+%   iff $(s_1,a,s'_1) \in \delta_1$ and $(s_2,a,s'_2) \in \delta_2$.  
+
+%   \item for all $(s_1,s_2) \in Q_1 \times Q_2$, $(s'_1,s'_2) \in Q_1 \times Q_2$:  
+%   $((s_1,s_2),\varepsilon,(s'_1,s'_2)) \in \delta$  
+%   iff $(s_1,\varepsilon,s'_1) \in \delta_1$ or $(s_2,\varepsilon,s'_2) \in \delta_2$.  
+% \end{itemize}  
+
+% It holds that  
+% $\mathcal{L}_{\text{words}}(\mathcal{A}_1 \otimes \mathcal{A}_2) =  
+% \mathcal{L}_{\text{words}}(\mathcal{A}_1) \cap  
+% \mathcal{L}_{\text{words}}(\mathcal{A}_2)$.  
+% \end{definition}
+
+% \begin{definition}[Dual DFA]\label{def:dual-dfa}
+% If $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$ is a DFA, its dual is  
+% defined as  
+% \[
+% \mathcal{A}^{\text{dual}} = (Q, \Sigma, \delta, q_0, Q \setminus F).
+% \]  
+% If $\mathcal{A}$ is complete, then  
+% $\mathcal{L}_{\text{words}}(\mathcal{A}^{\text{dual}}) =  
+% \Sigma^* \setminus \mathcal{L}_{\text{words}}(\mathcal{A})$.  
+% \end{definition}
+
+\section{Execution, Communication Models and MSCs}
+We assume a finite set of \emph{processes} 
+$\Procs=\{p,q,\ldots\}$ and a finite set of 
+messages (labels) $\Msg=\{\msg_1,\msg_2,\ldots\}$.  
+We consider two kinds of actions:  
+\begin{itemize}
+	\item \emph{send actions}, of the form $\send{p}{q}{\msg}$, 
+	executed by process $p$ when sending message $\msg$ to $q$;  
+	\item \emph{receive actions}, of the form $\recv{p}{q}{\msg}$, 
+	executed by process $q$ when receiving $\msg$ from $p$.  
+\end{itemize}
+
+Furthermore, we write $\Act$ for the set $\Procs \times \Procs \times \{!,?\} \times \Msg$  
+of all actions, and $\Actp$ for the subset of actions executable by $p$ 
+(i.e., $\send{p}{q}{\msg}$ or $\recv{q}{p}{\msg}$).  
+When processes are clear from the context, we abbreviate 
+send and receive actions as $!\msg$ and $?\msg$, respectively.  
+
+An \emph{event} $\event$ of a sequence of actions $w \in \Act^*$  
+is an index $i \in \{1,\ldots,\length{w}\}$.  
+It is a \emph{send event} (resp. \emph{receive event}) if $w[i]$  
+is a send (resp. receive) action.  
+We denote by $\sendeventsof{w}$ (resp. $\receiveeventsof{w}$)  
+the set of send (resp. receive) events of $w$, and  
+$\eventsof{w} = \sendeventsof{w} \cup \receiveeventsof{w}$.  
+When all events are labelled with distinct actions, 
+we identify an event with its action.  
+
+\subsubsection*{Executions.}
+An execution is a well-defined sequence of actions $e\in\Act^*$, where a
+receive action is always preceded by a unique corresponding send action. % TODO : in che senso?
+
+\begin{definition}[Execution]\label{def:execution}
+An \emph{execution} over $\Procs$ and $\Msg$ is a sequence 
+of actions $e \in \Act^*$ together with an injective mapping 
+$\source_{e} : \receiveeventsof{e} \to \sendeventsof{e}$  
+such that for each receive event $i$ labelled $\recv{p}{q}{\msg}$,  
+its source $\source_{e}(i)$ is labelled $\send{p}{q}{\msg}$ and  
+$\source_{e}(i) < i$.  
+\end{definition}
+
+For a set of executions $\mathcal{E}$, let 
+$\prefixclosureof{\mathcal{E}}$ be the set of all prefixes 
+of executions in $\mathcal{E}$.  
+The \emph{projection} $\projofon{e}{p}$ of $e$ on process $p$  
+is the subsequence of actions in $\Actp$.  
+A send event $s$ is \emph{matched} if there exists a receive event $r$  
+such that $\source(r) = s$.  
+An execution is \emph{orphan-free} if all send events are matched,  
+i.e., if $\source$ is surjective onto $\sendeventsof{e}$.  
+
+\subsubsection*{Communication Models.}
+In this thesis, we focus on two communication models: 
+the peer-to-peer model ($\ppmodel$) and the synchronous model ($\synchmodel$).  
+Nonetheless, this work forms part of a 
+broader and more general project. Some results presented here 
+naturally extend to a wide range of communication models, often requiring 
+only mild additional assumptions. Please, refer to the related work chapter
+(Chapter~\ref{sec:rel}, Section~\ref{sec:hier}).
+From this perspective, we introduce a general definition of a communication 
+model. 
+
+\bigskip
+
+\begin{definition}[Communication model]\label{def:communication-model}
+A \emph{communication model} $\acommunicationmodel$  
+is a set $\executionsofmodel{\acommunicationmodel}$ of executions.  
+\end{definition}
+
+In the \emph{synchronous model} $\synchmodel$,  
+every send is immediately followed by its matching receive:  
+
+\bigskip
+
+\begin{definition}[$\synchmodel$]\label{def:synchronous}
+An execution $e = (w,\source)$ belongs to 
+$\executionsofmodel{\synchmodel}$ if for every send event 
+$s \in \sendeventsof{e}$, the event $s+1$ is a receive event 
+with $\source(s+1) = s$.  
+\end{definition}
+
+In the peer-to-peer communication model $\ppmodel$, every pair of 
+processes $(p,q)$ is connected by a dedicated FIFO channel.  
+Messages sent by $p$ to $q$ are delivered in the same order in which 
+they were issued: if $p$ first sends $m_1$ and then $m_2$, the channel 
+guarantees that $m_2$ cannot overtake $m_1$. Concretely:
+\begin{itemize}
+    \item if $m_1$ is never received, then $m_2$ cannot be received either;
+    \item if both are received, then $m_1$ is delivered before $m_2$.
+\end{itemize}
+
+\bigskip
+
+\begin{definition}[Peer-to-peer model $\ppmodel$]
+\label{def:queue-based-communication-model}
+The set $\executionsofmodel{\ppmodel}$ consists of all executions $e$ 
+such that for any two send events 
+$s_1=\send{p}{q}{\msg_1}$ and $s_2=\send{p}{q}{\msg_2}$ in 
+$\sendeventsof{e}$, with $s_1 < s_2$, one of the following holds:
+\begin{itemize}
+    \item $s_2$ remains unmatched; or
+    \item there exist receive events $r_1, r_2$ such that $r_1 < r_2$, 
+          $\source(r_1)=s_1$, and $\source(r_2)=s_2$.
+\end{itemize}
+\end{definition}
+
+It is easy to observe that 
+$\executionsofmodel{\synchmodel} \subseteq \executionsofmodel{\ppmodel}$.  
+Furthermore, the \emph{source function} $\source_e$ is defined as follows.  
+If $e$ is an execution in $\ppmodel$, the source of the $i$-th receive 
+event of $q$ from $p$ is the $i$-th corresponding send event of $p$ to $q$.  
+If instead $e$ belongs to $\synchmodel$, then for every receive event $i$ 
+we define $\source_e(i) = i-1$.  
+
+\subsubsection*{Message Sequence Charts.}
+While executions correspond to a total order of events in a system,  
+message sequence charts (MSCs) provide a distributed view, using  
+a partial order on events.  
+For a tuple $\mmsc=(w_p)_{p\in\Procs}$, each $w_p \in \Actsp$ is a  
+sequence of actions executed by process $p$, according to some  
+total, locally observable order.  
+We write $\eventsof{\mmsc}$ for the set  
+$\{(p,i) \mid p \in \Procs \text{ and } 0 \leq i < \length{w_p}\}$.  
+The label $\actionof{\event}$ of an event $\event=(p,i)$ is the action  
+$w_p[i]$. The event $\event$ is a send (resp. receive) event if it is  
+labelled with a send (resp. receive) action.  
+We write $\sendeventsof{\mmsc}$ (resp. $\receiveeventsof{\mmsc}$)  
+for the set of send (resp. receive) events of $\mmsc$. We also write  
+$\messageof{\event}$ for the message sent or received at $\event$, and  
+$\processof{\event}$ for the process executing $\event$.  
+Finally, we write $\verticalorderstrict{\event_1}{\event_2}$ if there  
+exists a process $p$ and indices $i<j$ such that  
+$\event_1=(p,i)$ and $\event_2=(p,j)$.  
+
+\bigskip
+
+\begin{definition}[Message Sequence Chart]\label{def:msc}
+	An \emph{MSC} over $\Procs$ and $\Msg$ is a tuple 
+	$\mmsc = \big((w_p)_{p\in\Procs},\source\big)$ where
+    \begin{enumerate}
+        \item for each process $p$, $w_p\in\Actsp$ is a finite sequence 
+			of actions;
+		\item $\source : \receiveeventsof{\mmsc} \to \sendeventsof{\mmsc}$ is 
+			an injective function from receive events to send events such that
+			for all receive event $\event$ labelled with $\recv{p}{q}{\msg}$,
+			$\source(\event)$ is labelled with $\send{p}{q}{\msg}$.
+    \end{enumerate}
+\end{definition}
+
+For an execution $\execution$,  $\mscof{\execution}$ is the MSC 
+$\big((w_p)_{p\in\Procs},\source\big)$ where $w_p$ is the 
+subsequence of $\execution$ restricted to the actions of $p$,
+and $\source$ is the lifting of $\source_{\execution}$ to the
+events of $(w_p)_{p\in\Procs}$.
+
+\bigskip
+
+\begin{example}\label{exmp:msc}
+Consider the MSC depicted in Figure~\ref{fig:msc-exmp}.  
+It consists of $\Procs=\{p,q,r\}$ and $\Msg=\{\msg_1,\msg_2,\msg_3\}$
+with $\mmsc=((w_p,w_q,w_r),\source)$, where
+$w_p = {}!\msg_1{}?\msg_2$, 
+$w_q = {}?\msg_1{}!\msg_2{}!\msg_3$, 
+$w_r = {}?\msg_3$,
+$\source((p,2)) = (q,2)$,
+$\source((q,1)) = (p,1)$, and
+$\source((r,1)) = (q,3)$.
+
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{p}{p}{}
+	\declinst{q}{q}{}
+	\declinst{r}{r}{}
+
+	\mess{$m_1$}{p}{q}
+	\nextlevel
+	\mess{$m_2$}{q}{p}
+	\nextlevel
+	\mess{$m_3$}{q}{r}
+\end{msc}
+\caption{Simple example with an exchange of three messages.}
+\label{fig:msc-exmp}
+\end{figure}
+\end{example}
+
+Given a set of processes $\Procs$, an MSC 
+$M=\big((w_p)_{p\in\Procs},\source\big)$ is said to be a 
+\emph{prefix} of another MSC 
+$M'=\big((w'_p)_{p\in\Procs},\source'\big)$, denoted by 
+$M \prefixorder M'$, if the following conditions hold:  
+\begin{itemize}
+    \item for every $p \in \Procs$, the sequence $w_p$ is a prefix 
+    of $w'_p$;  
+    \item for every receive event $e$ of $M$, it holds that 
+    $\source'(e)=\source(e)$.  
+\end{itemize}
+
+The \emph{concatenation} of two MSCs $M_1$ and $M_2$ is the MSC 
+$M_1 \cdot M_2$ obtained by stacking $M_1$ vertically above $M_2$. 
+Formally, let 
+$M_1=((w_p^1)_{p\in\Procs},\source_1)$ and 
+$M_2=((w_p^2)_{p\in\Procs},\source_2)$. Then:  
+\begin{inparaenum}[(i)]
+   \item for each process $p$, the sequence is 
+   $w_p = w_p^1 \cdot w_p^2$;  
+   \item the source function $\source$ is defined so that 
+   $\source(e)=\source_i(e)$ for all receive events $e$ belonging 
+   to $M_i$, with $i\in\{1,2\}$.  
+\end{inparaenum}
+
+
+\subsubsection*{Happens-before relation and linearisations}
+In a given MSC $M$,
+an event $\event$ happens before  
+ $\event'$, if 
+(i) $\event$ and $\event'$ are events
+of a same process $p$ and happen in that order on 
+the timeline of $p$,
+or (ii) $\event$ is send event matched by $\event'$,
+or (iii) a sequence of such situations defines
+a path from $\event$ to $\event'$.
+
+\bigskip
+
+\begin{definition}[Happens-before relation]
+Let $\mmsc$ be an MSC. The happens-before relation over $M$
+is the binary relation $\happensbeforestrict$ defined as 
+the least transitive relation over $\eventsof{\mmsc}$ such that:
+\begin{itemize}
+   \item for all 
+   $p,i,j$, if $i<j$, then $(p,i)\happensbeforestrict (p,j)$, and
+   \item for all receive events 
+   $\event$, $\source(\event) \happensbeforestrict \event$.
+\end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{example}
+Consider the Example~\ref{exmp:msc}. 
+The following happens-before relations are valid:
+$${}!\msg_1{}\happensbeforestrict {}?\msg_1 \happensbeforestrict {}!\msg_2
+\happensbeforestrict {}!\msg_3 \happensbeforestrict {}?\msg_3$$
+and
+$${}!\msg_1{}\happensbeforestrict {}?\msg_1 \happensbeforestrict {}!\msg_2
+\happensbeforestrict {}?\msg_2.$$
+\end{example}
+
+\bigskip
+
+\begin{definition}[Linearisation]\label{def:linearisation}
+	A \emph{linearisation} of an MSC $\mmsc$ is a
+	total order $\alinearisation$ on $\eventsof{\mmsc}$
+	that refines $\happensbeforestrict$:  for all events $\event,\event'$, 
+	if $\event\happensbeforestrict \event'$, then $\event\alinearisation \event'$. 
+\end{definition}
+We write $\linearisationsof{\mmsc}{}$ for the set of all linearisations
+of $\mmsc$. 
+We often identify a linearisation with the execution it induces.
+
+\bigskip
+
+\begin{example}\label{exmp:lin}
+Considering the Example~\ref{exmp:msc},	
+let $\mmsc$ be the MSC in Figure~\ref{fig:msc-exmp}. 
+The elements of the set $\linearisationsof{\mmsc}{}$ are
+$$!m_1?m_1!m_2?m_2!m_3?m_3,$$
+$$!m_1?m_1!m_2!m_3?m_2?m_3,$$
+$$!m_1?m_1!m_2!m_3?m_3?m_2.$$
+\end{example}
+
+Given an MSC $\mmsc$, we write 
+$\linearisationsof{\mmsc}{\acommunicationmodel}$ to denote
+$\linearisationsof{\mmsc}{}\cap\executionsofmodel{\acommunicationmodel}$;
+the executions of $\linearisationsof{\mmsc}{\acommunicationmodel}$ 
+are called the linearisations of $\mmsc$ in the communication 
+model \verb|com|.
+
+\bigskip
+
+\begin{definition}[$\acommunicationmodel$-linearisable MSC]
+	\label{def:linearisable-msc}
+	An MSC $\mmsc$ is \textit{linearisable} in a communication 
+	model $\acommunicationmodel$
+	if $\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$.
+	We write $\mscsetofmodel{\acommunicationmodel}$ for the set of all MSCs 
+	linearisable in $\acommunicationmodel$.
+\end{definition}
+
+\bigskip
+
+\begin{example}
+Consider the Example~\ref{exmp:msc} and the respective linearisation
+listed in Example~\ref{exmp:lin}. 
+The MSC $\mmsc$ is \textit{linearisable} in the $\synchmodel$ communication 
+model because
+$\linearisationsof{\mmsc}{\synchmodel}\neq\emptyset$.
+The only element of $\linearisationsof{\mmsc}{\synchmodel}$ is
+$$!m_1?m_1!m_2?m_2!m_3?m_3.$$
+All the send events are followed by the respective
+receive events.
+\end{example}
+
+%% TODO: non so se sono utili
+% Finally, we introduce a property that will be helpful in the next paragraph 
+% for giving an alternative characterisation of deadlock-freedom of a system 
+% of communicating finite state machines.
+
+% \begin{definition}[Causally-closed communication model]\label{def:causally-closed-communication-model}
+% 	A communication model $\acommunicationmodel$ is \emph{causally-closed} if for all MSCs $M$,
+% 	$\linearisationsof{\mmsc}{\acommunicationmodel}\neq\emptyset$ implies that
+% 	$\linearisationsof{\mmsc}{\acommunicationmodel}=\linearisationsof{\mmsc}{}$.
+% \end{definition}
+
+  
+% %   \input{proofs/lem-pp-is-causally-closed.tex}
+%   %The proof of the following Lemma is in Appendix \ref{app:pp-is-causally-closed}.
+
+
+\subsubsection*{Communicating finite state machines.}
+We recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
+These definitions will later be used also for Chapter~\ref{sec:rescu}.
+
+\bigskip
+
+\begin{definition}[CFSM]\label{def:cfsm}
+    A communicating finite state machine (CFSM) is an NFA 
+	with $\varepsilon$-transitions $\acfsm$ over the alphabet $\Act$.
+    A system of CFSMs is a tuple $\cfsms = (\acfsm_p)_{p\in\Procs}$.
+\end{definition}
+
+Given a system of CFSMs $\cfsms=(\acfsm_p)_{p\in\Procs}$,
+we write $\acceptcompletion{\cfsms}{}$ for the system of CFSMs 
+$\acceptcompletion{\cfsms}=(\acceptcompletion{\acfsm_p})_{p\in\Procs}$
+where all states are accepting, i.e., $F_p = Q_p$.
+
+\bigskip
+
+% Let's now define the asynchronous product of an automaton.
+% TODO: capire questa definizione di prodotto ASYNC(che serve per la prova)
+% capire se c'è differenza con quello SYNC (che serve per il tool)
+% \begin{definition}[Asynchronous product automaton]
+% Let $\{A_i\}_{i=1}^n$ be a set of automata. For each ordered pair 
+% $(i,j)$ of process indices, we use two buffers: $B^s_{i,j}$ 
+% (pending messages sent by $P_i$ but not yet accessible by $P_j$) 
+% and $B^r_{i,j}$ (messages delivered to $P_j$ but not yet consumed). 
+% All buffers are words over the alphabet $\Sigma$.
+
+% The asynchronous product automaton 
+% $A = \prod_{i=1}^n A_i$ over $\hat{\Sigma}$ is given by: % TODO: capire cos'è \hat{\Sigma}
+
+% \begin{itemize}
+%   \item \textbf{States:} A state $q$ consists of the local states 
+%   $q_i$ of each $A_i$, together with the buffer contents.
+%   \item \textbf{Initial state:} $q_0$ has all components in their 
+%   start states $q_i^0$ and all buffers empty.
+%   \item \textbf{Transitions:} $\delta \subseteq Q \times 
+%   (\hat{\Sigma} \cup \{\tau\}) \times Q$.
+%     \begin{enumerate}
+%       \item For $x \in \hat{\Sigma}_i$, $(q,x,q') \in \delta$ iff:  
+%       (a) states of all other processes $k \neq i$ are unchanged,  
+%       (b) $(q_i,x,q'_i) \in \delta_i$,  
+% 		% TODO: capire semantica dei buffer dal paper di Alur
+%       (c) if $x = receive(j,i,a)$ then the buffer $B^r_{j,i}$ consume the message $a$ (if present),  
+%       (d) if $x = send(i,j,a)$ then the message $a$ is appended in the buffer $B^s_{i,j}$,  
+%       (e) all other buffers remain unchanged.
+%       \item There is a $\tau$-transition $(q,\tau,q')$ if $q$ and 
+%       $q'$ differ only in that one buffer $B^s_{i,j}$ loses its 
+%       head symbol $a$, and $B^r_{i,j}$ appends $a$.
+%     \end{enumerate}
+%   \item \textbf{Accepting states:} $q$ is accepting if all $q_i$ 
+%   are accepting and all buffers are empty.
+% \end{itemize}
+
+% The language $L(A)$ of $A$ consists of all words in $\hat{\Sigma}^*$ 
+% taking $q_0$ to an accepting state, interpreting $\tau$ as 
+% $\varepsilon$. For any set of automata $\{A_i\}$, the language 
+% $L(\prod_i A_i)$ contains only complete, well-formed words. For a 
+% given MSC $M$, $L(\prod_i A_i)$ either contains all linearisations 
+% of $M$, or none.
+% \end{definition}
+
+% \bigskip
+
+\begin{definition}[Executions of CFSMs in a model]
+\label{def:executions-of-cfsms}
+Given a system $\cfsms=(\acfsm_p)_{p\in\Procs}$ and a 
+model $\acommunicationmodel$,  
+$\executionsofcfsms{\cfsms}{\acommunicationmodel}$ is the set of 
+executions $e \in \executionsofmodel{\acommunicationmodel}$ such that  
+$\projofon{e}{p}\in\languageofnfa{\acfsm_p}$ for all $p$.  
+\end{definition}
+
+% \begin{remark}
+% 	Let $\acommunicationmodel$ be a communication model, 
+% 	$\cfsms$ a syste\m of CFSMs, and $e,e'\in\executionsofmodel{acommunicationmodel}$ 
+%   such that $\mscof{e}=\mscof{e'}$, 
+% 	then $e\in\executionsof{\cfsms}{\acommunicationmodel}$ 
+% 	if and only if $e'\in\executionsof{\cfsms}{\acommunicationmodel}$. 
+%   This follows from the fact that $\projofon{e}{p}= \projofon{e'}{p}$ for all $p$.
+% \end{remark}
+
+We write $\mscsofcfsms{\cfsms}{\acommunicationmodel}$ for the set 
+$\{\mscof{e} \mid e\in\executionsofcfsms{\cfsms}{\acommunicationmodel}\}$.
+
+A system is orphan-free if, whenever all machines have reached 
+an accepting state, no message
+remains in transit, i.e., no message is sent but not received.
+
+\bigskip
+
+\begin{definition}[Orphan-free]\label{def:orphan-free}
+A system $\cfsms$ is \emph{orphan-free} in a model $\acommunicationmodel$  
+if all its executions in $\executionsofcfsms{\cfsms}{\acommunicationmodel}$  
+are orphan-free.  
+\end{definition}
+
+All synchronous executions are orphan-free by definition.
+
+A system is deadlock-free if, 
+any \emph{partial} execution can be extended/completed to an accepting execution.
+
+\bigskip
+
+\begin{definition}[Deadlock-free]\label{def:deadlock-free}
+A system $\cfsms$ is \emph{deadlock-free} in $\acommunicationmodel$  
+if for every execution 
+$e \in \executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}$,  
+there exists a completion $e'$ with $e \prefixorder e'$ and  
+$e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel}$.  
+\end{definition}
+
+% \begin{remark}\label{rem:equivalent-formulation-of-deadlock-free-cfsms}
+% 	A system of CFSMs $\cfsms$ is \emph{deadlock-free} for a communication model
+% 	$\acommunicationmodel$ if and only if 
+% 	$$
+% 	\executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}\subseteq
+% 	\prefixclosureof{\executionsofcfsms{\cfsms}{\acommunicationmodel}}
+% 	$$
+% \end{remark}
+
+% TODO: capire se serve
+The following result shows that, for either $\ppmodel$ or 
+$\synchmodel$ communication models, the deadlock-freedom property 
+of a system of CFSMs can be expressed as a property on the MSCs
+of the system. 
+%The proof can be found in Appendix \ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
+
+\bigskip
+
+\begin{lemma}[Deadlock-freedom as an MSC property]
+	\label{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
+	Assume $\acommunicationmodel$ is $\ppmodel$ (respectively, $\acommunicationmodel$ is $\synchmodel$).
+	Then a system of CFSMs $\cfsms$ is deadlock-free for $\acommunicationmodel$ if and only if
+	$$
+	\mscsofcfsms{\acceptcompletion\cfsms}{\acommunicationmodel}
+	\subseteq
+	\prefixclosureof{\mscsofcfsms{\cfsms}{\acommunicationmodel}}.
+	$$
+\end{lemma}
+% TODO SPIEGARE PERCHE' FUNZIONA E METTERE PROVA?
+% %\input{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch.tex}
+
+% %\iflong
+% %\include{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
+% %\else
+% %The proof of Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} can be found in Appendix~\ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
+% %\fi
+
+
+\bigskip
+
+\section{Global Types}
+This part will further highlight the basic notions to understand the formal proof 
+for the theorem presented in Section~\ref{sec:proof} and, in particular, Global Type
+and Weakly-realizable. We begin by extending the definition of linearisability so 
+that it applies to all communication models.
+In our setting, Global Types are automata that describe a language of MSCs, 
+as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability}.
+
+%% TODO: commenti di ivan: non è proprio un type, lui definisce 
+%% così i choreography automata , magari specificare che le definizioni corrispondono
+%% e citare il paper che usa questa nozione
+
+%% !! CA da citare nei related 
+
+\bigskip
+
+\begin{definition}[Global Type]
+	An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ 
+	with $p\ne q$; we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and 
+	write $\labelalphabet$ to denote the finite set of arrows.
+	A Global Type $\gt$ is a deterministic finite state automaton over the 
+	alphabet $\labelalphabet$.
+\end{definition}
+% TODO: dare più contesto ad esempio
+
+\bigskip
+
+\begin{example}
+An example of a Global Type expressed as an automaton is the following.
+Consider the not-implementable specification stated in 
+Listing~\ref{lst:not-impl-exm}. The protocol can be modelled with the 
+Global Type in Figure~\ref{fig:gt-exm}.
+
+\begin{figure}[!ht]
+	\centering
+	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.8]
+		\node[state, initial, initial text={}] (s0) {1};
+			\node[state] (s1) [above right=of s0] {2};
+			\node[state] (s2) [below right=of s0] {3};
+			\node[state,accepting] (s3) [right=of s1] {4};
+			\node[state,accepting] (s4) [right=of s2] {5};
+
+			\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{x}$}(s1);
+			\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{y}$}(s2);
+			\draw[->] (s1) to node[above,sloped]{$\gtlabel{C}{D}{z}$}(s3);
+			\draw[->] (s2) to node[above,sloped]{$\gtlabel{C}{D}{w}$}(s4);
+			
+		\end{tikzpicture}
+		\caption{An automaton representing the specification's global type given in Listing~\ref{lst:not-impl-exm}.}
+		\label{fig:gt-exm}
+\end{figure}
+\end{example}
+
+\bigskip
+
+% --------------relationship between MSCs and Global Types--------------
+
+I can now formally define the relationship between MSCs and Global Types. 
+Intuitively, Global Types represent a set of MSCs, allowing us to reason 
+about multiple message sequence scenarios. 
+
+A Global Type defines a language of MSCs in two different ways, one
+existential and one universal. Let $\labellanguageof{\gt}$ be the set of
+sequences of arrows $w$ accepted by $\gt$. Note that for $w \in \Arrows^*$,
+the function $w \mapsto \labeltomsc{w}$ with
+$\labeltomsc{w} \in \mscsetofmodel{\synchmodel}$ is not injective, as two
+arrows with disjoint pairs of processes commute. We write $w_1 \sim w_2$ if
+$\labeltomsc{w_1} = \labeltomsc{w_2}$, and $[w]$ for the equivalence class
+of $w$ with respect to $\sim$.
+
+Informally, the existential MSC language $\existentialmsclanguageof{\gt}{}$ of a 
+Global Type $\gt$ is the set of MSCs that admit at least one representation as a
+sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC
+language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
+MSCs whose representations as sequences of arrows are all in
+$\labellanguageof{\gt}$:
+% TODO: ivan dice di controllare? la def di chor automata (o forse hanno una roba simile)
+
+\bigskip
+
+\begin{definition}[$\existentialmsclanguageof{\gt}$]
+	$$
+		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
+		w \in \labellanguageof{\gt}\}
+  $$
+\end{definition}
+
+\bigskip
+
+\begin{definition}[$\universalmsclanguageof{\gt}$]
+  $$
+		\universalmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
+		[w] \subseteq \labellanguageof{\gt}\}.
+	$$
+\end{definition}
+% TODO: dare più contesto ed esempio
+
+\bigskip
+
+\begin{definition}[Commutation-closed]
+    A global type $\gt$ is \emph{commutation-closed} if
+    $$
+    \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
+    $$
+\end{definition}
+% TODO: togliere exist e forall dalla nozione
+% We write $\msclanguageofcc{\gt}$ for the common language. % TODO: mi serve?
+
+I now introduce the definition of implementability following the one given 
+by Alur, et al. \cite{alur2005realizability}, referred to as 
+\textit{Weak-realizability}.
+To formalize it, we first define the notions of 
+\textit{weak implication} and \textit{weak closure}.
+
+%% TODO: Spiegare meglio con intuizioni
+
+\bigskip
+
+\begin{definition}[Weakly-imply]
+	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
+	\textit{weakly implies} $M$, if for any sequence of automata
+	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
+	$L(\prod_i A_i)$ then $M \in L(\prod_i A_i)$.
+\end{definition}
+
+In order to understand the meaning of \emph{weak implication},
+consider the following example.
+
+\bigskip
+
+\begin{example}
+Define two MSCs, MSC1 and MSC2. Both perform the same four
+communications, but in different orders.  
+MSC1 first sends message $a$ from P1 to P2, then from P1 to P3, 
+then sends $b$ from P4 to P2, and finally from P4 to P3.  
+MSC2 instead starts with P4 sending $b$ to P2, then to P3, 
+followed by P1 sending $a$ to P2 and then to P3.  
+
+Now define a third MSC $M$ with the same four messages but in a
+different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends 
+$b$ to P3, and finally P1 sends $a$ to P3.  
+
+We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
+at each process projection we recover the same behaviour in one of
+them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
+Figure~\ref{fig:weak-impl} illustrates the three MSCs.
+
+\begin{figure}[!ht]
+\centering
+\begin{tabular}{ccc}
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+	\nextlevel
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+\end{msc}
+} 
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\nextlevel
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage} \\
+MSC1 & MSC2 & $M$
+\end{tabular}
+\caption{The MSC $M$ is weakly implied by MSC1 and MSC2}
+\label{fig:weak-impl}
+\end{figure}
+\end{example}
+
+\bigskip
+
+\begin{definition}[Weakly-closure $\setmsc^w$]
+	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
+	weakly implied by $\setmsc$.
+\end{definition}
+
+% todo: esempio
+
+\bigskip
+
+\begin{definition}[Weakly-realizable]
+	An MSC $M$ is said to be weakly-realizable if the set of MSCs
+	$L(M)$ is weakly realizable. A set of MSCs $\setmsc$ is said to be weakly
+	realizable if $\setmsc=\setmsc^w$.
+\end{definition}
+It is important to note that this definition does not include the
+property of deadlock-freedom. 
+
+% todo: esempio
+
+% CINZIA, X TESI:
+% sarebbe interessante mettere la definizione di PPDP e mostrare 
+% l'equivalenza tra le due
+
+% VERSIONE ALTERNATIVA VECCHIA
+% \begin{definition}[Projection]
+% For an MSC $M$ and a process $P_i$, let $M|_i$ denote the sequence of events be
+% belonging to the process $P_i$ in $M$.
+% \end{definition}
+% \begin{definition}[Weakly-imply]
+% The set of MSCs $\setmsc$ weakly implies an MSC $M$ iff for all $1\leq i\leq n$, there
+% exist an MSC $M_i\in L$ such that $M|_i=M_i|_i$
+% \end{definition}
+% \begin{definition}[Weakly-realizable]
+% ? TODO ?
+% \end{definition}
+
+We are now ready to present the main contributions of this work.

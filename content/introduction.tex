@@ -132,7 +132,8 @@ development.
 
 \section{Background}\label{sec:sota}
 In this overview, we give a brief understanding of the
-state of the art regarding MSCs and the implementability 
+state of the art regarding Message Sequence Charts, Multiparty 
+Session Types and the implementability 
 (or realizability) problem.
 
 \subsection{Message Sequence Charts}
@@ -166,7 +167,7 @@ With MSCs, \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few them informally, using examples to
 highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synch}. In Section~\ref{sec:rel}, the discussion
+Definition~\ref{def:synchronous}. In Section~\ref{sec:rel}, the discussion
 continue presenting other communication semantics, and summarizing
 the relevance of the work by Di Giusto, et al.~\cite{di2023partial}.
 Some examples are shown in 
@@ -228,8 +229,9 @@ An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
 The synchronous (\verb|synch|) communication model imposes 
 the existence of a scheduling such that any send event is 
 immediately followed by its corresponding receive event. 
-An example for this communication model is shown in Figure~\ref{fig:sync}.c.
-A formal definition is given later for this semantic (Definition~\ref{def:synch}).
+An example for this communication model is shown in 
+Figure~\ref{fig:sync}.c. A formal definition is given later 
+for this semantic (Definition~\ref{def:synchronous}).
 
 \begin{figure}[!ht]
     \centering
@@ -282,9 +284,7 @@ and suitable \emph{type-checking rules}, one ensures that the
 implementation conforms to the local specification, thereby 
 guaranteeing properties such as \emph{well-formedness}.  
 Figure~\ref{fig:mpstschema} show a schema summarizing the principal
-part of the framework. 
-
-% TODO: esempio semplice
+parts of the framework.
 
 \begin{figure}[!ht]
 \centering
@@ -341,7 +341,7 @@ each participant. If projection succeeds, the resulting local types
 interact without mismatches or unintended behaviours, effectively 
 bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
 Projectability is, therefore, comparable to the implementability
-problem as have the same aim.
+problem as they have the same aim.
 Projection algorithms, however, often reject natural protocols that 
 fail to meet restrictive syntactic conditions. This difference between 
 expressivity and safety has motivated extensions of the theory, with 

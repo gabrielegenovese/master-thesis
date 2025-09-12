@@ -73,7 +73,7 @@ We now define a particular Global Type that will be useful in the reduction.
 	% TODO: fixa immagine
 	\begin{figure}[!ht]
 		\centering
-		\begin{tikzpicture}[->, node distance=24mm, on grid, auto]
+		\begin{tikzpicture}[->, node distance=30mm, on grid, auto]
 			\node[state] (q0) {$q_0$};
 			\node[state] (q1) [right=of q0] {$q_1$};
 			\node[state] (q2) [right=of q1] {$q_2$};
@@ -84,7 +84,7 @@ We now define a particular Global Type that will be useful in the reduction.
 
 			\path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
 			\path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
-			\path (q2) edge[] node[above left] {\arrmess{s}{r}{(i,n)}} (q3.45);
+			\path (q2) edge[] node[above left] {\arrmess{s}{r}{(i,n)}} (q3.60);
 			\path (q3) edge[] node[above] {\arrmess{q}{r}{S_1}} (q4);
 			\path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
 			\path (q5) edge[] node[above] {\arrmess{q}{r}{S_c}} (q6);
@@ -186,7 +186,8 @@ Theorem~\ref{thm:main}.
 \end{lemma}
 
 \begin{proof}
-	By Definition~\ref{def:linearisable-msc} and Definition~\ref{def:synch},
+	By Definition~\ref{def:linearisable-msc} and ù
+	Definition~\ref{def:synchronous},
 	we need to show a linearization with all send operations
 	followed by their corresponding receive operations:
 	$$
