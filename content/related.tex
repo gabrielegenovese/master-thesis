@@ -1,5 +1,4 @@
 
-% TODO: renderlo capitolo, prima delle conclusioni
 \chapter{Related work}\label{sec:rel}
 
 \section{Hierarchy of communication model's semantics}\label{sec:hier}
@@ -129,23 +128,23 @@ coordinates all the senders with all the receivers.
 % and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
-\section{Realizability for MSCs}
+\section{Realisability for MSCs}
 
-For finite sets of MSCs, weakly realizability as defined in 
-\cite{alur2005realizability}is \verb|coNP|-complete and safe 
-realizability is shown to be decidable in \verb|P|-time~\cite{alur2005realizability}.
+For finite sets of MSCs, weakly realisability as defined in 
+\cite{alur2005realizability} is \verb|coNP|-complete and safe 
+realisability is shown to be decidable in \verb|P|-time~\cite{alur2005realizability}.
 The problem was subsequently studied for infinite MSC languages, defined 
-as MSC-Graphs (MSGs). For bounded MSGs, safe realizability 
-remains decidable, but weak realizability 
+as MSC-Graphs (MSGs). For bounded MSGs, safe realisability 
+remains decidable, but weak realisability 
 is undecidable~\cite{alur2005realizability}. Extensions of these results to non-FIFO 
 semantics were investigated in~\cite{morin2002recognizable}, corresponding 
 to bag semantics under peer-to-peer communication. 
-Later, Lohrey proved that in the general case, safe realizability 
+Later, Lohrey proved that in the general case, safe realisability 
 is undecidable~\cite{lohrey2003realizability}, though it is decidable (and 
 \verb|EXPSPACE|-complete) for MSGs. %for globally cooperative MSGs.
 Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
 a new class of HMSCs that allows unbounded channels while maintaining implementability.
-A summary of the main complexity results is given in Table~\ref{tab:realizability}.
+A summary of the main complexity results is given in Table~\ref{tab:realisability}.
 
 \begin{table}[!ht]
 	\centering
@@ -158,11 +157,11 @@ A summary of the main complexity results is given in Table~\ref{tab:realizabilit
 		\textbf{Safe} & P-time & \verb|EXPSPACE|-complete & undecidable \\
 		\hline
 	\end{tabular}
-	\caption{Summary of results on realizability.}
-	\label{tab:realizability}
+	\caption{Summary of results on realisability.}
+	\label{tab:realisability}
 \end{table}
 
-\section{Realizability for MPST}
+\section{Realisability for MPST}
 
 Recent work has focused on strengthening the connection between MPST 
 and automata-theoretic formalisms. Stutz and Zufferey 
@@ -190,7 +189,7 @@ intended message exchanges. Similarly to MPST, their goal is to ensure that
 a distributed  implementation can be derived in which each participant 
 follows a local behaviour consistent with the global description, called
 respectively \emph{local} and \emph{global-view}. This setting naturally 
-connects to the realizability problem, since the key question is whether 
+connects to the realisability problem, since the key question is whether 
 a choreography can be faithfully implemented by a system of local 
 processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
 and it is derived throughout a projection operation from the global-view.

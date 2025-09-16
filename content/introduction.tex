@@ -64,7 +64,7 @@ types, preserving the intended behaviour.
 \section{Goal}
 The goal of this work is to study the \textbf{implementability
 problem}, which concerns whether a global specification can be
-faithfully realized by a set of \textit{local processes} in a
+faithfully realised by a set of \textit{local processes} in a
 distributed system.
 In essence, it asks: does an implementation really \textbf{respect}
 the behaviour described by a given specification model?
@@ -134,7 +134,7 @@ development.
 In this overview, we give a brief understanding of the
 state of the art regarding Message Sequence Charts, Multiparty 
 Session Types and the implementability 
-(or realizability) problem.
+(or realisability) problem.
 
 \subsection{Message Sequence Charts}
 Message Sequence Charts (MSCs) are a standardized graphical formalism,
@@ -259,11 +259,11 @@ for this semantic (Definition~\ref{def:synchronous}).
 
 The \emph{implementability problem} was first introduced for MSC languages 
 in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
-implementation that can realize all behaviours of a finite set of MSCs 
+implementation that can realise all behaviours of a finite set of MSCs 
 without introducing additional ones. A stronger variant, called 
 \emph{safe implementability}, requires the implementation to also be \textbf{deadlock-free}. 
 This problem has some synonyms in the term, with slightly different definition,
-but it can be called also realizability and projectability.
+but it can be called also realisability and projectability.
 % In this setting, distributed implementations are defined using communicating 
 % automata with explicit accepting states, and deadlock-freedom corresponds 
 % to the ability to reach an accepting state from any reachable configuration. 
@@ -327,12 +327,12 @@ parts of the framework.
 \label{fig:mpstschema}
 \end{figure}
 
-% In this setting, the analogue of realizability is often called 
+% In this setting, the analogue of realisability is often called 
 % \emph{session fidelity}: a property ensuring that the combined local 
 % types behave exactly according to the global type. When the global 
 % type satisfies syntactic restrictions, its projection is guaranteed 
-% to be both realizable and deadlock-free, which corresponds to safe 
-% realizability in the MSC setting.  
+% to be both realisable and deadlock-free, which corresponds to safe 
+% realisability in the MSC setting.  
 
 \subsubsection{Projectability}
 A central notion in MPST is \emph{projectability}, which asks whether 
@@ -375,20 +375,19 @@ implementable in more general models such as peer-to-peer or mailbox
 semantics. This reduction requires constraints such as 
 \emph{orphan-freedom} (no message is left unmatched) and
 \emph{deadlock-freedom}.
-The following theorem, currently a work in progress by my supervisors \cite{di2025realisability}, 
+The following theorem, currently a work in progress by my 
+supervisors~\cite[Theorem 5.3]{di2025realisability}, 
 provides a characterization of a connection between 
 peer-to-peer semantics and synchronous semantics:
-
-% TODO: citarlo e toglierlo come questo formato, basta solo raccontarlo
-\begin{theorem}
-	A global type $G$ is implementable in \verb|p2p| iff:
-	\begin{enumerate}
-		\item $L_{\text{p2p}}(proj(G))$ is a set of sync MSCs;
-		\item $proj(G)$ is orphan-free in p2p;
-		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free;
-		\item $G$ is implementable in sync.
-	\end{enumerate}
-\end{theorem}
+a global type $G$ is deadlock-free realisable in p2p iff
+the following four conditions hold
+\begin{itemize}
+  \item the language of $G$'s local type is in synchronous semantics
+  \item all $G$'s projections are orphan-free
+  \item all the traces of the MSCs' language of $G$ is deadlock-free
+  in \verb|p2p|
+  \item $G$ is realisable in synchronous semantics
+\end{itemize}
 
 This result highlights the central role of synchronous semantics as a 
 \emph{core model}: implementability in peer-to-peer systems 

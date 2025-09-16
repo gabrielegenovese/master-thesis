@@ -1,9 +1,9 @@
-\chapter{Weak-Realizability is Undecidable for Synch Global Types}\label{sec:proof}
+\chapter{Weak-Realisability is Undecidable for Synch Global Types}\label{sec:proof}
 
 As already mentioned, the first contribution is Theorem~\ref{thm:main},
-which states that Weak-realizability is undecidable for synchronous global types. 
+which states that Weak-realisability is undecidable for synchronous global types. 
 To understand this result, I have already covered the basic notions in 
-Section~\ref{sec:pre} on MSCs, Global Types, and Weak-realizability. 
+Section~\ref{sec:pre} on MSCs, Global Types, and Weak-realisability. 
 These concepts are general and align 
 closely with definitions used in previously established works. 
 We now introduce the main objects employed in the proof of Theorem~\ref{thm:main}. 
@@ -12,12 +12,12 @@ Alur et~al.~\cite{alur2005realizability}.
 I will first give a sketch of the proof, to also highlight the 
 differences with the original one.
 
-\begin{proof}[Sketch of Proof]
+\subsubsection*{Sketch of Proof}
 The proof is carried out by a \emph{reduction} from the
 \textbf{Relaxed Post Correspondence Problem (RPCP)}, a variant of
 the classical Post Correspondence Problem (PCP).
 The main idea is to encode the existence of a
-solution to an RPCP instance into the (non-)realizability of a
+solution to an RPCP instance into the (non-)realisability of a
 \emph{global type} $L^*$ built from synchronous MSCs. 
 In the original proof, $L^*$ is not a global type, but an MSC.
 Therefore, we changed the base definitions of the original paper
@@ -37,29 +37,29 @@ concatenations of the $M^n_i$.
 \bigskip
 
 \textbf{Step 2: Direction ``$\Rightarrow$''.}
-Assume $\Delta$ has a solution $R=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$.
+Assume $\Delta$ has a solution $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$.
 From this, construct two MSC sequences:
 \[
-M = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad
-M' = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
+M_x = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad
+M_y = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
 \]
-Both $M,M'$ are synchronous concatenations of synchronous MSCs.
-Consider now a third MSC $M''$ obtained by taking the projections
-$M'|_1,M'|_2$ and $M|_3,M|_4$. Intuitively, processes $P_1,P_2$
+Both $M_x,M_y$ are synchronous concatenations of synchronous MSCs.
+Consider now a third MSC $M_{\texttt{sol}}$ obtained by taking the projections
+$M_y|_1,M_y|_2$ and $M_x|_3,M_x|_4$. Intuitively, processes $P_1,P_2$
 construct the \emph{right string} $y_{i_1}\cdots y_{i_m}$, while
 processes $P_3,P_4$ construct the \emph{left string}
 $x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP ensures that
-$M''$ is acyclic and \emph{synchronous}. 
-The $M''$ synchrony is not trivial, therefore we need to prove it.
+$M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. 
+The $M_{\texttt{sol}}$ synchrony is not trivial, therefore we need to prove it.
 This part was not present in the original proof.
 By construction, $L^*$ weakly
-implies $M''$, but $M'' \notin L^*$, since at least one tile
-differs. Hence, $L^*$ is \emph{not realizable}.
+implies $M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least one tile
+differs. Hence, $L^*$ is \emph{not realisable}.
 
 \bigskip
 
 \textbf{Step 3: Direction ``$\Leftarrow$''.}
-Suppose $L^*$ is not realizable: then there exists some MSC $M^@$
+Suppose $L^*$ is not realisable: then there exists some MSC $M^@$
 weakly implied by $L^*$ but not in $L^*$. Analysing the projections
 of $M^@$ on each process, we recover two sequences of words, one
 built along processes $P_1,P_2$ and the other along $P_3,P_4$. The
@@ -73,12 +73,13 @@ on $P_2$ is always a prefix of the word on $P_3$. This yields a
 \textbf{Step 4: Conclusion.}
 We have shown the equivalence:
 \[
-\Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realizable}.
+\Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
 \]
 Since RPCP is known to be \textbf{undecidable}, it follows that
-\emph{checking weak realizability of a global type is also
+\emph{checking weak realisability of a global type is also
 undecidable}.
-\end{proof}
+
+\bigskip
 
 Let's first define the main objects used in the proof.
 
@@ -100,13 +101,49 @@ from PCP.
 	\end{itemize}
 \end{definition}
 
-% TODO: dare esempio
-
 Intuitively, RPCP requires that the concatenation on the left-hand side always 
 grows at least as fast as the right-hand side, while ensuring that at least one 
 chosen tile differs between the two sequences. Moreover, in constructing the 
 strings, we may freely choose which element of each tile (either $v_i$ or $w_i$) 
 contributes to the left or right sequence.
+
+\bigskip
+
+\begin{example}[Simple RPCP instance]\label{exmp:rpcp}
+Consider the tile set
+\[
+(v_1,w_1)=(\texttt{b},\ \texttt{bb}),\quad
+(v_2,w_2)=(\texttt{a},\ \texttt{ab}),\quad
+(v_3,w_3)=(\texttt{c},\ \texttt{c}).
+\]
+Take the index sequence $(2,1,3)$ and the choices
+\[
+x_1 = w_2,\ y_1 = v_2;\quad
+x_2 = v_1,\ y_2 = w_1;\quad
+x_3 = v_3,\ y_3 = w_3.
+\]
+Then
+\[
+x_1 x_2 x_3 = \texttt{ab}\ \texttt{b}\ \texttt{c} = \texttt{abbc},
+\qquad
+y_1 y_2 y_3 = \texttt{a}\ \texttt{bb}\ \texttt{c} = \texttt{abbc},
+\]
+so the two sides are equal.
+
+We now check the RPCP conditions:
+\begin{itemize}
+  \item \textbf{at least one mismatch:} here $x_1\neq y_1$ and
+        $x_2\neq y_2$, so the ``some index differs'' condition holds;
+  \item \textbf{prefix property:} for every prefix length $j$ we have
+        $y_{1}\cdots y_{j}$ is a prefix of $x_{1}\cdots x_{j}$:
+        \begin{itemize}
+          \item $j=1$: $y_1=\texttt{a}$ is a prefix of $x_1=\texttt{ab}$;
+          \item $j=2$: $y_1y_2=\texttt{abb}$ is a prefix of $x_1x_2=\texttt{abb}$;
+          \item $j=3$: $y_1y_2y_3=\texttt{abbc}$ is a prefix of $x_1x_2x_3=\texttt{abbc}$.
+        \end{itemize}
+\end{itemize}
+\end{example}
+
 
 With this definition in place, I now introduce the main objects used 
 in the proof. Specifically, I begin by showing how a Global Type can 
@@ -136,7 +173,7 @@ We now define a particular Global Type that will be useful in the reduction.
 		      \arrmess{q}{r}{m_{S_1}}, ..., \arrmess{q}{r}{m_{S_c}}$\}$ where each arrow
 		      denotes a synchronous message accompanied by an acknowledgment. % TODO: definisci/formalizza questa doppia freccia
 	\end{itemize}
-	This global type is depicted in Figure~\ref{fig:gtype}.
+	The $G_S$'s automaton is depicted in Figure~\ref{fig:gtype}.
 	
 	\begin{figure}[!ht]
 		\centering
@@ -146,8 +183,8 @@ We now define a particular Global Type that will be useful in the reduction.
 			\node[state] (q2) [right=of q1] {$q_2$};
 			\node[state] (q3) [below left=of q0] {$q_3$};
 			\node[state] (q4) [right=of q3] {$q_4$};
-			\node[state] (q5) [right=of q4] {$q_x$};
-			\node[state] (q6) [right=of q5] {$q_y$};
+			\node[state] (q5) [right=of q4] {$\cdots$};
+			\node[state,accepting] (q6) [right=of q5] {$q_x$};
 
 			\path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
 			\path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
@@ -204,6 +241,8 @@ let's define a particular MSC corresponding to Definition~\ref{def:gs}.
 
 \bigskip
 
+% TODO: Definire per bene le stringhe all'inizio dei preliminare
+% Prima frase da spostare
 \begin{definition}[$M^n_i$]\label{def:mni}
 	For a string $u$, let $u^l$ denote the $l$-th character of the string.
 	In the MSC $M^n_i$, process~1 synchronously sends the label
@@ -213,7 +252,10 @@ let's define a particular MSC corresponding to Definition~\ref{def:gs}.
 	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
 	synchronously to process~3 (where $c$ is the length of $x_i$).
 	This MSC is depicted in Figure~\ref{fig:mni}, where $n\in\{0,1\}$ and:
-	if $n=0$, then $x_i=v_i$; if $n=1$, then $x_i=w_i$.
+	\begin{itemize}
+		\item if $n=0$, then $x_i=v_i$;
+		\item if $n=1$, then $x_i=w_i$.
+	\end{itemize}
 
 	\begin{figure}[!ht]
 		\centering
@@ -283,7 +325,7 @@ Theorem~\ref{thm:main}.
 \bigskip
 
 \begin{theorem}\label{thm:main}
-	Given a global type $G$, checking if $G$ is weakly-realizable is undecidable.
+	Given a global type $G$, checking if $G$ is weakly-realisable is undecidable.
 \end{theorem}
 
 \begin{proof}
@@ -302,48 +344,48 @@ Theorem~\ref{thm:main}.
 
 	We need to prove:
 	\begin{center}
-		$\Delta \in \text{RPCP}$ iff the global type $L^*$ is not weakly-realizable.
+		$\Delta \in \text{RPCP}$ iff the global type $L^*$ is not weakly-realisable.
 	\end{center}
 
 	\begin{itemize}
 		\item[$\Rightarrow$]
 		      Let's assume that
-		      $R = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
+		      $\Delta = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
 		      for a solution to a generic RPCP problem instance, and the bits $a_j$ and
 		      $b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into
 		      the two (left and right)
-		      long strings. Consider the new MSCs $M$ and $M'$ obtained from the sequences
-		      $M = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M' = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
+		      long strings. Consider the new MSCs $M_x$ and $M_y$ obtained from the sequences
+		      $M_x = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M_y = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
 		      Executions of both of these (sequences of) MSCs must exist in any
-		      realization of $L^*$. Additionally, these MSCs are in $\mscsetofmodel{\synchmodel}$
+		      realisation of $L^*$. Additionally, these MSCs are in $\mscsetofmodel{\synchmodel}$
 		      because they are sequence of $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
-		      $M$ corresponds to the construction of the left side of equation (1) of the RPCP
-		      problem, and, instead, $M'$ represents the construction of the right side.
-		      We then look at the projections $M|_1$, $M|_2$, $M|_3$,
-		      and $M|_4$ of $M$, and $M'|_1$, $M'|_2$, $M'|_3$, $M'|_4$ of $M'$ onto the
-		      4 processes. Now consider an MSC $M''$ formed from $M'|_1$, $M'|_2$,
-		      $M|_3$, and $M|_4$. This MSC represent the construction of the solution to
+		      $M_x$ corresponds to the construction of the left side of equation (1) of the RPCP
+		      problem, and, instead, $M_y$ represents the construction of the right side.
+		      We then look at the projections $M_x|_1$, $M_x|_2$, $M_x|_3$,
+		      and $M_x|_4$ of $M_x$, and $M_y|_1$, $M_y|_2$, $M_y|_3$, $M_y|_4$ of $M_y$ onto the
+		      4 processes. Now consider an MSC $M_{\texttt{sol}}$ formed from $M_y|_1$, $M_y|_2$,
+		      $M_x|_3$, and $M_x|_4$. This MSC represent the construction of the solution to
 		      the problem. Processes 1 and 2 construct the right part ($y_{i_1}...y_{i_m}$)
 		      and processes 3 and 4 construct the left part ($x_{i_1}...x_{i_m}$).
-		      The claim is that the combined MSC $M''$ is weakly
-		      implied by $L^*$. By definition, the only thing to establish is that $M''$
+		      The claim is that the combined MSC $M_{\texttt{sol}}$ is weakly
+		      implied by $L^*$. By definition, the only thing to establish is that $M_{\texttt{sol}}$
 		      is indeed an MSC, in the sense that it is acyclic, well-formed, complete
 		      and synchronous.
-		      The only new situation in terms of communication in $M''$ is the
+		      The only new situation in terms of communication in $M_{\texttt{sol}}$ is the
 		      communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
 		      But the communication between $P_1$ and $P_4$ is consistent in
-		      $M'|_1$ and $M|_4$ (i.e., the sequence of messages sent from $P_1$ to
-		      $P_4$ in $M'|_1$ is equal to the sequence of messages received in $M|_4$),
+		      $M_y|_1$ and $M_x|_4$ (i.e., the sequence of messages sent from $P_1$ to
+		      $P_4$ in $M_y|_1$ is equal to the sequence of messages received in $M_x|_4$),
 		      and the communication between $P_2$ and $P_3$ is consistent in
-		      $M'|_2$ and $M|_3$ because $R$ is a solution to the RPCP.
-		      Furthermore, the acyclicity of $M''$ follows from the property of the
+		      $M_y|_2$ and $M_x|_3$ because $R$ is a solution to the RPCP.
+		      Furthermore, the acyclicity of $M_{\texttt{sol}}$ follows from the property of the
 		      solution that the string formed by the first $j$ words on processes 1
 		      and 2 is always a prefix of the string formed by the first $j$ words
 		      on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
 		      is sent before it needs to be received.
 
-		      Finally, we prove that $M'' \in \mscsetofmodel{\synchmodel}$.
-		      Assume, for contradiction, that $M'' \notin \mscsetofmodel{\synchmodel}$.
+		      Finally, we prove that $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
+		      Assume, for contradiction, that $M_{\texttt{sol}} \notin \mscsetofmodel{\synchmodel}$.
 		      Then, there should be a cycle of dependencies in the communication pattern.
 		      There are no communication between $P_2$ and $P_4$, and between $P_1$
 		      and $P_3$. Therefore, this cycle must involve all processes, starting
@@ -424,16 +466,16 @@ Theorem~\ref{thm:main}.
 		      $x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
 		      in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
 		      assumption that $y_1...y_{k-1} \leq x_1...x_{k-1}$.
-		      Therefore, we conclude that $M'' \in \mscsetofmodel{\synchmodel}$.
+		      Therefore, we conclude that $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
 
-		      Note that $M''$ cannot itself be in $L^*$ because there must be
+		      Note that $M_{\texttt{sol}}$ cannot itself be in $L^*$ because there must be
 		      some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
 		      after $P_1$ announces the index, what $P_2$ sends is not
 		      identical to what $P_3$ receives.
 
 		\item[$\Leftarrow$]
 		      Suppose there is some MSC $M^@$ which
-		      exists in any realization of $L^*$, but is not in $L^*$ itself. We want
+		      exists in any realisation of $L^*$, but is not in $L^*$ itself. We want
 		      to derive a solution to $\Delta$ from $M^@$.
 		      First, it is clear that the projection $M^@|_1$ must consist of a sequence
 		      of pairs of messages (the first of each pair acknowledged), sent from
@@ -463,9 +505,156 @@ Theorem~\ref{thm:main}.
 
 \end{proof}
 
+In this example, I will show the step-by-step construction 
+of $M_{\texttt{sol}}$ from Theorem~\ref{thm:main}.
+
+\bigskip
+
 % TODO: dare un esempietto per far vedere che la prova regge
+\begin{example}[Proof Example of Theorem~\ref{thm:main}]
+Consider the tiles and the solution of the RPCP instance 
+in Example~\ref{exmp:rpcp}, with the tile set and the solution
+with index sequence $(2,1,3)$
+$$
+ (v_1,w_1)=(\texttt{b},\texttt{bb}),\ 
+ (v_2,w_2)=(\texttt{a},\texttt{ab}),\ 
+ (v_3,w_3)=(\texttt{c},\texttt{c}).
+$$
+
+$$
+ x_1=w_2,\ y_1=v_2;\quad x_2=v_1,\ y_2=w_1;\quad x_3=v_3,\ y_3=w_3
+$$
+This sequence is a solution because
+$x_1x_2x_3=\texttt{ab}\,\texttt{b}\,\texttt{c}=\texttt{abbc}$ and
+$y_1y_2y_3=\texttt{a}\,\texttt{bb}\,\texttt{c}=\texttt{abbc}$. The
+prefix property and the ``some index differs'' condition are satisfied.
+
+Therefore, the encoding of the solution is
+$$\Delta = (i_1=2,a_1=1,b_1=0,i_2=1,a_2=0,b_2=1,i_3=3,a_3=0,b_3=1)$$
+
+Recall that for each tile index \(i\) we have two synchronous MSCs
+\(M_i^0\) and \(M_i^1\) (see Def.~\ref{def:mni}), where the bit
+indicates choosing \(v_i\) (0) or \(w_i\) (1) for the character stream.
+Using the concrete index sequence \((2,1,3)\) we form two
+concatenated MSCs:
+\[
+  M_x\;=\; M^{1}_{2}\ \cdot\ M^{0}_{1}\ \cdot\ M^{0}_{3},
+\qquad
+  M_y\;=\; M^{0}_{2}\ \cdot\ M^{1}_{1}\ \cdot\ M^{1}_{3}.
+\]
+Here \(M\) encodes the \(\mathbf{x}\)-concatenation
+\((x_1,x_2,x_3)=(w_2,v_1,v_3)\) (depicted 
+in Figure~\ref{fig:exmp-mx}) and \(M_y\) encodes 
+the \(\mathbf{y}\)-concatenation (depicted in 
+Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
+
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\syncmscmess{$(2,1)$}{P1}{P2}
+	\syncmscmess{$2$}{P1}{P4}
+	\syncmscmess{$(2,1)$}{P4}{P3}
+	\syncmscmess{$a$}{P2}{P3}
+	\syncmscmess{$b$}{P2}{P3}
+
+	\syncmscmess{$(1,0)$}{P1}{P2}
+	\syncmscmess{$1$}{P1}{P4}
+	\syncmscmess{$(1,0)$}{P4}{P3}
+	\syncmscmess{$b$}{P2}{P3}
+
+	\syncmscmess{$(3,0)$}{P1}{P2}
+	\syncmscmess{$3$}{P1}{P4}
+	\syncmscmess{$(3,0)$}{P4}{P3}
+	\syncmscmess{$c$}{P2}{P3}
+\end{msc}
+\caption{The MSC $M_x$}
+\label{fig:exmp-mx}
+\end{figure}
+
+
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\syncmscmess{$(2,0)$}{P1}{P2}
+	\syncmscmess{$2$}{P1}{P4}
+	\syncmscmess{$(2,0)$}{P4}{P3}
+	\syncmscmess{$a$}{P2}{P3}
+
+	\syncmscmess{$(1,1)$}{P1}{P2}
+	\syncmscmess{$1$}{P1}{P4}
+	\syncmscmess{$(1,1)$}{P4}{P3}
+	\syncmscmess{$b$}{P2}{P3}
+	\syncmscmess{$b$}{P2}{P3}
+
+	\syncmscmess{$(3,1)$}{P1}{P2}
+	\syncmscmess{$3$}{P1}{P4}
+	\syncmscmess{$(3,1)$}{P4}{P3}
+	\syncmscmess{$c$}{P2}{P3}
+\end{msc}
+\caption{The MSC $M_y$}
+\label{fig:exmp-my}
+\end{figure}
+
+Recall that \(M|_p\) denote the projection of \(M\) onto process \(p\). We
+construct the MSC
+\[
+  M_{\texttt{sol}} = (M_y|_{P1},\; M_y|_{P2},\; M_x|_{P3},\; M_x|_{P4}),
+\]
+i.e.\ processes $1,2$ follow $M_y$ while $3,4$ follow $M_x$.
+Intuitively, $M_{\texttt{sol}}$ pairs the right-side construction (from $M_y$)
+with the left-side construction (from $M_x$). Figure~\ref{fig:exmp-msol}
+depicts the MSC $M_{\texttt{sol}}$.
+Figure~\ref{fig:exmp-msol} illustrates the behaviour of the MSC
+$M_{\texttt{sol}}$. Observe that when process~3 expects to receive the
+second character $\texttt{b}$ right after $a$, 
+but process~2 cannot send it immediately:
+it must first obtain the corresponding index and bit from process~1.
+The prefix property guarantees
+that every partial construction of the right-hand side is aligned with
+a prefix of the left-hand side, therefore preserving synchronous
+semantics throughout the execution.
+
+\begin{figure}[!ht]
+\centering
+\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{}{$M_y|_{P1}$}
+	\declinst{P2}{}{$M_y|_{P2}$}
+	\declinst{P3}{}{$M_x|_{P3}$}
+	\declinst{P4}{}{$M_x|_{P4}$}
+
+	\syncmscmess{$(2,1)$}{P1}{P2}
+	\syncmscmess{$2$}{P1}{P4}
+	\syncmscmess{$(2,0)$}{P4}{P3}
+	\syncmscmess{$a$}{P2}{P3}
+
+	\syncmscmess{$(1,0)$}{P1}{P2}
+	\syncmscmess{$b$}{P2}{P3}
+	\syncmscmess{$1$}{P1}{P4}
+	\syncmscmess{$(1,1)$}{P4}{P3}
+	\syncmscmess{$b$}{P2}{P3}
+	
+	\syncmscmess{$(3,0)$}{P1}{P2}
+	\syncmscmess{$3$}{P1}{P4}
+	\syncmscmess{$(3,1)$}{P4}{P3}
+	\syncmscmess{$c$}{P2}{P3}
+\end{msc}
+\caption{The MSC $M_\texttt{sol}$}
+\label{fig:exmp-msol}
+\end{figure}
+
+\end{example}
 
 The sequence of lemmas and the main theorem collectively establish the
-undecidability of weak-realizability for global types. Having developed the
+undecidability of weak-realisability for global types. Having developed the
 theoretical foundation, we now move to the next section, where we focus on the
-practical aspects of analysing realizability, and introduce the \textsc{ReSCu} tool.
+practical aspects of analysing realisability, and introduce the \textsc{ReSCu} tool.

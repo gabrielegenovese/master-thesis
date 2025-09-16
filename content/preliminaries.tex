@@ -5,7 +5,7 @@ I, first, introduce automaton, executions, and
 Message Sequence Charts (MSC), followed by 
 an examination of communication model's semantics that are particularly 
 interesting. 
-Then, the notions of Global Type and Realizability are 
+Then, the notions of Global Type and Realisability are 
 defined within the scope of this work, along with the foundational 
 elements required to understand the theoretical contributions.
 
@@ -125,6 +125,8 @@ we identify an event with its action.
 An execution is a well-defined sequence of actions $e\in\Act^*$, where a
 receive action is always preceded by a unique corresponding send action. % TODO : in che senso?
 
+\bigskip
+
 \begin{definition}[Execution]\label{def:execution}
 An \emph{execution} over $\Procs$ and $\Msg$ is a sequence 
 of actions $e \in \Act^*$ together with an injective mapping 
@@ -186,6 +188,7 @@ guarantees that $m_2$ cannot overtake $m_1$. Concretely:
 
 \bigskip
 
+% TODO: togliere def, mettere versione intuitiva nei related
 \begin{definition}[Peer-to-peer model $\ppmodel$]
 \label{def:queue-based-communication-model}
 The set $\executionsofmodel{\ppmodel}$ consists of all executions $e$ 
@@ -306,15 +309,15 @@ $M_2=((w_p^2)_{p\in\Procs},\source_2)$. Then:
 
 
 \subsubsection*{Happens-before relation and linearisations}
-In a given MSC $M$,
-an event $\event$ happens before  
- $\event'$, if 
-(i) $\event$ and $\event'$ are events
-of a same process $p$ and happen in that order on 
-the timeline of $p$,
-or (ii) $\event$ is send event matched by $\event'$,
-or (iii) a sequence of such situations defines
-a path from $\event$ to $\event'$.
+In a given MSC $M$, an event $\event$ happens before $\event'$, if 
+ \begin{itemize}
+	\item $\event$ and $\event'$ are events
+	of a same process $p$ and happen in that order on 
+	the timeline of $p$
+	\item  $\event$ is send event matched by $\event'$
+	\item a sequence of such situations defines
+	a path from $\event$ to $\event'$
+\end{itemize}
 
 \bigskip
 
@@ -569,7 +572,7 @@ of the system.
 \section{Global Types}
 This part will further highlight the basic notions to understand the formal proof 
 for the theorem presented in Section~\ref{sec:proof} and, in particular, Global Type
-and Weakly-realizable. We begin by extending the definition of linearisability so 
+and Weakly-realisable. We begin by extending the definition of linearisability so 
 that it applies to all communication models.
 In our setting, Global Types are automata that describe a language of MSCs, 
 as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability}.
@@ -590,6 +593,11 @@ as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability
 	alphabet $\labelalphabet$.
 \end{definition}
 % TODO: dare più contesto ad esempio
+
+We use the notation $p \xleftrightarrow{m} q$ to denote the
+\emph{round-trip} exchange of a message $m$: first $p$ sends $m$
+to $q$, and then $q$ sends back the same message $m$ to $p$.
+This will serve as an acknowledgment message for $p$.
 
 \bigskip
 
@@ -676,7 +684,7 @@ $\labellanguageof{\gt}$:
 
 I now introduce the definition of implementability following the one given 
 by Alur, et al. \cite{alur2005realizability}, referred to as 
-\textit{Weak-realizability}.
+\textit{Weak-realisability}.
 To formalize it, we first define the notions of 
 \textit{weak implication} and \textit{weak closure}.
 
@@ -793,10 +801,10 @@ MSC1 & MSC2 & $M$
 
 \bigskip
 
-\begin{definition}[Weakly-realizable]
-	An MSC $M$ is said to be weakly-realizable if the set of MSCs
-	$L(M)$ is weakly realizable. A set of MSCs $\setmsc$ is said to be weakly
-	realizable if $\setmsc=\setmsc^w$.
+\begin{definition}[Weakly-realisable]
+	An MSC $M$ is said to be weakly-realisable if the set of MSCs
+	$L(M)$ is weakly realisable. A set of MSCs $\setmsc$ is said to be weakly
+	realisable if $\setmsc=\setmsc^w$.
 \end{definition}
 It is important to note that this definition does not include the
 property of deadlock-freedom. 
@@ -816,7 +824,7 @@ property of deadlock-freedom.
 % The set of MSCs $\setmsc$ weakly implies an MSC $M$ iff for all $1\leq i\leq n$, there
 % exist an MSC $M_i\in L$ such that $M|_i=M_i|_i$
 % \end{definition}
-% \begin{definition}[Weakly-realizable]
+% \begin{definition}[Weakly-realisable]
 % ? TODO ?
 % \end{definition}
 
