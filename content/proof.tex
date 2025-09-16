@@ -212,7 +212,7 @@ We now define a particular Global Type that will be useful in the reduction.
 		      \arrmess{q}{r}{m_{S_1}}, ..., \arrmess{q}{r}{m_{S_c}}$\}$ where each arrow
 		      denotes a synchronous message accompanied by an acknowledgment. % TODO: definisci/formalizza questa doppia freccia
 	\end{itemize}
-	The $G_S$'s automaton is depicted in Figure~\ref{fig:gtype}.
+	$G_S$'s automaton is depicted in Figure~\ref{fig:gtype}.
 	
 	\begin{figure}[!ht]
 		\centering
@@ -275,9 +275,11 @@ all the possible combinations and constructions of a set of MSCs.
 	Finally, $L^*$ is obtained by determinising $L^*_{N}$.
 \end{definition}
 
+$L^*$'s automaton is depicted in Figure~\ref{fig:lstar}.
+
 \begin{figure}[!ht]
 	\centering
-	\begin{tikzpicture}[->, node distance=30mm, on grid, auto]
+	\begin{tikzpicture}[->, node distance=35mm, on grid, auto]
 		\node[state] (vI) {$v_I$};
 		\node[state] (qI2) [right=of vI] {$\cdots$};
 		\node[state] (qI1) [above=of qI2] {$q_0^{G^1}$};
@@ -293,12 +295,12 @@ all the possible combinations and constructions of a set of MSCs.
 		\path (vI) edge[] node[above] {$\epsilon$} (qI1);
 		\path (vI) edge[] node[above] {$\epsilon$} (qI2);
 		\path (vI) edge[] node[above] {$\epsilon$} (qI3);
-		\path (qI1) edge[] node[above] {$\cdots$} (qM1);
+		\path (qI1) edge[] node[above] {\arrmess{p}{q}{(i^{G^1},n^{G^1})}} (qM1);
 		\path (qI2) edge[] node[above] {$\cdots$} (qM2);
-		\path (qI3) edge[] node[above] {$\cdots$} (qM3);
-		\path (qM1) edge[] node[above] {$\cdots$} (qF1);
+		\path (qI3) edge[] node[above] {\arrmess{p}{q}{(i^{G^n},n^{G^n})}} (qM3);
+		\path (qM1) edge[] node[above] {\arrmess{q}{r}{S^{G^1}_c}} (qF1);
 		\path (qM2) edge[] node[above] {$\cdots$} (qF2);
-		\path (qM3) edge[] node[above] {$\cdots$} (qF3);
+		\path (qM3) edge[] node[above] {\arrmess{q}{r}{S^{G^n}_c}} (qF3);
 		\path (qF1) edge[] node[above] {$\epsilon$} (vT);
 		\path (qF2) edge[] node[above] {$\epsilon$} (vT);
 		\path (qF3) edge[] node[above] {$\epsilon$} (vT);
@@ -310,8 +312,8 @@ all the possible combinations and constructions of a set of MSCs.
 		\draw (qF1.225) to node[above] {$\epsilon$} (qI2.60);
 		\draw (qF3.120) to node[above] {$\epsilon$} (qI2.315);
 		
-		\draw (qF3.0) to [bend right=50] node[above] {$\epsilon$} (qI1.90);
-		\draw (qF1.0) to [bend left=50] node[above] {$\epsilon$} (qI3.270);
+		\draw (qF3) .. controls +(8,10) and +(1,3) .. node[midway,above] {$\epsilon$} (qI1);
+		\draw (qF1) ..  controls +(8,-10) and +(1,-3) .. node[midway,above] {$\epsilon$} (qI3);
 	\end{tikzpicture}
 	\caption{The automaton of the global type $L^*$.}
 	\label{fig:lstar}
