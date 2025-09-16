@@ -3,7 +3,7 @@
 As already mentioned, the first contribution is Theorem~\ref{thm:main},
 which states that Weak-realisability is undecidable for synchronous global types. 
 To understand this result, I have already covered the basic notions in 
-Section~\ref{sec:pre} on MSCs, Global Types, and Weak-realisability. 
+Chapter~\ref{sec:pre} on MSCs, Global Types, and Weak-realisability. 
 These concepts are general and align 
 closely with definitions used in previously established works. 
 We now introduce the main objects employed in the proof of Theorem~\ref{thm:main}. 
@@ -26,18 +26,19 @@ to fit the model.
 \bigskip
 
 \textbf{Step 1: Construction.}
-Given an RPCP instance $\Delta = \{(v_1,w_1),\ldots,(v_m,w_m)\}$,
+Given an RPCP instance $\{(v_1,w_1),\ldots,(v_m,w_m)\}$,
 we associate to each pair $(v_i,w_i)$ two MSCs $M^0_i,M^1_i$,
-following Def.~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
+following Definition~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
 (Lemma~\ref{lemma:minsynch}) and belongs to the language of the
 global type $G_S$ (Lemma~\ref{lemma:msgs}). From all such MSCs we
-build $L^*$ (Def.~\ref{def:lstar}), which represents all possible
-concatenations of the $M^n_i$.
+build $L^*$ (Definition~\ref{def:lstar}), which represents all possible
+concatenations and combination of a set of $M^n_i$'s instances.
 
 \bigskip
 
 \textbf{Step 2: Direction ``$\Rightarrow$''.}
-Assume $\Delta$ has a solution $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$.
+Let's suppose $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a solution
+to the RPCP Problem.
 From this, construct two MSC sequences:
 \[
 M_x = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad
@@ -45,9 +46,9 @@ M_y = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
 \]
 Both $M_x,M_y$ are synchronous concatenations of synchronous MSCs.
 Consider now a third MSC $M_{\texttt{sol}}$ obtained by taking the projections
-$M_y|_1,M_y|_2$ and $M_x|_3,M_x|_4$. Intuitively, processes $P_1,P_2$
+$M_y|_{P1},M_y|_{P2}$ and $M_x|_{P3},M_x|_{P4}$. Intuitively, processes $P1,P2$
 construct the \emph{right string} $y_{i_1}\cdots y_{i_m}$, while
-processes $P_3,P_4$ construct the \emph{left string}
+processes $P3,P4$ construct the \emph{left string}
 $x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP ensures that
 $M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. 
 The $M_{\texttt{sol}}$ synchrony is not trivial, therefore we need to prove it.
@@ -62,16 +63,16 @@ differs. Hence, $L^*$ is \emph{not realisable}.
 Suppose $L^*$ is not realisable: then there exists some MSC $M^@$
 weakly implied by $L^*$ but not in $L^*$. Analysing the projections
 of $M^@$ on each process, we recover two sequences of words, one
-built along processes $P_1,P_2$ and the other along $P_3,P_4$. The
+built along processes $P1,P2$ and the other along $P3,P4$. The
 fact that $M^@ \notin L^*$ implies that these two sequences must
 differ at some tile, and the prefix property ensures that the word
-on $P_2$ is always a prefix of the word on $P_3$. This yields a
+on $P2$ is always a prefix of the word on $P3$. This yields a
 \emph{solution to the RPCP instance} $\Delta$.
 
 \bigskip
 
 \textbf{Step 4: Conclusion.}
-We have shown the equivalence:
+This equivalence is proved:
 \[
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
 \]
@@ -144,6 +145,44 @@ We now check the RPCP conditions:
 \end{itemize}
 \end{example}
 
+\bigskip
+
+% TODO: Definire per bene le stringhe all'inizio dei preliminare
+% Prima frase da spostare
+\begin{definition}[$M^n_i$]\label{def:mni}
+	For a string $u$, let $u^l$ denote the $l$-th character of the string.
+	In the MSC $M^n_i$, process~1 synchronously sends the label
+	$m_1 = (i, n)$ to process~2, then transmits the index $m_2=i$
+	to process~4. Subsequently, process~4 sends $m_3 = (i, n)$
+	synchronously to process~3. After these control messages, process~2
+	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
+	synchronously to process~3 (where $c$ is the length of $x_i$).
+	This MSC is depicted in Figure~\ref{fig:mni}, where $n\in\{0,1\}$ and:
+	\begin{itemize}
+		\item if $n=0$, then $x_i=v_i$;
+		\item if $n=1$, then $x_i=w_i$.
+	\end{itemize}
+
+	\begin{figure}[!ht]
+		\centering
+		\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+			\declinst{P1}{P1}{}
+			\declinst{P2}{P2}{}
+			\declinst{P3}{P3}{}
+			\declinst{P4}{P4}{}
+
+			\syncmscmess{$(i,n)$}{P1}{P2}
+			\syncmscmess{$i$}{P1}{P4}
+			\syncmscmess{$(i,n)$}{P4}{P3}
+			\syncmscmess{$x_i^1$}{P2}{P3}
+			\syncmscmess{...}{P2}{P3}
+			\syncmscmess{$x_i^c$}{P2}{P3}
+		\end{msc}
+		\caption{The $M_i^n$ MSC.}
+		\label{fig:mni}
+	\end{figure}
+
+\end{definition}
 
 With this definition in place, I now introduce the main objects used 
 in the proof. Specifically, I begin by showing how a Global Type can 
@@ -204,19 +243,20 @@ Now, let's generalize Definition~\ref{def:gm} to include a set of MSCs.
 \bigskip
 
 \begin{definition}[$G^*$]\label{def:gstar}
-	Given a set of MSCs $\mathcal{M} =\{M\ |\ \mscsetofmodel{\synchmodel}\}$,
+	Given a set of MSCs $\mathcal{M} =\{M\ |\ M\in\mscsetofmodel{\synchmodel}\}$,
 	$G^*$ is the set of global types such that $G^*=\{G_M\ |\ M \in \setmsc\}$,
 	where $G_M$ is built using Definition~\ref{def:gm}.
 \end{definition}
 
 Informally, for every MSC $M\in\setmsc$ there exists a global type $G\in G^*$ that
-captures the language of $M$. 
+captures the language of $M$. Now, let's build the automaton that represents
+all the possible combinations and constructions of a set of MSCs.
 
 \bigskip
 
 \begin{definition}[The $L^*$ global type]\label{def:lstar}
 	Assume a finite set $\setmsc$ of MSCs, where
-	$\setmsc = \{m\ |\ m \in \mscsetofmodel{\synchmodel}\}$. Let $G^*$
+	$\setmsc = \{M\ |\ M \in \mscsetofmodel{\synchmodel}\}$. Let $G^*$
 	be defined as in Definition~\ref{def:gstar}.
 	We define the global type $L^*_{N}$ as the automaton
 	$\mathcal A = (Q,\Sigma, \delta, l_0, F)$ where:
@@ -232,51 +272,54 @@ captures the language of $M$.
 		\item $l_0 = v_I$ is the initial state;
 		\item $F = v_T$ is the accepting state.
 	\end{itemize}
-	Finally, $L^*$ is obtained by determinizing $L^*_{N}$.
+	Finally, $L^*$ is obtained by determinising $L^*_{N}$.
 \end{definition}
+
+\begin{figure}[!ht]
+	\centering
+	\begin{tikzpicture}[->, node distance=30mm, on grid, auto]
+		\node[state] (vI) {$v_I$};
+		\node[state] (qI2) [right=of vI] {$\cdots$};
+		\node[state] (qI1) [above=of qI2] {$q_0^{G^1}$};
+		\node[state] (qI3) [below=of qI2] {$q_0^{G^n}$};
+		\node[state] (qM1) [right=of qI1] {$\cdots$};
+		\node[state] (qM2) [right=of qI2] {$\cdots$};
+		\node[state] (qM3) [right=of qI3] {$\cdots$};
+		\node[state] (qF1) [right=of qM1] {$q_f^{G^1}$};
+		\node[state] (qF2) [right=of qM2] {$\cdots$};
+		\node[state] (qF3) [right=of qM3] {$q_f^{G^n}$};
+		\node[state,accepting] (vT) [right=of qF2] {$v_T$};
+
+		\path (vI) edge[] node[above] {$\epsilon$} (qI1);
+		\path (vI) edge[] node[above] {$\epsilon$} (qI2);
+		\path (vI) edge[] node[above] {$\epsilon$} (qI3);
+		\path (qI1) edge[] node[above] {$\cdots$} (qM1);
+		\path (qI2) edge[] node[above] {$\cdots$} (qM2);
+		\path (qI3) edge[] node[above] {$\cdots$} (qM3);
+		\path (qM1) edge[] node[above] {$\cdots$} (qF1);
+		\path (qM2) edge[] node[above] {$\cdots$} (qF2);
+		\path (qM3) edge[] node[above] {$\cdots$} (qF3);
+		\path (qF1) edge[] node[above] {$\epsilon$} (vT);
+		\path (qF2) edge[] node[above] {$\epsilon$} (vT);
+		\path (qF3) edge[] node[above] {$\epsilon$} (vT);
+		
+		\draw (qF1.135) to [bend right=30] node[above] {$\epsilon$} (qI1.45);
+		\draw (qF2.135) to [bend right=30] node[above] {$\epsilon$} (qI2.45);
+		\draw (qF3.135) to [bend right=30] node[above] {$\epsilon$} (qI3.45);
+
+		\draw (qF1.225) to node[above] {$\epsilon$} (qI2.60);
+		\draw (qF3.120) to node[above] {$\epsilon$} (qI2.315);
+		
+		\draw (qF3.0) to [bend right=50] node[above] {$\epsilon$} (qI1.90);
+		\draw (qF1.0) to [bend left=50] node[above] {$\epsilon$} (qI3.270);
+	\end{tikzpicture}
+	\caption{The automaton of the global type $L^*$.}
+	\label{fig:lstar}
+\end{figure}
 
 Informally, $L^*$ represents all the
 possible executions of a set of MSCs. To complete the set of definitions,
 let's define a particular MSC corresponding to Definition~\ref{def:gs}.
-
-\bigskip
-
-% TODO: Definire per bene le stringhe all'inizio dei preliminare
-% Prima frase da spostare
-\begin{definition}[$M^n_i$]\label{def:mni}
-	For a string $u$, let $u^l$ denote the $l$-th character of the string.
-	In the MSC $M^n_i$, process~1 synchronously sends the label
-	$m_1 = (i, n)$ to process~2, then transmits the index $m_2=i$
-	to process~4. Subsequently, process~4 sends $m_3 = (i, n)$
-	synchronously to process~3. After these control messages, process~2
-	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
-	synchronously to process~3 (where $c$ is the length of $x_i$).
-	This MSC is depicted in Figure~\ref{fig:mni}, where $n\in\{0,1\}$ and:
-	\begin{itemize}
-		\item if $n=0$, then $x_i=v_i$;
-		\item if $n=1$, then $x_i=w_i$.
-	\end{itemize}
-
-	\begin{figure}[!ht]
-		\centering
-		\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-			\declinst{P1}{P1}{}
-			\declinst{P2}{P2}{}
-			\declinst{P3}{P3}{}
-			\declinst{P4}{P4}{}
-
-			\syncmscmess{$(i,n)$}{P1}{P2}
-			\syncmscmess{$i$}{P1}{P4}
-			\syncmscmess{$(i,n)$}{P4}{P3}
-			\syncmscmess{$x_i^1$}{P2}{P3}
-			\syncmscmess{...}{P2}{P3}
-			\syncmscmess{$x_i^c$}{P2}{P3}
-		\end{msc}
-		\caption{The $M_i^n$ MSC.}
-		\label{fig:mni}
-	\end{figure}
-
-\end{definition}
 
 Finally, let's state the lemmas and main theorem of this work, 
 along with all the proofs. 
@@ -308,8 +351,8 @@ Theorem~\ref{thm:main}.
 \bigskip
 
 \begin{lemma}\label{lemma:msgs}
-	The MSC $M^n_i$ (Def.~\ref{def:mni}) is included in $L(G_S)$, where $G_S$
-	is the global type defined in Def.~\ref{def:gs}.
+	The MSC $M^n_i$ (Definition~\ref{def:mni}) is included in $L(G_S)$, where $G_S$
+	is the global type defined in Definition~\ref{def:gs}.
 \end{lemma}
 
 \begin{proof}
@@ -359,7 +402,7 @@ Theorem~\ref{thm:main}.
 		      Executions of both of these (sequences of) MSCs must exist in any
 		      realisation of $L^*$. Additionally, these MSCs are in $\mscsetofmodel{\synchmodel}$
 		      because they are sequence of $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
-		      $M_x$ corresponds to the construction of the left side of equation (1) of the RPCP
+		      $M_x$ corresponds to the construction of the left side of the equivalence of the RPCP
 		      problem, and, instead, $M_y$ represents the construction of the right side.
 		      We then look at the projections $M_x|_1$, $M_x|_2$, $M_x|_3$,
 		      and $M_x|_4$ of $M_x$, and $M_y|_1$, $M_y|_2$, $M_y|_3$, $M_y|_4$ of $M_y$ onto the
@@ -533,7 +576,7 @@ Therefore, the encoding of the solution is
 $$\Delta = (i_1=2,a_1=1,b_1=0,i_2=1,a_2=0,b_2=1,i_3=3,a_3=0,b_3=1)$$
 
 Recall that for each tile index \(i\) we have two synchronous MSCs
-\(M_i^0\) and \(M_i^1\) (see Def.~\ref{def:mni}), where the bit
+\(M_i^0\) and \(M_i^1\) (see Definition~\ref{def:mni}), where the bit
 indicates choosing \(v_i\) (0) or \(w_i\) (1) for the character stream.
 Using the concrete index sequence \((2,1,3)\) we form two
 concatenated MSCs:
@@ -576,7 +619,6 @@ Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 \label{fig:exmp-mx}
 \end{figure}
 
-
 \begin{figure}[!ht]
 \centering
 \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
@@ -612,8 +654,7 @@ construct the MSC
 \]
 i.e.\ processes $1,2$ follow $M_y$ while $3,4$ follow $M_x$.
 Intuitively, $M_{\texttt{sol}}$ pairs the right-side construction (from $M_y$)
-with the left-side construction (from $M_x$). Figure~\ref{fig:exmp-msol}
-depicts the MSC $M_{\texttt{sol}}$.
+with the left-side construction (from $M_x$). 
 Figure~\ref{fig:exmp-msol} illustrates the behaviour of the MSC
 $M_{\texttt{sol}}$. Observe that when process~3 expects to receive the
 second character $\texttt{b}$ right after $a$, 

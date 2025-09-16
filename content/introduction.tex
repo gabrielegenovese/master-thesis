@@ -167,7 +167,7 @@ With MSCs, \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few them informally, using examples to
 highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synchronous}. In Section~\ref{sec:rel}, the discussion
+Definition~\ref{def:synchronous}. In Chapter~\ref{sec:rel}, the discussion
 continue presenting other communication semantics, and summarizing
 the relevance of the work by Di Giusto, et al.~\cite{di2023partial}.
 Some examples are shown in 
@@ -384,6 +384,7 @@ the following four conditions hold
 \begin{itemize}
   \item the language of $G$'s local type is in synchronous semantics
   \item all $G$'s projections are orphan-free
+  % deadlock freedom con gli msc in p2p
   \item all the traces of the MSCs' language of $G$ is deadlock-free
   in \verb|p2p|
   \item $G$ is realisable in synchronous semantics
@@ -395,6 +396,6 @@ can be reduced to the synchronous case provided the additional safety
 conditions are met. My own contribution focuses on the last item of the 
 theorem, namely the problem of checking whether a given global type is 
 implementable in synchronous semantics. This question is at the heart 
-of the undecidability results presented in Section~\ref{sec:proof}, 
+of the undecidability results presented in Chapter~\ref{sec:proof}, 
 and motivates the need for the identification of new subclasses that 
 enable new verification techniques along with tool support.
