@@ -4,7 +4,7 @@ describing its features, the input
 language it uses, its implementation, and the modifications I introduced to
 extend its functionality~\cite{rescuoriginalrepo}. The updated
 public repository with 
-the new examples is available:
+the new features and examples is available at 
 \begin{center}
 \verb|https://github.com/gabrielegenovese/rescu|~\cite{rescurepo}.
 \end{center}
@@ -25,16 +25,19 @@ a progress display to estimate remaining runtime during long computations, and
 \verb|-to_dot|, which exports the system to DOT format for visualization.
 One of the most similar tools is \textsc{McScm} \cite{heussner2012mcscm}, that
 uses a framework with for different verification techniques. 
-Symbolic Communicating Machines (SCM), defined and used in \cite{brand1983communicating} 
-serve as the input format of the tool.
-A formal definition for this object is stated in Definition~\ref{def:cfsm}.
+Symbolic Communicating Machines (SCM), defined and used in \cite[Definition 5.1]{le2008abstract}
+serve as the input format of the tool. SCMs are Communicating 
+Finite-State Machines (CFSM, Definition~\ref{def:cfsm}) 
+extended with a finite set of variables.
 The grammar has been updated to provide greater flexibility and clarity. In
 particular, transition guards have been made optional (with a default value
 \verb|: when true|), and a new \verb|final| keyword has been introduced to
 explicitly specify final states. The updated grammar is shown in
 Listing~\ref{lst:scm-grammar}. 
 
-\begin{lstlisting}[language={},caption={Simplified SCM grammar},
+\bigskip
+
+\begin{lstlisting}[language={},caption={Modified SCM grammar},
     keywordstyle=\color{blue}\bfseries,label={lst:scm-grammar}] 
 prog         ::= <header> <aut_list> [<bad_confs>]
 header       ::= scm <ident>:<channels> [<bags>] <parameters>
@@ -67,6 +70,166 @@ bad_buffers  ::= <regular_expression>
 nothing      ::= 
 \end{lstlisting}
 
+Let's make a simple example.
+
+\bigskip
+
+\begin{example}[Ping-Pong Example]\label{exm:ping}
+
+Let the set of processes be $\Procs = \{A,B\}$,
+the set of messages $\Msg = \{\texttt{ping},\texttt{pong}\}$,
+and the set of channels consist of a single FIFO channel~0 from 
+$A$ to $B$ and from $B$ to $A$. The corresponding actions are
+$$
+\Act = \{\, (A,B,!,\texttt{ping}), (B,A,?,\texttt{ping}), 
+(B,A,!,\texttt{pong}), (A,B,?,\texttt{pong}) \,\}.
+$$
+
+The system of CFSMs is $\cfsms = (\acfsm_A, \acfsm_B)$, where:
+$$
+\acfsm_A = (Q_A, \Sigma, \delta_A, q_{0,A}, F_A)
+$$
+
+with
+\begin{itemize}
+\item $Q_A = \{0,1,2\}$, initial state $q_{0,A} = 0$, final state $F_A = \{2\}$,
+\item transitions: $0 \xrightarrow{(A,B,!,\texttt{ping})} 1 \xrightarrow{(B,A,?,\texttt{pong})} 2$.
+\end{itemize}
+
+$$
+\acfsm_B = (Q_B, \Sigma, \delta_B, q_{0,B}, F_B)
+$$
+
+with
+\begin{itemize}
+\item $Q_B = \{0,1,2\}$, initial state $q_{0,B} = 0$, final state $F_B = \{2\}$,
+\item transitions: $0 \xrightarrow{(B,A,?,\texttt{ping})} 1 \xrightarrow{(A,B,!,\texttt{pong})} 2$.
+\end{itemize}
+
+This CFSM system $\cfsms$ is showed in Figure~\ref{fig:ping}. The corresponding
+input for the tool is showed in Listing~\ref{lst:ping}.
+
+\bigskip
+
+\begin{lstlisting}[language={},caption={Tool's input for Example~\ref{exm:ping}},label={lst:ping}]
+scm ping_pong :
+
+nb_channels = 1 ;
+parameters :
+unit ping ;
+unit pong ;
+
+automaton A :
+initial : 0
+final : 2
+
+state 0 :
+to 1 : 0 ! ping ;
+state 1 :
+to 2 : 0 ? pong ;
+state 2 :
+
+automaton B :
+initial : 0
+final : 2
+
+state 0 :
+to 1 : 0 ? ping ;
+state 1 :
+to 2 : 0 ! pong ;
+state 2 :
+\end{lstlisting}
+  
+\begin{figure}[!ht]
+\centering
+\begin{tikzpicture}[>=latex',line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: Bdummy -> B0
+  \draw [->] (99.0bp,258.17bp) .. controls (99.0bp,250.56bp) and (99.0bp,241.35bp)  .. (99.0bp,221.45bp);
+  % Edge: B0 -> B1
+  \draw [->] (99.0bp,184.91bp) .. controls (99.0bp,173.26bp) and (99.0bp,157.55bp)  .. (99.0bp,132.85bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (121.12bp,158.75bp) node {0 ? ping};
+  % Edge: A1 -> A2
+  \draw [->] (27.0bp,96.051bp) .. controls (27.0bp,84.609bp) and (27.0bp,69.297bp)  .. (27.0bp,44.218bp);
+  \draw (50.625bp,70.25bp) node {0 ? pong};
+  % Edge: A0 -> A1
+  \draw [->] (27.0bp,184.91bp) .. controls (27.0bp,173.26bp) and (27.0bp,157.55bp)  .. (27.0bp,132.85bp);
+  \draw (48.375bp,158.75bp) node {0 ! ping};
+  % Edge: B1 -> B2
+  \draw [->] (99.0bp,96.051bp) .. controls (99.0bp,84.609bp) and (99.0bp,69.297bp)  .. (99.0bp,44.218bp);
+  \draw (121.88bp,70.25bp) node {0 ! pong};
+  % Edge: Adummy -> A0
+  \draw [->] (27.0bp,258.17bp) .. controls (27.0bp,250.56bp) and (27.0bp,241.35bp)  .. (27.0bp,221.45bp);
+  % Node: A2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+  \draw (27.0bp,22.0bp) node {2};
+\end{scope}
+  % Node: Bdummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  % \draw (99.0bp,276.0bp) ellipse (27.0bp and 18.0bp);
+  \draw (99.0bp,276.0bp) node {B};
+\end{scope}
+  % Node: B0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (99.0bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (99.0bp,203.0bp) node {0};
+\end{scope}
+  % Node: B1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (99.0bp,114.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (99.0bp,114.5bp) node {1};
+\end{scope}
+  % Node: A1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,114.5bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,114.5bp) node {1};
+\end{scope}
+  % Node: B2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (99.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (99.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+  \draw (99.0bp,22.0bp) node {2};
+\end{scope}
+  % Node: A0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,203.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (27.0bp,203.0bp) node {0};
+\end{scope}
+  % Node: Adummy
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  % \draw (27.0bp,276.0bp) ellipse (27.0bp and 18.0bp);
+  \draw (27.0bp,276.0bp) node {A};
+\end{scope}
+%
+\end{tikzpicture}
+\caption{Simple Ping-Pong example.}
+\label{fig:ping}
+\end{figure}
+
+\end{example}
+
 \section{Progress and Deadlock-Freedom}
 I extended \textsc{ReSCu} with verification routines that focus on two
 fundamental correctness properties of distributed systems: \emph{progress} and
@@ -87,7 +250,7 @@ $\mathcal{A}_p = (L_p, \mathit{Act}_p, \delta_p, l_{0,p}, F_p)$ is the CFSM asso
 to process $p$.  
 
 The \emph{synchronous product} of $\mathcal{S}$ is the global type 
-$\mathrm{prod}(\mathcal{S}) = (L, \mathit{Arr}, \delta, l_0, F)$,
+$P = \mathrm{prod}_s(\mathcal{S}) = (L, \mathit{Arr}, \delta, l_0, F)$,
 where
 \begin{itemize}
     \item $L = \prod_{p \in \mathbb{P}} L_p$ is the set of global locations,
@@ -103,53 +266,100 @@ where
 \end{itemize}
 \end{definition}
 
+\bigskip
+
+\begin{example}[Synchronous Product Example]\label{exm:syncping}
+Consider the system of CFSMs $\cfsms = (\acfsm_A, \acfsm_B)$ 
+from the Example~\ref{exm:ping}. Its synchronous product is 
+$P = \mathrm{prod}_s(\cfsms) = (L, \mathit{Arr}, \delta, l_0, F)$,
+where
+\begin{itemize}
+  \item $L = Q_A \times Q_B = \{0,1,2\} \times \{0,1,2\}$,
+  \item $l_0 = (0,0)$,
+  \item $F = \{(2,2)\}$,
+  \item $\delta$ consists of the following transitions:
+  $(0,0) \;\xrightarrow{A \xrightarrow{\texttt{ping}} B}\; (1,1)
+  \;\xrightarrow{B \xrightarrow{\texttt{pong}} A}\; (2,2)$.
+\end{itemize}
+Thus, the synchronous product captures the joint behaviour: process $A$ 
+sends $\texttt{ping}$ to $B$, then $B$ responds with $\texttt{pong}$ 
+to $A$, and both processes reach their final states simultaneously.
+Figure~\ref{fig:syncping} illustrates the $\mathrm{prod}_s(\cfsms)$'s automaton.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}[>=latex',line join=bevel,scale=0.8]
+    \pgfsetlinewidth{1bp}
+  %%
+  \pgfsetcolor{black}
+    % Edge: A1B1 -> A2B2
+    \draw [->] (27.0bp,96.051bp) .. controls (27.0bp,84.609bp) and (27.0bp,69.297bp)  .. (27.0bp,44.218bp);
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (69.0bp,70.25bp) node {B$\to$A:pong};
+    % Edge: A0B0 -> A1B1
+    \draw [->] (27.0bp,184.91bp) .. controls (27.0bp,173.26bp) and (27.0bp,157.55bp)  .. (27.0bp,132.85bp);
+    \draw (67.125bp,158.75bp) node {A$\to$B:ping};
+    % Edge: start_node -> A0B0
+    \draw [->] (27.0bp,258.17bp) .. controls (27.0bp,250.56bp) and (27.0bp,241.35bp)  .. (27.0bp,221.45bp);
+    % Node: A2B2
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (27.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+    \draw (27.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+    \draw (27.0bp,22.0bp) node {2};
+  \end{scope}
+    % Node: A1B1
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (27.0bp,114.5bp) ellipse (18.0bp and 18.0bp);
+    \draw (27.0bp,114.5bp) node {1};
+  \end{scope}
+    % Node: A0B0
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (27.0bp,203.0bp) ellipse (18.0bp and 18.0bp);
+    \draw (27.0bp,203.0bp) node {0};
+  \end{scope}
+    % Node: start_node
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (27.0bp,276.0bp) node {start};
+  \end{scope}
+  %
+  \end{tikzpicture}
+  \caption{Synchronous Product of the CFSM system in Example~\ref{exm:syncping}.}
+  \label{fig:syncping}
+\end{figure}
+  
+\end{example}
+
 After constructing the synchronous product, the tool performs several
 important post-processing operations. In particular, it removes any
 unreachable nodes from the resulting product, simplifying the structure
 and ensuring that only relevant states are retained for further analysis.
 We can now define the two properties added to the tool.
 
-I denote \verb|Reach| as the function that, given a node, gives the set of 
-reachable nodes, and $\text{Init}, \text{Final}$ as the initial and final node.
-Informally, a given system satisfies \emph{progress} if, 
-from every reachable node,
-either the system can eventually perform a transition, or the node is
-a final one.
+Let's consider Definition~\ref{def:deadlock-free}. The modified version for the
+tool is the following.
 
 \bigskip
 
-\begin{definition}[Progress]
-	A system $S$ has the progress property iff $\text{Prod}_{sync}(S)$
-	has the property
-	$\text{Reach}(\text{Init})\subseteq \text{Reach}(\text{Final})$.
+\begin{definition}[Deadlock-free]\label{def:deadlock-free-tool}
+A system of CFSMs $\cfsms$ is \emph{deadlock-free} in $\rscmodel$
+if for every execution 
+$e \in \executionsofcfsms{\acceptcompletion{P}}{}$,  
+there exists an execution $e'\in \executionsofcfsms{P}{}$ 
+with $e \prefixorder e'$, where $P=\mathrm{prod}_s(\cfsms)$.  
 \end{definition}
 
-%% sostituire posit con reach: sono tutti gli stati raggiungibili
+%% nella tesi mettere la def di ppdp spiegata bene che è quella che
+%% include tutte le semantiche di network
 
-In other words, this property is implemented by checking the existence of 
-any not-final-node without outgoing transitions.
-This definition allows infinite loops.
-Informally, a system is \emph{deadlock-free} if no reachable
-non-final node exists in which all processes are blocked (i.e., no further
-actions can be taken).
-
-% For a set of executions $\mathcal{E}$, we write Prefixes($\mathcal{E}$) 
-% for the set of all prefixes of the executions in $\mathcal{E}$.
-
-\bigskip
-
-\begin{definition}[Deadlock-Freedom]
-	A system $S$ is deadlock-free iff
-    $\text{Prod}_{\text{sync}}(S)$ has the property
-	$\text{Reach}(\text{Init})\subseteq \text{Prefixes}(\text{Final})$.
-\end{definition}
-%% mettere controesempio x questa def: in un sistema non sincrono potrei non vedere un deadlock con questa def
-
-%% nella tesi mettere la def di ppdp spiegata bene che è quella che include tutte le semantiche di network
-
-% Intuitively, the set of all the execution that starts from the initial state
-% are a section of the set of all prefixes of the executions that start from
-% the final state.
 More precisely, a system that can reach, from its initial states, some state
 that does not lead to a final state is not deadlock-free. Under this definition,
 even a loop that never reaches a final state is considered a deadlock,
@@ -158,18 +368,39 @@ reverse search algorithm starting from the final states.
 
 % TODO: Specificare che questa nozione di deadlock-freedom vale per il paper di cinzia
 
+Informally, a given system satisfies \emph{progress} if, from every reachable node,
+either the system can eventually perform a transition, or the node is a final one.
+
+\bigskip
+
+\begin{definition}[Progress]\label{def:progress}
+A system of CFSMs $\cfsms$ satisfies the \emph{progress} property in $\rscmodel$
+if for every execution $e \in \executionsofcfsms{\acceptcompletion{P}}{}$, 
+with $P = \mathrm{prod}_s(\cfsms)$,
+\begin{itemize}
+    \item the execution $e$ is also a valid execution of $e\in \executionsofcfsms{P}{}$, or
+    \item there exists another execution $e'\in\executionsofcfsms{\acceptcompletion{P}}{}$
+          such that $e \prefixorder e'$.
+\end{itemize}
+\end{definition}
+
+Intuitively, progress ensures that the system never reaches a state
+where it is permanently stuck, except in the case of successful termination.
+This is weaker than deadlock-freedom, since infinite executions are allowed
+as long as they can always perform a new step. In particular, livelocks
+(loops without termination) are considered to satisfy progress, but would
+violate deadlock-freedom.
+
 Additionally, the synchronized system can be exported in DOT format
 (with a default filename of \verb|sync.dot|), which allows for graphical 
 visualization of its structure and behaviour.
-% Some illustrative examples 
-% demonstrating these new features are included in the
-% \verb|rescu/examples/deadlock| folder.
-Let's finally see some relevant examples.
+Some illustrative examples 
+demonstrating these new features are included in the
+\verb|rescu/examples/deadlock| folder.
 
 % TODO: CINZIA, X TESI:
 % pensare ad un esempio che fa vedere che non è vero in generale
 
-% TODO: migliorare visualizzazione dei grafi
 \section{Examples}
 
 To illustrate these notions, I present two examples. The first is the
@@ -178,8 +409,9 @@ contention can lead to deadlock. The second is a minimal looping system
 that demonstrates how a process may satisfy the progress property while
 still failing to be deadlock-free.
 
-\bigskip
+\subsection{The Dining Philosophers}
 
+% TODO: mettere anche versione giusta?
 \begin{example}\label{exm:philo}
 Consider two philosophers $P_0, P_1$ and two forks $F_1, F_2$, arranged
 so that each philosopher needs both forks to eat. If both philosophers
@@ -187,6 +419,8 @@ pick up their left fork simultaneously, each waits indefinitely for the
 other fork, producing a deadlock. This captures the essence of the Dining
 Philosophers problem: concurrent processes blocking one another when
 competing for shared resources.
+
+\bigskip
 
 \begin{lstlisting}[language={},caption={Output of Example~\ref{exm:philo}},
     label={lst:philo}]
@@ -733,6 +967,8 @@ of these problematic states.
 
 \end{example}
 
+\subsection{Example with a loop}
+
 \begin{example}\label{exm:loop}
 Now consider two processes $A$ and $B$ that exchange data. At some
 point, each makes a nondeterministic choice: one branch continues
@@ -741,6 +977,8 @@ Once the choice to continue is taken, however, there is no way to
 return to the terminating branch. As a result, the system may remain
 stuck in an infinite loop, never reaching a final state. Although both
 processes remain active, the system is effectively deadlocked.
+
+\bigskip
 
 \begin{lstlisting}[language={},caption={Output of Example~\ref{exm:loop}.},
     label={lst:loop}]
@@ -762,7 +1000,7 @@ deadlock.
 
 \begin{figure}[!ht]
     \centering
-\begin{tikzpicture}[>=latex',line join=bevel,scale=0.9]
+\begin{tikzpicture}[>=latex',line join=bevel,scale=1.05]
   \pgfsetlinewidth{1bp}
 %%
 \pgfsetcolor{black}
@@ -918,7 +1156,7 @@ deadlock.
   \draw (43.89bp,116.89bp) ellipse (20.13bp and 20.13bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (43.89bp,116.89bp) node {15};
+  \draw (43.89bp,116.89bp) node {2};
 \end{scope}
   % Node: A1B4
 \begin{scope}
@@ -927,7 +1165,7 @@ deadlock.
   \draw (43.89bp,20.13bp) ellipse (20.13bp and 20.13bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (43.89bp,20.131bp) node {17};
+  \draw (43.89bp,20.131bp) node {4};
 \end{scope}
   % Node: A2B2
 \begin{scope}
@@ -935,7 +1173,7 @@ deadlock.
   \pgfsetstrokecolor{strokecol}
   \draw (129.89bp,116.89bp) ellipse (20.13bp and 20.13bp);
   \draw (129.89bp,116.89bp) ellipse (24.13bp and 24.13bp);
-  \draw (129.89bp,116.89bp) node {10};
+  \draw (129.89bp,116.89bp) node {3};
 \end{scope}
   % Node: A0B0
 \begin{scope}
@@ -949,7 +1187,7 @@ deadlock.
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
   \draw (86.89bp,211.52bp) ellipse (18.0bp and 18.0bp);
-  \draw (86.89bp,211.52bp) node {5};
+  \draw (86.89bp,211.52bp) node {1};
 \end{scope}
   % Node: start_node
 \begin{scope}
@@ -960,7 +1198,7 @@ deadlock.
 %
 \end{tikzpicture}
 
-    \caption{Synchronous Product of the Loop example}
+    \caption{Synchronous Product of the Loop Example~\ref{exm:loop}}
     \label{fig:loop-sync}
 \end{figure}
 

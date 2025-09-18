@@ -23,9 +23,7 @@ In the original proof, $L^*$ is not a global type, but an MSC.
 Therefore, we changed the base definitions of the original paper
 to fit the model. 
 
-\bigskip
-
-\textbf{Step 1: Construction.}
+\paragraph{Encoding.}
 Given an RPCP instance $\{(v_1,w_1),\ldots,(v_m,w_m)\}$,
 we associate to each pair $(v_i,w_i)$ two MSCs $M^0_i,M^1_i$,
 following Definition~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
@@ -34,9 +32,7 @@ global type $G_S$ (Lemma~\ref{lemma:msgs}). From all such MSCs we
 build $L^*$ (Definition~\ref{def:lstar}), which represents all possible
 concatenations and combination of a set of $M^n_i$'s instances.
 
-\bigskip
-
-\textbf{Step 2: Direction ``$\Rightarrow$''.}
+\paragraph{Direction ``$\Rightarrow$''.}
 Let's suppose $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a solution
 to the RPCP Problem.
 From this, construct two MSC sequences:
@@ -57,9 +53,7 @@ By construction, $L^*$ weakly
 implies $M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least one tile
 differs. Hence, $L^*$ is \emph{not realisable}.
 
-\bigskip
-
-\textbf{Step 3: Direction ``$\Leftarrow$''.}
+\paragraph{Direction ``$\Leftarrow$''.}
 Suppose $L^*$ is not realisable: then there exists some MSC $M^@$
 weakly implied by $L^*$ but not in $L^*$. Analysing the projections
 of $M^@$ on each process, we recover two sequences of words, one
@@ -71,7 +65,6 @@ on $P2$ is always a prefix of the word on $P3$. This yields a
 
 \bigskip
 
-\textbf{Step 4: Conclusion.}
 This equivalence is proved:
 \[
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
@@ -82,7 +75,7 @@ undecidable}.
 
 \bigskip
 
-Let's first define the main objects used in the proof.
+Let's now define the main objects used in the proof.
 
 \section{Definitions}
 RPCP was shown to be 
@@ -216,7 +209,7 @@ We now define a particular Global Type that will be useful in the reduction.
 	
 	\begin{figure}[!ht]
 		\centering
-		\begin{tikzpicture}[->, node distance=30mm, on grid, auto]
+		\begin{tikzpicture}[->, node distance=35mm, on grid, auto]
 			\node[state] (q0) {$q_0$};
 			\node[state] (q1) [right=of q0] {$q_1$};
 			\node[state] (q2) [right=of q1] {$q_2$};
@@ -296,10 +289,10 @@ $L^*$'s automaton is depicted in Figure~\ref{fig:lstar}.
 		\path (vI) edge[] node[above] {$\epsilon$} (qI2);
 		\path (vI) edge[] node[above] {$\epsilon$} (qI3);
 		\path (qI1) edge[] node[above] {\arrmess{p}{q}{(i^{G^1},n^{G^1})}} (qM1);
-		\path (qI2) edge[] node[above] {$\cdots$} (qM2);
+		\path (qI2) edge[] node[above] {} (qM2);
 		\path (qI3) edge[] node[above] {\arrmess{p}{q}{(i^{G^n},n^{G^n})}} (qM3);
 		\path (qM1) edge[] node[above] {\arrmess{q}{r}{S^{G^1}_c}} (qF1);
-		\path (qM2) edge[] node[above] {$\cdots$} (qF2);
+		\path (qM2) edge[] node[above] {} (qF2);
 		\path (qM3) edge[] node[above] {\arrmess{q}{r}{S^{G^n}_c}} (qF3);
 		\path (qF1) edge[] node[above] {$\epsilon$} (vT);
 		\path (qF2) edge[] node[above] {$\epsilon$} (vT);
@@ -556,7 +549,7 @@ of $M_{\texttt{sol}}$ from Theorem~\ref{thm:main}.
 \bigskip
 
 % TODO: dare un esempietto per far vedere che la prova regge
-\begin{example}[Proof Example of Theorem~\ref{thm:main}]
+\begin{example}[$M_{\texttt{sol}}$ Example of Theorem~\ref{thm:main}]
 Consider the tiles and the solution of the RPCP instance 
 in Example~\ref{exmp:rpcp}, with the tile set and the solution
 with index sequence $(2,1,3)$
@@ -565,7 +558,6 @@ $$
  (v_2,w_2)=(\texttt{a},\texttt{ab}),\ 
  (v_3,w_3)=(\texttt{c},\texttt{c}).
 $$
-
 $$
  x_1=w_2,\ y_1=v_2;\quad x_2=v_1,\ y_2=w_1;\quad x_3=v_3,\ y_3=w_3
 $$
@@ -679,11 +671,16 @@ semantics throughout the execution.
 	\syncmscmess{$2$}{P1}{P4}
 	\syncmscmess{$(2,0)$}{P4}{P3}
 	\syncmscmess{$a$}{P2}{P3}
+	\mess{}{P3}{P2}[4]
+	\nextlevel
 
 	\syncmscmess{$(1,0)$}{P1}{P2}
-	\syncmscmess{$b$}{P2}{P3}
-	\syncmscmess{$1$}{P1}{P4}
+	\mess[pos=0.4]{$1$}{P1}{P4}
+	\mess{}{P4}{P1}
+	\nextlevel
 	\syncmscmess{$(1,1)$}{P4}{P3}
+	\mess[pos=0.2]{$b$}{P2}{P3}[-4]
+	\nextlevel
 	\syncmscmess{$b$}{P2}{P3}
 	
 	\syncmscmess{$(3,0)$}{P1}{P2}
