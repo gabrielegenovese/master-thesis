@@ -23,7 +23,7 @@ In the original proof, $L^*$ is not a global type, but an MSC.
 Therefore, we changed the base definitions of the original paper
 to fit the model. 
 
-\paragraph{Encoding.}
+\paragraph{Encoding:}
 Given an RPCP instance $\{(v_1,w_1),\ldots,(v_m,w_m)\}$,
 we associate to each pair $(v_i,w_i)$ two MSCs $M^0_i,M^1_i$,
 following Definition~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
@@ -32,7 +32,7 @@ global type $G_S$ (Lemma~\ref{lemma:msgs}). From all such MSCs we
 build $L^*$ (Definition~\ref{def:lstar}), which represents all possible
 concatenations and combination of a set of $M^n_i$'s instances.
 
-\paragraph{Direction ``$\Rightarrow$''.}
+\paragraph{Direction ``$\Rightarrow$'':}
 Let's suppose $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a solution
 to the RPCP Problem.
 From this, construct two MSC sequences:
@@ -53,7 +53,7 @@ By construction, $L^*$ weakly
 implies $M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least one tile
 differs. Hence, $L^*$ is \emph{not realisable}.
 
-\paragraph{Direction ``$\Leftarrow$''.}
+\paragraph{Direction ``$\Leftarrow$'':}
 Suppose $L^*$ is not realisable: then there exists some MSC $M^@$
 weakly implied by $L^*$ but not in $L^*$. Analysing the projections
 of $M^@$ on each process, we recover two sequences of words, one
@@ -66,9 +66,9 @@ on $P2$ is always a prefix of the word on $P3$. This yields a
 \bigskip
 
 This equivalence is proved:
-\[
+$$
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
-\]
+$$
 Since RPCP is known to be \textbf{undecidable}, it follows that
 \emph{checking weak realisability of a global type is also
 undecidable}.
@@ -265,10 +265,9 @@ all the possible combinations and constructions of a set of MSCs.
 		\item $l_0 = v_I$ is the initial state;
 		\item $F = v_T$ is the accepting state.
 	\end{itemize}
+	$L^*_N$'s automaton is depicted in Figure~\ref{fig:lstar}.
 	Finally, $L^*$ is obtained by determinising $L^*_{N}$.
 \end{definition}
-
-$L^*$'s automaton is depicted in Figure~\ref{fig:lstar}.
 
 \begin{figure}[!ht]
 	\centering
@@ -308,7 +307,7 @@ $L^*$'s automaton is depicted in Figure~\ref{fig:lstar}.
 		\draw (qF3) .. controls +(8,10) and +(1,3) .. node[midway,above] {$\epsilon$} (qI1);
 		\draw (qF1) ..  controls +(8,-10) and +(1,-3) .. node[midway,above] {$\epsilon$} (qI3);
 	\end{tikzpicture}
-	\caption{The automaton of the global type $L^*$.}
+	\caption{The automaton of the global type $L^*_N$.}
 	\label{fig:lstar}
 \end{figure}
 
@@ -338,7 +337,7 @@ Theorem~\ref{thm:main}.
 	we need to show a linearization with all send operations
 	followed by their corresponding receive operations:
 	$$
-		\{~!m_1?m_1\ !m_2?m_2\ !m_3?m_3\ !m_i^1?m_i^1 \ldots !m_i^c?m_i^c~\}.
+	\{~!m_1?m_1\ !m_2?m_2\ !m_3?m_3\ !m_i^1?m_i^1 \ldots !m_i^c?m_i^c~\}.
 	$$
 	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
 \end{proof}
@@ -357,7 +356,7 @@ Theorem~\ref{thm:main}.
 	process $q$ then sends the characters of $S$ (here matching $x_i$) to $r$.
 	If $i,n$ and $S$ are the same, the sequence of messages is identical in both 
 	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
-	their linearizations coincide. Hence, $M^n_i \in L(G_S)$.
+	their linearisations coincide. Hence, $M^n_i \in L(G_S)$.
 \end{proof}
 
 \bigskip
@@ -477,7 +476,7 @@ Theorem~\ref{thm:main}.
 
 				      \mess[label position=above right, pos=0.3]{$c$}{P2}{P3}[4]%
 				      \nextlevel
-				      \syncmscmess{($i_k,n_k)$}{P1}{P2}
+				      \syncmscmess{$(i_k,n_k)$}{P1}{P2}
 				      \mess[pos=0.62]{$i_k$}{P1}{P4}%
 				      \mess{}{P4}{P1}
 				      \nextlevel
@@ -641,11 +640,11 @@ Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 \label{fig:exmp-my}
 \end{figure}
 
-Recall that \(M|_p\) denote the projection of \(M\) onto process \(p\). We
+Recall that $M|_p$ denote the projection of $M$ onto process $p$. We
 construct the MSC
-\[
+$$
   M_{\texttt{sol}} = (M_y|_{P1},\; M_y|_{P2},\; M_x|_{P3},\; M_x|_{P4}),
-\]
+$$
 i.e.\ processes $1,2$ follow $M_y$ while $3,4$ follow $M_x$.
 Intuitively, $M_{\texttt{sol}}$ pairs the right-side construction (from $M_y$)
 with the left-side construction (from $M_x$). 

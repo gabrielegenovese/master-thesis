@@ -93,9 +93,9 @@ from $\mathcal A$ by setting $F=Q$.
 % \Sigma^* \setminus \mathcal{L}_{\text{words}}(\mathcal{A})$.  
 % \end{definition}
 
-\section{Execution, Communication Models and MSCs}
+\section{Execution, Communication Models and MSC}
 We assume a finite set of \emph{processes} 
-$\Procs=\{p,q,\ldots\}$ and a finite set of 
+$\Procs=\{p,q,\ldots,P1,P2,\ldots\}$ and a finite set of 
 messages (labels) $\Msg=\{\msg_1,\msg_2,\ldots\}$.  
 We consider two kinds of actions:  
 \begin{itemize}
@@ -547,7 +547,7 @@ of the system.
 
 \bigskip
 
-\begin{lemma}[Deadlock-freedom as an MSC property]
+\begin{lemma}[Deadlock-freedom as an MSC property]\label{lem:ddlckmsc}
 	\label{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
 	Assume $\acommunicationmodel$ is $\ppmodel$ (respectively, $\acommunicationmodel$ is $\synchmodel$).
 	Then a system of CFSMs $\cfsms$ is deadlock-free for $\acommunicationmodel$ if and only if
@@ -557,7 +557,10 @@ of the system.
 	\prefixclosureof{\mscsofcfsms{\cfsms}{\acommunicationmodel}}.
 	$$
 \end{lemma}
-% TODO SPIEGARE PERCHE' FUNZIONA E METTERE PROVA?
+
+The proof for Lemma~\ref{lem:ddlckmsc} can be found in \cite[Proposition 2.1]{di2025realisability}.
+
+% TODO SPIEGARE PERCHE' FUNZIONA
 % %\input{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch.tex}
 
 % %\iflong
@@ -565,9 +568,6 @@ of the system.
 % %\else
 % %The proof of Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} can be found in Appendix~\ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
 % %\fi
-
-
-\bigskip
 
 \section{Global Types}
 This part will further highlight the basic notions to understand the formal proof 
@@ -611,19 +611,18 @@ Global Type in Figure~\ref{fig:gt-exm}.
 	\centering
 	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.8]
 		\node[state, initial, initial text={}] (s0) {1};
-			\node[state] (s1) [above right=of s0] {2};
-			\node[state] (s2) [below right=of s0] {3};
-			\node[state,accepting] (s3) [right=of s1] {4};
-			\node[state,accepting] (s4) [right=of s2] {5};
+		\node[state] (s1) [above right=of s0] {2};
+		\node[state] (s2) [below right=of s0] {3};
+		\node[state,accepting] (s3) [right=of s1] {4};
+		\node[state,accepting] (s4) [right=of s2] {5};
 
-			\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{x}$}(s1);
-			\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{y}$}(s2);
-			\draw[->] (s1) to node[above,sloped]{$\gtlabel{C}{D}{z}$}(s3);
-			\draw[->] (s2) to node[above,sloped]{$\gtlabel{C}{D}{w}$}(s4);
-			
-		\end{tikzpicture}
-		\caption{An automaton representing the specification's global type given in Listing~\ref{lst:not-impl-exm}.}
-		\label{fig:gt-exm}
+		\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{x}$}(s1);
+		\draw[->] (s0) to node[above,sloped]{$\gtlabel{A}{B}{y}$}(s2);
+		\draw[->] (s1) to node[above,sloped]{$\gtlabel{C}{D}{z}$}(s3);
+		\draw[->] (s2) to node[above,sloped]{$\gtlabel{C}{D}{w}$}(s4);
+	\end{tikzpicture}
+	\caption{An automaton representing the specification's global type given in Listing~\ref{lst:not-impl-exm}.}
+	\label{fig:gt-exm}
 \end{figure}
 \end{example}
 
