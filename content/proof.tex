@@ -1,7 +1,8 @@
 \chapter{Weak-Realisability is Undecidable for Synch Global Types}\label{sec:proof}
 
 As already mentioned, the first contribution is Theorem~\ref{thm:main},
-which states that Weak-realisability is undecidable for synchronous global types. 
+which states that \emph{Weak-realisability is undecidable for 
+synchronous global types}. 
 To understand this result, I have already covered the basic notions in 
 Chapter~\ref{sec:pre} on MSCs, Global Types, and Weak-realisability. 
 These concepts are general and align 
@@ -9,78 +10,25 @@ closely with definitions used in previously established works.
 We now introduce the main objects employed in the proof of Theorem~\ref{thm:main}. 
 The proof itself is adapted from the work of 
 Alur et~al.~\cite{alur2005realizability}. 
-I will first give a sketch of the proof, to also highlight the 
-differences with the original one.
+In between the new definition's declaration, I will also highlight the 
+differences with the original proof.
 
-\subsubsection*{Sketch of Proof}
+\section{Definitions}
 The proof is carried out by a \emph{reduction} from the
 \textbf{Relaxed Post Correspondence Problem (RPCP)}, a variant of
-the classical Post Correspondence Problem (PCP).
+the classical Post Correspondence Problem (PCP). 
+RPCP was shown to be undecidable by
+Alur~et~al.~\cite{alur2005realizability}, via reduction from PCP.
 The main idea is to encode the existence of a
 solution to an RPCP instance into the (non-)realisability of a
-\emph{global type} $L^*$ built from synchronous MSCs. 
-In the original proof, $L^*$ is not a global type, but an MSC.
-Therefore, we changed the base definitions of the original paper
-to fit the model. 
-
-\paragraph{Encoding:}
-Given an RPCP instance $\{(v_1,w_1),\ldots,(v_m,w_m)\}$,
-we associate to each pair $(v_i,w_i)$ two MSCs $M^0_i,M^1_i$,
-following Definition~\ref{def:mni}. Each $M^n_i$ is \emph{synchronous}
-(Lemma~\ref{lemma:minsynch}) and belongs to the language of the
-global type $G_S$ (Lemma~\ref{lemma:msgs}). From all such MSCs we
-build $L^*$ (Definition~\ref{def:lstar}), which represents all possible
-concatenations and combination of a set of $M^n_i$'s instances.
-
-\paragraph{Direction ``$\Rightarrow$'':}
-Let's suppose $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a solution
-to the RPCP Problem.
-From this, construct two MSC sequences:
-\[
-M_x = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad
-M_y = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
-\]
-Both $M_x,M_y$ are synchronous concatenations of synchronous MSCs.
-Consider now a third MSC $M_{\texttt{sol}}$ obtained by taking the projections
-$M_y|_{P1},M_y|_{P2}$ and $M_x|_{P3},M_x|_{P4}$. Intuitively, processes $P1,P2$
-construct the \emph{right string} $y_{i_1}\cdots y_{i_m}$, while
-processes $P3,P4$ construct the \emph{left string}
-$x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP ensures that
-$M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. 
-The $M_{\texttt{sol}}$ synchrony is not trivial, therefore we need to prove it.
-This part was not present in the original proof.
-By construction, $L^*$ weakly
-implies $M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least one tile
-differs. Hence, $L^*$ is \emph{not realisable}.
-
-\paragraph{Direction ``$\Leftarrow$'':}
-Suppose $L^*$ is not realisable: then there exists some MSC $M^@$
-weakly implied by $L^*$ but not in $L^*$. Analysing the projections
-of $M^@$ on each process, we recover two sequences of words, one
-built along processes $P1,P2$ and the other along $P3,P4$. The
-fact that $M^@ \notin L^*$ implies that these two sequences must
-differ at some tile, and the prefix property ensures that the word
-on $P2$ is always a prefix of the word on $P3$. This yields a
-\emph{solution to the RPCP instance} $\Delta$.
-
-\bigskip
-
-This equivalence is proved:
+\emph{global type} (called $L^*$) built from synchronous MSCs.
+Therefore, we need to prove:
 $$
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
 $$
-Since RPCP is known to be \textbf{undecidable}, it follows that
-\emph{checking weak realisability of a global type is also
-undecidable}.
-
-\bigskip
-
-Let's now define the main objects used in the proof.
-
-\section{Definitions}
-RPCP was shown to be 
-undecidable by Alur~et~al.~\cite{alur2005realizability}, via reduction 
-from PCP.
+In the original proof, $L^*$ is not a global type, but an MSC.
+Then, we need to change some base definitions of the original paper
+to fit the model. 
 
 \bigskip
 
@@ -140,21 +88,26 @@ We now check the RPCP conditions:
 
 \bigskip
 
-% TODO: Definire per bene le stringhe all'inizio dei preliminare
-% Prima frase da spostare
+We have now identified the main problem to which our proof reduces.  
+The next step is to encode an RPCP instance into an MSC.
+
+\bigskip
+
 \begin{definition}[$M^n_i$]\label{def:mni}
-	For a string $u$, let $u^l$ denote the $l$-th character of the string.
-	In the MSC $M^n_i$, process~1 synchronously sends the label
-	$m_1 = (i, n)$ to process~2, then transmits the index $m_2=i$
-	to process~4. Subsequently, process~4 sends $m_3 = (i, n)$
-	synchronously to process~3. After these control messages, process~2
-	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
-	synchronously to process~3 (where $c$ is the length of $x_i$).
-	This MSC is depicted in Figure~\ref{fig:mni}, where $n\in\{0,1\}$ and:
+	Given the index $i$ of a tile $(v_i, w_i)$, and
+	given an interger $n\in\{0,1\}$, where:
 	\begin{itemize}
 		\item if $n=0$, then $x_i=v_i$;
-		\item if $n=1$, then $x_i=w_i$.
+		\item if $n=1$, then $x_i=w_i$;
 	\end{itemize}
+	let's define the behavior of the MSC $M^n_i$.
+	Firstly, Process~1 synchronously sends the message
+	$m_1 = (i, n)$ to Process~2, then Process~1 transmits the index $m_2=i$
+	to Process~4. Subsequently, Process~4 sends $m_3 = (i, n)$
+	synchronously to Process~3. After these control messages, Process~2
+	sends the characters $m_i^1 = x_i^1,..., m_i^c = x_i^c$
+	synchronously to Process~3 (where $c$ is the length of $x_i$).
+	This MSC is depicted in Figure~\ref{fig:mni}, 
 
 	\begin{figure}[!ht]
 		\centering
@@ -177,19 +130,76 @@ We now check the RPCP conditions:
 
 \end{definition}
 
-With this definition in place, I now introduce the main objects used 
-in the proof. Specifically, I begin by showing how a Global Type can 
-represent a single \verb|synch| MSC.
+Given a RPCP instance $\{(v_1,w_1),\ldots,(v_m,w_m)\}$, we associate  
+with each pair $(v_i,w_i)$ two MSCs $M^0_i$ and $M^1_i$, following  
+Definition~\ref{def:mni}. Each MSC $M^n_i$ is \emph{synchronous}  
+(Lemma~\ref{lemma:minsynch}). Intuitively, the MSC $M_i^n$ encodes the  
+construction of a string given some tiles through the interaction of four processes.  
+Processes~2 and~3 are responsible for building the string itself,  
+while Processes~1 and~4 transmit the index information to Processes~2  
+and~3, respectively. In particular, Process~1 initiates the choice and  
+forwards it to Process~4.
 
 \bigskip
 
-% TODO ivan: non sembra una def, più un lemma
+\begin{lemma}\label{lemma:minsynch}
+	The MSC $M_i^n$ belongs to $\mscsetofmodel{\synchmodel}$.
+\end{lemma}
+
+\begin{proof}
+	By Definition~\ref{def:linearisable-msc} and
+	Definition~\ref{def:synchronous},
+	we need to show a linearization with all send operations
+	followed by their corresponding receive operations:
+	$$
+	\{~!m_1?m_1\ !m_2?m_2\ !m_3?m_3\ !m_i^1?m_i^1 \ldots !m_i^c?m_i^c~\}.
+	$$
+	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
+\end{proof}
+
+Before establishing the connection between MSCs and  
+Global Types, we briefly summarize the rationale behind the design of  
+$M_i^n$.
+
+Suppose that $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a  
+solution to the RPCP instance. From this solution we construct two MSC  
+sequences:
+\[
+M_x = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad  
+M_y = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
+\]
+Both $M_x$ and $M_y$ are synchronous concatenations of synchronous  
+MSCs. We then define a third MSC $M_{\texttt{sol}}$, obtained by  
+projecting $M_y$ onto processes $P1,P2$ and $M_x$ onto processes  
+$P3,P4$. Intuitively, processes $P1,P2$ represent the construction of  
+the \emph{right-hand string} $y_{i_1}\cdots y_{i_m}$, while processes  
+$P3,P4$ represent the construction of the \emph{left-hand string}  
+$x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP guarantees that  
+$M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. Establishing the  
+synchrony of $M_{\texttt{sol}}$ is non-trivial, and this step is an  
+addition to the original proof. By construction, $L^*$ weakly implies  
+$M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least  
+one tile differs. Consequently, $L^*$ is \emph{not realisable}.
+  
+With these constructions in place, we proceed to introduce the main  
+objects used in the proof. Specifically, we first show how a Global  
+Type can represent a single \verb|synch| MSC.
+
+\bigskip
+
+% TODO: ivan: forse lemma?
 \begin{definition}[$G_M$]\label{def:gm}
 	Given an MSC $M\in \mscsetofmodel{\synchmodel}$, there exists a
-	global type $G_M$ such that $\{M\} = \existentialmsclanguageof{\gt}$.
+	global type $G_M$ such that $M \in \existentialmsclanguageof{\gt}$.
 \end{definition}
 
-We now define a particular Global Type that will be useful in the reduction.
+Definition~\ref{def:gm} establishes a direct correspondence between a  
+single synchronous MSC and a global type. In particular, every  
+synchronous MSC can be captured precisely by a global type whose  
+language contains that MSC. This correspondence will be useful  
+when embedding RPCP instances into the global type framework.
+We now introduce a more structured global type, parameterized by a  
+string $S$, which will serve as the building block in the reduction.
 
 \bigskip
 
@@ -231,7 +241,34 @@ We now define a particular Global Type that will be useful in the reduction.
 
 \end{definition}
 
-Now, let's generalize Definition~\ref{def:gm} to include a set of MSCs.
+Intuitively, $G_S$ specifies the same communication pattern as the MSC  
+$M^n_i$ introduced in Definition~\ref{def:mni}, with the string $S$  
+representing the transmitted sequence of characters. This structural  
+correspondence will be made precise in the next lemma (Lemma~\ref{lmm:msgs}).  
+
+\bigskip
+
+% TODO: check
+\begin{lemma}\label{lmm:msgs}
+The MSC $M^n_i$ (Definition~\ref{def:mni}) is included in 
+$\languageof{G_S}{}{}$ (Definition~\ref{def:gs}).
+\end{lemma}
+
+\begin{proof}
+	Both $M^n_i$ and $G_S$ describe the same communication structure:
+	process $p$ sends $(i,n)$ to $q$ and $i$ to $s$;
+	process $s$ relays $(i,n)$ to $r$;
+	process $q$ then sends the characters of $S$ (here matching $x_i$) to $r$.
+	If $i,n$ and $S$ are the same, the sequence of messages is identical in both 
+	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
+	their linearisations coincide. Hence, $M^n_i \in L(G_S)$.
+\end{proof}
+
+Having established the correspondence between an individual MSC and a  
+global type, we can now extend Definition~\ref{def:gm} to encompass  
+sets of MSCs, thereby capturing entire families of synchronous  
+behaviours within a global type. This definition is used to easily 
+construct the global type $L^*$.
 
 \bigskip
 
@@ -265,8 +302,8 @@ all the possible combinations and constructions of a set of MSCs.
 		\item $l_0 = v_I$ is the initial state;
 		\item $F = v_T$ is the accepting state.
 	\end{itemize}
-	$L^*_N$'s automaton is depicted in Figure~\ref{fig:lstar}.
-	Finally, $L^*$ is obtained by determinising $L^*_{N}$.
+	The automaton of $L^*_{N}$ is shown in Figure~\ref{fig:lstar}.  
+	Finally, $L^*$ is obtained as the determinisation of $L^*_{N}$.
 \end{definition}
 
 \begin{figure}[!ht]
@@ -311,53 +348,15 @@ all the possible combinations and constructions of a set of MSCs.
 	\label{fig:lstar}
 \end{figure}
 
-Informally, $L^*$ represents all the
-possible executions of a set of MSCs. To complete the set of definitions,
-let's define a particular MSC corresponding to Definition~\ref{def:gs}.
+Informally, $L^*$ denotes the set of all possible executions  
+arising from a family of MSCs. This construction constitutes the  
+final component required for the proof, as it provides the key  
+structure used to demonstrate non-realisability.
 
-Finally, let's state the lemmas and main theorem of this work, 
-along with all the proofs. 
+\section{Undecidability proof}
 
-\section{Lemmas and main proof}
-
-Before presenting the main undecidability result, we first establish two
-auxiliary lemmas that characterize the behaviour of the MSCs used in the
-reduction. These lemmas will serve as building blocks for the proof of
-Theorem~\ref{thm:main}.
-
-\bigskip
-
-\begin{lemma}\label{lemma:minsynch}
-	The MSC $M_i^n$ belongs to $\mscsetofmodel{\synchmodel}$.
-\end{lemma}
-
-\begin{proof}
-	By Definition~\ref{def:linearisable-msc} and
-	Definition~\ref{def:synchronous},
-	we need to show a linearization with all send operations
-	followed by their corresponding receive operations:
-	$$
-	\{~!m_1?m_1\ !m_2?m_2\ !m_3?m_3\ !m_i^1?m_i^1 \ldots !m_i^c?m_i^c~\}.
-	$$
-	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
-\end{proof}
-
-\bigskip
-
-\begin{lemma}\label{lemma:msgs}
-	The MSC $M^n_i$ (Definition~\ref{def:mni}) is included in $L(G_S)$, where $G_S$
-	is the global type defined in Definition~\ref{def:gs}.
-\end{lemma}
-
-\begin{proof}
-	Both $M^n_i$ and $G_S$ describe the same communication structure:
-	process $p$ sends $(i,n)$ to $q$ and $i$ to $s$;
-	process $s$ relays $(i,n)$ to $r$;
-	process $q$ then sends the characters of $S$ (here matching $x_i$) to $r$.
-	If $i,n$ and $S$ are the same, the sequence of messages is identical in both 
-	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
-	their linearisations coincide. Hence, $M^n_i \in L(G_S)$.
-\end{proof}
+Given the definitions and lemmas state in the last section, I am now ready
+to present the proof for the undecidability result.
 
 \bigskip
 
@@ -548,6 +547,7 @@ of $M_{\texttt{sol}}$ from Theorem~\ref{thm:main}.
 \bigskip
 
 % TODO: dare un esempietto per far vedere che la prova regge
+% Andrà bene?
 \begin{example}[$M_{\texttt{sol}}$ Example of Theorem~\ref{thm:main}]
 Consider the tiles and the solution of the RPCP instance 
 in Example~\ref{exmp:rpcp}, with the tile set and the solution

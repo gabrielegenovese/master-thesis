@@ -109,35 +109,49 @@ analysis of different communication models within a unified setting.
 
 The main contributions of this work are: 
 \begin{itemize}
-    \item a related-work overview, highlighting
-    existing research and results in this particular domain and giving
-    perspective to our work;
-    \item we prove \textbf{undecidability} of the \textit{weak implementability} 
-    problem under the synchronous semantics of our framework;
-    \item we extend and improve the model-checking tool \textsc{ReSCu}~\cite{rescurepo},  
-    enabling verification of \textit{deadlock-freedom} and \textit{progress} 
-    for synchronous systems.
+    \item a proof of the \textbf{undecidability} of the 
+    \textit{weak implementability} problem under the synchronous 
+    semantics of our framework;
+    \item an extension and improvement of the model-checking tool 
+    \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
+    \textit{deadlock-freedom} and \textit{progress} for synchronous 
+    systems;
+    \item a related-work overview, highlighting existing research and 
+    results in this particular domain, providing a structured summary 
+    and comparison with our approach, and setting the perspective for 
+    the contributions that follow.
 \end{itemize}
-The thesis begins with a brief overview of the background
-in Section~\ref{sec:sota}, presented in a general and accessible manner, avoiding
-formal definitions and proofs. Chapters~\ref{sec:pre} and
-\ref{sec:proof} then introduce the necessary formal definitions,
-followed by the main theoretical contribution and in 
-Chapter~\ref{sec:rescu} the practical contributions of
-this work. Finally, Chapter~\ref{sec:end} presents concluding
-remarks and outlines possible directions for future research and
-development.
 
-% discorso più ampio sulla roadmap e sulla struttura della tesi, e su cosa di basa etc...
+These two contributions are closely connected: they both address the 
+implementability problem, but from two complementary angles. The first 
+contribution establishes undecidability, showing that in the general 
+case the weak implementability problem cannot be solved for synchronous semantic. 
+This motivates the second contribution: once undecidability is proven, 
+there is a clear need to identify suitable restrictions of the problem 
+that yield decidability results. The model-checking framework presented 
+in the second part of the thesis is designed as a foundational step 
+towards this direction, providing practical verification techniques that 
+can serve as building blocks for further decidability analyses.  
 
-\section{Background}\label{sec:sota}
-In this overview, we give a brief understanding of the
-state of the art regarding Message Sequence Charts, Multiparty 
-Session Types and the implementability 
-(or realisability) problem.
+The thesis is structured as follows. 
+Chapter~\ref{chap:intro} (the present chapter) gives a high-level 
+description of the frameworks used, avoiding formal definitions and 
+proofs for accessibility. Chapters~\ref{sec:pre} and~\ref{sec:proof} 
+then introduce the formal definitions and present the main theoretical 
+contribution. Chapter~\ref{sec:rescu} develops the practical 
+contributions through the \textsc{ReSCu} tool. 
+Chapter~\ref{sec:rel} presents 
+a detailed overview of related work, comparing different approaches in 
+the literature and highlighting how this thesis departs from them. Finally, 
+Chapter~\ref{sec:end} concludes with a discussion of the results and 
+outlines directions for future research and development.
+
+The \emph{implementability problem} was originally introduced for 
+languages of Message Sequence Charts (MSCs). Before presenting it, 
+we first recall the necessary informal background on MSCs.
 
 \subsection{Message Sequence Charts}
-Message Sequence Charts (MSCs) are a standardized graphical formalism,
+Message Sequence Charts (MSCs) are a standardised graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages for specifying
 communication behaviour. Thanks to their simplicity and intuitive
 semantics, MSCs have been widely adopted in industry.
@@ -268,6 +282,9 @@ but it can be called also realisability and projectability.
 % automata with explicit accepting states, and deadlock-freedom corresponds 
 % to the ability to reach an accepting state from any reachable configuration. 
 
+As already mentioned, the implementability problem in MPST is 
+analogous to checking whether a given global type can be soundly 
+projected into local types while preserving the intended behaviour.
 
 \subsection{Multiparty Session Types}
 Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
@@ -374,7 +391,8 @@ synchronous semantics, then under certain conditions it is also
 implementable in more general models such as peer-to-peer or mailbox 
 semantics. This reduction requires constraints such as 
 \emph{orphan-freedom} (no message is left unmatched) and
-\emph{deadlock-freedom}.
+\emph{deadlock-freedom}.  
+
 The following theorem, currently a work in progress by my 
 supervisors~\cite[Theorem 5.3]{di2025realisability}, 
 provides a characterization of a connection between 
@@ -382,20 +400,26 @@ peer-to-peer semantics and synchronous semantics:
 a global type $G$ is deadlock-free realisable in p2p iff
 the following four conditions hold
 \begin{itemize}
-  \item the language of $G$'s local type is in synchronous semantics
-  \item all $G$'s projections are orphan-free
-  % deadlock freedom con gli msc in p2p
-  \item all the traces of the MSCs' language of $G$ is deadlock-free
-  in \verb|p2p|
-  \item $G$ is realisable in synchronous semantics
+  \item the language of $G$'s local type is in synchronous semantics;
+  \item all $G$'s projections are orphan-free;
+  \item all the traces of the MSCs' language of $G$ are deadlock-free
+  in \verb|p2p|;
+  \item $G$ is realisable in synchronous semantics.
 \end{itemize}
 
-This result highlights the central role of synchronous semantics as a 
-\emph{core model}: implementability in peer-to-peer systems 
-can be reduced to the synchronous case provided the additional safety 
-conditions are met. My own contribution focuses on the last item of the 
-theorem, namely the problem of checking whether a given global type is 
-implementable in synchronous semantics. This question is at the heart 
-of the undecidability results presented in Chapter~\ref{sec:proof}, 
-and motivates the need for the identification of new subclasses that 
-enable new verification techniques along with tool support.
+The second and third conditions are already known to be decidable and 
+can be automatically verified. The focus of this thesis is instead on 
+the fourth condition, namely checking whether a global type is 
+implementable in synchronous semantics. The undecidability result 
+presented in Chapter~\ref{sec:proof} shows that this condition cannot 
+be verified in general. Consequently, the theorem above must be refined 
+by introducing further restrictions that ensure decidability.  
+
+This observation motivates the second part of the thesis: 
+Chapter~\ref{sec:rescu} presents the extension of the 
+\textsc{ReSCu} tool, which provides practical verification of 
+properties such as \emph{deadlock-freedom} and \emph{progress}. These 
+results should be understood as building blocks toward identifying 
+restricted subclasses of synchronous systems that admit decidable 
+implementability checks, complementing the undecidability findings of 
+the theoretical contribution.

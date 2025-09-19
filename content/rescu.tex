@@ -244,7 +244,7 @@ tool and serves as a key component for analysing.
 
 \bigskip
 
-\begin{definition}[Synchronous Product]
+\begin{definition}[Synchronous Product]\label{def:syncprod}
 Let $\mathcal{S} = (\mathcal{A}_p)_{p \in \mathbb{P}}$ be a system of CFSMs, where 
 $\mathcal{A}_p = (L_p, \mathit{Act}_p, \delta_p, l_{0,p}, F_p)$ is the CFSM associated 
 to process $p$.  
@@ -335,6 +335,7 @@ Figure~\ref{fig:syncping} illustrates the $\mathrm{prod}_s(\cfsms)$'s automaton.
   \caption{Synchronous Product of the CFSM system in Example~\ref{exm:syncping}.}
   \label{fig:syncping}
 \end{figure}
+% TODO: mostrare pseudo codice dell'algoritmo?
   
 \end{example}
 
@@ -344,17 +345,18 @@ unreachable nodes from the resulting product, simplifying the structure
 and ensuring that only relevant states are retained for further analysis.
 We can now define the two properties added to the tool.
 
-Let's consider Definition~\ref{def:deadlock-free}. The modified version for the
-tool is the following.
+Let's consider Definition~\ref{def:deadlock-free}. I will copy the 
+definition here, changing only the semantic of the system. This implies 
+that the system uses the synchronous product (Definition~\ref{def:syncprod}).
 
 \bigskip
 
-\begin{definition}[Deadlock-free]\label{def:deadlock-free-tool}
-A system of CFSMs $\cfsms$ is \emph{deadlock-free} in $\rscmodel$
+\begin{definition}[Deadlock-free]
+A system $\cfsms$ is \emph{deadlock-free} in $\synchmodel$  
 if for every execution 
-$e \in \executionsofcfsms{\acceptcompletion{P}}{}$,  
-there exists an execution $e'\in \executionsofcfsms{P}{}$ 
-with $e \prefixorder e'$, where $P=\mathrm{prod}_s(\cfsms)$.  
+$e \in \executionsofcfsms{\acceptcompletion{\cfsms}}{\synchmodel}$,  
+there exists a completion $e'$ with $e \prefixorder e'$ and  
+$e' \in \executionsofcfsms{\cfsms}{\synchmodel}$.  
 \end{definition}
 
 %% nella tesi mettere la def di ppdp spiegata bene che è quella che
@@ -366,10 +368,10 @@ even a loop that never reaches a final state is considered a deadlock,
 making the property more restrictive. This check is implemented using a
 reverse search algorithm starting from the final states.
 
-% TODO: Specificare che questa nozione di deadlock-freedom vale per il paper di cinzia
+% TODO: mostrare pseudo codice dell'algoritmo?
 
-Informally, a given system satisfies \emph{progress} if, from every reachable node,
-either the system can eventually perform a transition, or the node is a final one.
+% TODO: Specificare che questa nozione di deadlock-freedom vale per il paper di cinzia
+% Vale ancora questo todo?
 
 \bigskip
 
@@ -380,7 +382,7 @@ with $P = \mathrm{prod}_s(\cfsms)$,
 \begin{itemize}
     \item the execution $e$ is also a valid execution of $e\in \executionsofcfsms{P}{}$, or
     \item there exists another execution $e'\in\executionsofcfsms{\acceptcompletion{P}}{}$
-          such that $e \prefixorder e'$.
+          such that $e \prefixorder e'$, with $e \neq e'$.
 \end{itemize}
 \end{definition}
 
@@ -391,12 +393,13 @@ as long as they can always perform a new step. In particular, livelocks
 (loops without termination) are considered to satisfy progress, but would
 violate deadlock-freedom.
 
+% TODO: mostrare pseudo codice dell'algoritmo?
+
 Additionally, the synchronized system can be exported in DOT format
 (with a default filename of \verb|sync.dot|), which allows for graphical 
-visualization of its structure and behaviour.
-Some illustrative examples 
+visualization of its structure and behaviour. Some illustrative examples 
 demonstrating these new features are included in the
-\verb|rescu/examples/deadlock| folder.
+\verb|examples/deadlock| folder from the online repository~\cite{rescurepo}.
 
 % TODO: CINZIA, X TESI:
 % pensare ad un esempio che fa vedere che non è vero in generale
