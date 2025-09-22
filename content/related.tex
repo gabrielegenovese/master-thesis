@@ -1,5 +1,26 @@
 
 \chapter{Related work}\label{sec:rel}
+This thesis is centred around the study of the \emph{implementability 
+problem} for \emph{global types} and MSC-based formal models.  
+In this chapter, I review related works addressing this problem, 
+both within the same formal framework and in comparable models.  
+
+In particular, this thesis forms part of a broader line of research 
+originating from~\cite{di2023partial} and later expanded in 
+\cite{di2025realisability}, which aims to develop a general framework 
+for communication models. I first present and discuss the results of 
+these works, positioning my own contributions in relation to them.  
+
+Subsequently, I analyse recent results by 
+Stutz~et~al.~\cite{stutz2024implementability}, who extensively study 
+the implementability problem, while also tracing the line of research 
+back to early contributions such as Alur~et~al.~\cite{alur2000inference} 
+and Lohrey~et~al.~\cite{lohrey2003realizability}.  
+
+Finally, I briefly review related approaches in comparable formal 
+models, such as Multiparty Session Types (MPST) and Choreography 
+Automata~\cite{barbanera2020choreography}, highlighting similarities 
+and differences with respect to the problem addressed in this thesis.
 
 \section{Hierarchy of communication model's semantics}\label{sec:hier}
 We defined early some communication semantics of out interest.
@@ -39,6 +60,17 @@ extend to the implementability problem.
 % Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, 
 % in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
 % message $m 1$ excludes the reception of any later message.
+
+\paragraph{Peer-to-peer}
+In the peer-to-peer communication model $\ppmodel$, every pair of 
+processes $(p,q)$ is connected by a dedicated FIFO channel.  
+Messages sent by $p$ to $q$ are delivered in the same order in which 
+they were issued: if $p$ first sends $m_1$ and then $m_2$, the channel 
+guarantees that $m_2$ cannot overtake $m_1$. Concretely:
+\begin{itemize}
+    \item if $m_1$ is never received, then $m_2$ cannot be received either;
+    \item if both are received, then $m_1$ is delivered before $m_2$.
+\end{itemize}
 
 \paragraph{Causally ordered}
 In the causally ordered (\verb|co|) communication model, messages are delivered 
@@ -127,6 +159,12 @@ coordinates all the senders with all the receivers.
 % - either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
 % and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
+\paragraph{RSC}
+Figure~\ref{fig:coms} shows \verb|rsc| as the last block of the hierarchy.
+\verb|rsc| stands for \emph{Realisable in Synchronous Communication}, therefore, 
+is comparable to our definition of $\synchmodel$ model, but there are 
+some differences. For example, it does not accept \emph{orphan messages}, 
+which are instead accepted for the defintion of this thesis.
 
 \section{Realisability for MSCs}
 

@@ -148,8 +148,8 @@ An execution is \emph{orphan-free} if all send events are matched,
 i.e., if $\source$ is surjective onto $\sendeventsof{e}$.  
 
 \subsubsection*{Communication Models.}
-In this thesis, we focus on two communication models: 
-the peer-to-peer model ($\ppmodel$) and the synchronous model ($\synchmodel$).  
+In this thesis, we focus on a communication model: 
+the synchronous model ($\synchmodel$).  
 Nonetheless, this work forms part of a 
 broader and more general project. Some results presented here 
 naturally extend to a wide range of communication models, often requiring 
@@ -176,40 +176,16 @@ $\executionsofmodel{\synchmodel}$ if for every send event
 $s \in \sendeventsof{e}$, the event $s+1$ is a receive event 
 with $\source(s+1) = s$.  
 \end{definition}
-
-In the peer-to-peer communication model $\ppmodel$, every pair of 
-processes $(p,q)$ is connected by a dedicated FIFO channel.  
-Messages sent by $p$ to $q$ are delivered in the same order in which 
-they were issued: if $p$ first sends $m_1$ and then $m_2$, the channel 
-guarantees that $m_2$ cannot overtake $m_1$. Concretely:
-\begin{itemize}
-    \item if $m_1$ is never received, then $m_2$ cannot be received either;
-    \item if both are received, then $m_1$ is delivered before $m_2$.
-\end{itemize}
+ 
+Furthermore, the \emph{source function} $\source_e$ is defined as follows.  
 
 \bigskip
 
-% TODO: togliere def, mettere versione intuitiva nei related
-\begin{definition}[Peer-to-peer model $\ppmodel$]
-\label{def:queue-based-communication-model}
-The set $\executionsofmodel{\ppmodel}$ consists of all executions $e$ 
-such that for any two send events 
-$s_1=\send{p}{q}{\msg_1}$ and $s_2=\send{p}{q}{\msg_2}$ in 
-$\sendeventsof{e}$, with $s_1 < s_2$, one of the following holds:
-\begin{itemize}
-    \item $s_2$ remains unmatched; or
-    \item there exist receive events $r_1, r_2$ such that $r_1 < r_2$, 
-          $\source(r_1)=s_1$, and $\source(r_2)=s_2$.
-\end{itemize}
+\begin{definition}[$\source$ function for $\synchmodel$]\label{def:src}
+If $e$ is an execution in $\synchmodel$, then for every receive event $i$ 
+we define $\source_e(i) = i-1$.
 \end{definition}
 
-It is easy to observe that 
-$\executionsofmodel{\synchmodel} \subseteq \executionsofmodel{\ppmodel}$.  
-Furthermore, the \emph{source function} $\source_e$ is defined as follows.  
-If $e$ is an execution in $\ppmodel$, the source of the $i$-th receive 
-event of $q$ from $p$ is the $i$-th corresponding send event of $p$ to $q$.  
-If instead $e$ belongs to $\synchmodel$, then for every receive event $i$ 
-we define $\source_e(i) = i-1$.  
 
 \subsubsection*{Message Sequence Charts.}
 While executions correspond to a total order of events in a system,  
@@ -540,8 +516,9 @@ $e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel}$.
 % \end{remark}
 
 % TODO: capire se serve
-The following result shows that, for either $\ppmodel$ or 
-$\synchmodel$ communication models, the deadlock-freedom property 
+% MODIFICATO SOLO PER SYNC
+The following result shows that, for
+$\synchmodel$ communication model, the deadlock-freedom property 
 of a system of CFSMs can be expressed as a property on the MSCs
 of the system. 
 %The proof can be found in Appendix \ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
@@ -550,7 +527,7 @@ of the system.
 
 \begin{lemma}[Deadlock-freedom as an MSC property]\label{lem:ddlckmsc}
 	\label{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
-	Assume $\acommunicationmodel$ is $\ppmodel$ (respectively, $\acommunicationmodel$ is $\synchmodel$).
+	Assume $\acommunicationmodel$ is $\synchmodel$.
 	Then a system of CFSMs $\cfsms$ is deadlock-free for $\acommunicationmodel$ if and only if
 	$$
 	\mscsofcfsms{\acceptcompletion\cfsms}{\acommunicationmodel}
@@ -561,7 +538,6 @@ of the system.
 
 The proof for Lemma~\ref{lem:ddlckmsc} can be found in \cite[Proposition 2.1]{di2025realisability}.
 
-% TODO SPIEGARE PERCHE' FUNZIONA
 % %\input{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch.tex}
 
 % %\iflong
