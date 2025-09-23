@@ -215,30 +215,6 @@ communication.
   \label{fig:asy}
 \end{figure}
 
-\paragraph{Peer-to-peer} 
-In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
-process to another are always received in the same order as they are sent.
-An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
-
-\begin{figure}[!ht]
-    \centering
-      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-                    head height=0px, label distance=0.5ex, 
-                    foot height=0px, foot distance=0px]{}
-            \declinst{p}{p}{}
-            \declinst{q}{q}{}
-            \declinst{r}{r}{}
-
-            \mess[pos=0.15]{$m_1$}{p}{r}[3]
-            \nextlevel
-            \mess[pos=0.8]{$m_2$}{p}{q}
-            \nextlevel
-            \mess[pos=0.8]{$m_3$}{q}{r}
-        \end{msc}
-  \caption{Peer-to-peer semantic example.}
-  \label{fig:p2p}
-\end{figure}
-
 \paragraph{Synchronous}
 The synchronous (\verb|synch|) communication model imposes 
 the existence of a scheduling such that any send event is 

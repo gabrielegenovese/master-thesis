@@ -658,6 +658,18 @@ $\labellanguageof{\gt}$:
 % TODO: togliere exist e forall dalla nozione
 % We write $\msclanguageofcc{\gt}$ for the common language. % TODO: mi serve?
 
+When a global type is implemented in a concrete system,
+its behaviour depends on the chosen communication model.
+
+\bigskip
+
+\begin{definition}[Global Type Language]\label{def:global-type-language}
+    Let $\gt$ be a global type and $\acommunicationmodel$ a communication model. 
+    The language of $\gt$ in $\acommunicationmodel$ is $
+    \executionsof{\gt}{\acommunicationmodel}\eqdef
+    \bigcup\{\linearizationsof{M}{\acommunicationmodel}\mid M\in\existentialmsclanguageof{\gt}\}$.
+\end{definition}
+
 I now introduce the definition of implementability following the one given 
 by Alur, et al. \cite{alur2005realizability}, referred to as 
 \textit{Weak-realisability}.
@@ -777,13 +789,17 @@ MSC1 & MSC2 & $M$
 
 \bigskip
 
-\begin{definition}[Weakly-realisable]
+\begin{definition}[Weakly-realisable]\label{def:weak-realisability}
 	An MSC $M$ is said to be weakly-realisable if the set of MSCs
 	$L(M)$ is weakly realisable. A set of MSCs $\setmsc$ is said to be weakly
 	realisable if $\setmsc=\setmsc^w$.
 \end{definition}
 It is important to note that this definition does not include the
 property of deadlock-freedom. 
+
+
+
+
 
 % todo: esempio
 

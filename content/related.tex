@@ -34,8 +34,6 @@ shown that this monotonicity only applies to specific properties, such
 as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
 extend to the implementability problem.
 
-% TODO: rsc =/= sync (messaggi orfani)
-
 \begin{figure}[!ht]
 \centering
 \begin{tikzpicture}[scale=0.6]
@@ -61,16 +59,29 @@ extend to the implementability problem.
 % in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
 % message $m 1$ excludes the reception of any later message.
 
-\paragraph{Peer-to-peer}
-In the peer-to-peer communication model $\ppmodel$, every pair of 
-processes $(p,q)$ is connected by a dedicated FIFO channel.  
-Messages sent by $p$ to $q$ are delivered in the same order in which 
-they were issued: if $p$ first sends $m_1$ and then $m_2$, the channel 
-guarantees that $m_2$ cannot overtake $m_1$. Concretely:
-\begin{itemize}
-    \item if $m_1$ is never received, then $m_2$ cannot be received either;
-    \item if both are received, then $m_1$ is delivered before $m_2$.
-\end{itemize}
+\paragraph{Peer-to-peer} 
+In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
+process to another are always received in the same order as they are sent.
+An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
+
+\begin{figure}[!ht]
+    \centering
+      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+                    head height=0px, label distance=0.5ex, 
+                    foot height=0px, foot distance=0px]{}
+            \declinst{p}{p}{}
+            \declinst{q}{q}{}
+            \declinst{r}{r}{}
+
+            \mess[pos=0.15]{$m_1$}{p}{r}[3]
+            \nextlevel
+            \mess[pos=0.8]{$m_2$}{p}{q}
+            \nextlevel
+            \mess[pos=0.8]{$m_3$}{q}{r}
+        \end{msc}
+  \caption{Peer-to-peer semantic example.}
+  \label{fig:p2p}
+\end{figure}
 
 \paragraph{Causally ordered}
 In the causally ordered (\verb|co|) communication model, messages are delivered 
@@ -166,20 +177,80 @@ is comparable to our definition of $\synchmodel$ model, but there are
 some differences. For example, it does not accept \emph{orphan messages}, 
 which are instead accepted for the defintion of this thesis.
 
-\section{Realisability for MSCs}
+\subsection{Realisability for Di Giusto et~al.}
+For the general model, we now recall the definition of 
+realisability. Recall that safe realisability correspond to weak 
+realisability with the addition of the deadlock freedom property.
+
+\bigskip
+
+\begin{definition}[Deadlock-free realisability]\label{def:realisability}
+    A global type $\gt$ is \emph{deadlock-free realisable}
+    in the communication model
+    $\acommunicationmodel$
+    if there is a system $\cfsms$ such that the following two conditions hold:
+    \begin{enumerate}
+    \item $\executionsof{\cfsms}{\acommunicationmodel} = 
+                \executionsof{\gt}{\acommunicationmodel}$
+    \item $\cfsms$ is deadlock-free in $\acommunicationmodel$.
+    \end{enumerate}
+\end{definition}
+
+The first condition of Definition~\ref{def:realisability} corresponds to  
+the property of \emph{global type conformance}: all system executions 
+faithfully follow the behaviours prescribed by the global type.
+When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
+deadlock-free realisability coincides with the notion of 
+\emph{safe realisability} introduced in~\cite{alur2005realizability}.
+This equivalence does not extend to more general communication models, 
+such as the mailbox model, where 
+Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} 
+fails to apply. Nonetheless, even in such settings, global type 
+conformance can still be expressed in terms of MSCs.
+
+
+\section{Realisability for Alur and Lohrey}
+We recall the definition of Safe Realsability for 
+Alur~et~al.~\cite{alur2005realizability}.
+
+\bigskip
+
+\begin{definition}[Safe Realsability~\cite{alur2005realizability}]
+Let $L$ be a set of MSCs. Then $L$ is said to be \emph{safely realisable}
+if there exists a family of concurrent automata 
+$\langle A_i \mid 1 \leq i \leq n \rangle$ such that
+$ L = L(\prod_i A_i)$ and 
+$\prod_i A_i$ is deadlock-free.
+
+Equivalently, $L$ is safely realisable iff it satisfies the following two
+closure conditions, where $\mathit{pref}(L)$ denotes the set of prefixes 
+of the MSCs (or words) in $L$:
+\begin{enumerate}
+  \item For every well-formed word $w$ (a partial MSC), if for all 
+  $1 \leq i \leq n$ there exists a word $v_i \in \mathit{pref}(L)$ 
+  such that $w{\upharpoonright_i} = v_i{\upharpoonright_i}$, then 
+  $w \in \mathit{pref}(L)$.
+  \item For every well-formed and complete word $w$ (an MSC) in 
+  $\mathit{pref}(L)$, if for all $1 \leq i \leq n$ there exists a 
+  word $v_i \in L$ such that $w{\upharpoonright_i} = v_i{\upharpoonright_i}$, 
+  then $w \in L$.
+\end{enumerate}
+\end{definition}
+
 
 For finite sets of MSCs, weakly realisability as defined in 
-\cite{alur2005realizability} is \verb|coNP|-complete and safe 
+\cite{alur2005realizability}, as defined in this thesis 
+(Definition~\ref{def:weak-realisability}), is \verb|coNP|-complete and safe 
 realisability is shown to be decidable in \verb|P|-time~\cite{alur2005realizability}.
-The problem was subsequently studied for infinite MSC languages, defined 
-as MSC-Graphs (MSGs). For bounded MSGs, safe realisability 
+The problem was subsequently studied for HMSCs. For bounded HMSCs, safe realisability 
 remains decidable, but weak realisability 
 is undecidable~\cite{alur2005realizability}. Extensions of these results to non-FIFO 
 semantics were investigated in~\cite{morin2002recognizable}, corresponding 
 to bag semantics under peer-to-peer communication. 
-Later, Lohrey proved that in the general case, safe realisability 
+Later, Lohrey proved, with a technique that involves five processes, 
+that in the general case, safe realisability 
 is undecidable~\cite{lohrey2003realizability}, though it is decidable (and 
-\verb|EXPSPACE|-complete) for MSGs. %for globally cooperative MSGs.
+\verb|EXPSPACE|-complete) for globally cooperative HMSCs. % TODO: capire cos'è globally cooperative
 Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
 a new class of HMSCs that allows unbounded channels while maintaining implementability.
 A summary of the main complexity results is given in Table~\ref{tab:realisability}.
@@ -201,7 +272,7 @@ A summary of the main complexity results is given in Table~\ref{tab:realisabilit
 
 \section{Realisability for MPST}
 
-Recent work has focused on strengthening the connection between MPST 
+Recent work has focused on addressing the connection between MPST 
 and automata-theoretic formalisms. Stutz and Zufferey 
 showed that implementability is decidable by encoding global types 
 into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
@@ -217,6 +288,34 @@ He also proves that while syntactic projection is incomplete,
 an automata-theoretic encoding into HMSCs yields decidability for 
 sender-driven choice, with implementability shown to be in 
 \verb|PSPACE|-the first precise complexity bound for this fragment.
+
+We recall the definition of the \emph{Implementability Problem} as 
+introduced by Stutz et al.~\cite{stutz2024implementability}.  
+
+\bigskip
+
+\begin{definition}[Implementability Problem~\cite{stutz2024implementability}]
+A language $L \subseteq \Gamma^\omega$ is said to be 
+\emph{implementable} if there exists a CSM 
+$\{A_p\}_{p \in \mathbb{P}}$ such that
+\begin{itemize}
+    \item \textbf{deadlock freedom:} 
+    $\{A_p\}_{p \in \mathbb{P}}$ is deadlock-free, and
+    \item \textbf{protocol fidelity:} 
+    $L$ is the language of $\{A_p\}_{p \in \mathbb{P}}$.
+\end{itemize}
+\end{definition}
+
+where the definition of deadlock freedom is:
+
+\bigskip
+
+\begin{definition}[Deadlock freedom~\cite{stutz2024implementability}]
+A configuration for an automaton is a deadlock if it is not final and  
+has no outgoing transitions while it is reachable if it occurs on some 
+run of A. A CSM is deadlock-free if no reachable configuration is a
+deadlock. We say a CSM is sink-final if all its state machines are.
+\end{definition}
 
 \section{Choreographies}
 Choreographies \cite{montesi2014choreographic} are another formalism to describe  
