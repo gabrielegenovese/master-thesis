@@ -458,7 +458,7 @@ where all states are accepting, i.e., $F_p = Q_p$.
 
 % \bigskip
 
-\begin{definition}[Executions of CFSMs in a model]
+\begin{definition}[Executions of CFSMs in $\acommunicationmodel$]
 \label{def:executions-of-cfsms}
 Given a system $\cfsms=(\acfsm_p)_{p\in\Procs}$ and a 
 model $\acommunicationmodel$,  
@@ -670,6 +670,27 @@ its behaviour depends on the chosen communication model.
     \bigcup\{\linearizationsof{M}{\acommunicationmodel}\mid M\in\existentialmsclanguageof{\gt}\}$.
 \end{definition}
 
+% TODO: FARE UN CONFRONTO CON LE DUE DEFINIZIONI
+Let's now give the defintions of waek and safe realisability.
+
+\bigskip
+
+\begin{definition}[Weak realisability]\label{def:gt-weak-realis}
+A global type $\gt$ is \emph{weak realisable} in the
+communication model $\acommunicationmodel$ if there is a
+system CFMS $\cfsms$ such that the following condition hold:
+$\executionsof{\cfsms}{\acommunicationmodel} = \executionsof{\gt}{\acommunicationmodel}$
+\end{definition}
+
+\bigskip
+
+\begin{definition}[Safe realisability]\label{def:gt-safe-realis}
+    A global type $\gt$ is \emph{safe realisable}
+    in the communication model $\acommunicationmodel$
+    if there is a system $\cfsms$ that is \emph{weak realisable} and  
+    $\cfsms$ is deadlock-free in $\acommunicationmodel$.
+\end{definition}
+
 I now introduce the definition of implementability following the one given 
 by Alur, et al. \cite{alur2005realizability}, referred to as 
 \textit{Weak-realisability}.
@@ -796,9 +817,6 @@ MSC1 & MSC2 & $M$
 \end{definition}
 It is important to note that this definition does not include the
 property of deadlock-freedom. 
-
-
-
 
 
 % todo: esempio

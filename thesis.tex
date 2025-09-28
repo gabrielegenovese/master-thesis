@@ -163,10 +163,39 @@
 \newpage~\thispagestyle{plain}~\newpage
 
 \phantomsection
-\addcontentsline{toc}{chapter}{Abstract}
-\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract in Italian}
+\chapter*{Abstract in Italian}
+I tipi comportamentali definiscono come le informazioni vengono scambiate nei
+sistemi distribuiti. Un esempio sono i Multiparty Session Types (MPST),
+che descrivono le interazioni tra più partecipanti attraverso protocolli globali
+e le loro controparti locali. Garantire una corretta implementazione, inclusa
+l’assenza di deadlock e la conformità alla sessione, è una preoccupazione
+centrale negli MPST.  
+Mentre la maggior parte della ricerca si concentra sulla comunicazione
+peer-to-peer, i sistemi reali spesso utilizzano modelli di comunicazione
+differenti, come la messaggistica basata su mailbox o l’ordinamento
+causale dei messaggi. Una sfida fondamentale è che protocolli validi in un
+modello possono fallire in un altro.  
+In questo lavoro sviluppiamo un quadro MPST flessibile parametrizzato da diverse
+semantiche di rete, tra cui asincrona, peer-to-peer, con ordinamento
+causale e sincrona. Studiamo il problema dell’implementabilità da una
+prospettiva semantica ampia, con l’obiettivo di comprenderne i limiti
+fondamentali. I miei contributi includono una rassegna dei lavori correlati, una
+dimostrazione di indecidibilità per la debole implementabilità sotto semantica
+sincrona e miglioramenti allo strumento \textsc{ReSCu} per la verifica
+dell’assenza di deadlock nei sistemi sincroni.  
+Questo approccio incorpora i modelli di comunicazione come parametro e fornisce
+una base per la verifica dei sistemi distribuiti oltre gli scenari classici. 
+\thispagestyle{plain}
+\topmargin=-1cm
+\cleardoublepage
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract in English}
+\chapter*{Abstract in English}
 Behavioural types define how information is exchanged in distributed systems.
-An example are Multiparty Session Types (MPST), which describe interactions between multiple participants
+An example are Multiparty Session Types (MPST), which describe interactions between 
+multiple participants
 using global protocols and their local counterparts. Ensuring correct implementation,
 including deadlock freedom and session conformance, is a central concern in MPST.
 While most research targets peer-to-peer communication, real-world systems often

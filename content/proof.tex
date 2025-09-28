@@ -20,8 +20,10 @@ the classical Post Correspondence Problem (PCP).
 RPCP was shown to be undecidable by
 Alur~et~al.~\cite{alur2005realizability}, via reduction from PCP.
 The main idea is to encode the existence of a
-solution to an RPCP instance into the (non-)realisability of a
-\emph{global type} (called $L^*$) built from synchronous MSCs.
+solution to an RPCP instance into the (non-)realisability of our formal
+specification. In the original proof, they use MSCs, therefore, 
+defining an HMSC called $M^*$. In my case, I will define a
+\emph{global type} (called $L^*$) built from synchronous global types.
 Therefore, we need to prove:
 $$
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
@@ -89,7 +91,10 @@ We now check the RPCP conditions:
 \bigskip
 
 We have now identified the main problem to which our proof reduces.  
-The next step is to encode an RPCP instance into an MSC.
+The next step is to encode an RPCP instance into our formal model.
+In the original proof, they use MSCs, but in my case I need to give
+an encoding using Global Types. I will give both definition in order
+to give a cleaner parallel.
 
 \bigskip
 
@@ -157,28 +162,76 @@ forwards it to Process~4.
 	Such a linearization exists by construction, hence $M_i^n$ is synchronous.
 \end{proof}
 
-Before establishing the connection between MSCs and  
-Global Types, we briefly summarize the rationale behind the design of  
-$M_i^n$.
+We now give the same definition of the encoding, but in a Global Type format.
+
+\bigskip
+
+\begin{definition}[$G_i^n$]\label{def:gni}
+	Given a tile $(v_i,w_i)$ and a bit $n\in\{0,1\}$, define
+    $x_i = v_i$ if $n=0$, and $x_i = w_i$ if $n=1$. The global
+    type $G_i^n$ is composed of:
+    \begin{itemize}
+        \item $\mathbb{P}=\{p,q,r,s\}$;
+        \item $\mathbb{M}=\{m_1,m_2,m_3,m_{x_i^1},\ldots,m_{x_i^c}\}$,
+              where $m_1=(i,n),\ m_2=i,\ m_3=(i,n),$ and
+              $m_{x_i^j}=x_i^j$ for $1\leq j\leq c$, with
+              $c=|x_i|$;
+        \item Arr $=\{$\arrmess{p}{q}{m_1}, \arrmess{p}{s}{m_2},
+              \arrmess{s}{r}{m_3}, \arrmess{q}{r}{m_{x_i^1}}, $\ldots$,
+              \arrmess{q}{r}{m_{x_i^c}}$\}$, where each arrow denotes
+              a synchronous message with acknowledgment.
+    \end{itemize}
+    The automaton of $G_i^n$ is shown in Figure~\ref{fig:gtype}.
+	
+	\begin{figure}[!ht]
+		\centering
+		\begin{tikzpicture}[->, node distance=35mm, on grid, auto]
+			\node[state] (q0) {$q_0$};
+			\node[state] (q1) [right=of q0] {$q_1$};
+			\node[state] (q2) [right=of q1] {$q_2$};
+			\node[state] (q3) [below left=of q0] {$q_3$};
+			\node[state] (q4) [right=of q3] {$q_4$};
+			\node[state] (q5) [right=of q4] {$\cdots$};
+			\node[state,accepting] (q6) [right=of q5] {$q_x$};
+
+			\path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
+			\path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
+			\path (q2) edge[] node[above left] {\arrmess{s}{r}{(i,n)}} (q3.60);
+			\path (q3) edge[] node[above] {\arrmess{q}{r}{S_1}} (q4);
+			\path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
+			\path (q5) edge[] node[above] {\arrmess{q}{r}{S_c}} (q6);
+		\end{tikzpicture}
+		\caption{The global type $G_i^n$.}
+		\label{fig:gtype}
+	\end{figure}
+
+\end{definition}
+
+Intuitively, $G_i^n$ specifies the same communication pattern as the MSC  
+$M^n_i$ introduced in Definition~\ref{def:mni}. This structural  
+correspondence will be made precise in the next lemma (Lemma~\ref{lmm:msgs}).  
+
+Before establishing the connection between MSCs and Global Types,
+we briefly summarize the rationale behind the design of $M_i^n$ and $G_i^n$.
 
 Suppose that $\Delta=(i_1,a_1,b_1,\ldots,i_m,a_m,b_m)$ is a  
 solution to the RPCP instance. From this solution we construct two MSC  
 sequences:
 \[
-M_x = M^{a_1}_{i_1}\cdots M^{a_m}_{i_m}, \qquad  
-M_y = M^{b_1}_{i_1}\cdots M^{b_m}_{i_m}.
+G_x = G^{a_1}_{i_1}\cdots G^{a_m}_{i_m}, \qquad  
+G_y = G^{b_1}_{i_1}\cdots G^{b_m}_{i_m}.
 \]
-Both $M_x$ and $M_y$ are synchronous concatenations of synchronous  
-MSCs. We then define a third MSC $M_{\texttt{sol}}$, obtained by  
-projecting $M_y$ onto processes $P1,P2$ and $M_x$ onto processes  
+Both $G_x$ and $G_y$ are synchronous concatenations of synchronous  
+MSCs. We then define a third MSC $G_{\texttt{sol}}$, obtained by  
+projecting $G_y$ onto processes $P1,P2$ and $G_x$ onto processes  
 $P3,P4$. Intuitively, processes $P1,P2$ represent the construction of  
 the \emph{right-hand string} $y_{i_1}\cdots y_{i_m}$, while processes  
 $P3,P4$ represent the construction of the \emph{left-hand string}  
 $x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP guarantees that  
-$M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. Establishing the  
-synchrony of $M_{\texttt{sol}}$ is non-trivial, and this step is an  
+$G_{\texttt{sol}}$ is acyclic and \emph{synchronous}. Establishing the  
+synchrony of $G_{\texttt{sol}}$ is non-trivial, and this step is an  
 addition to the original proof. By construction, $L^*$ weakly implies  
-$M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin L^*$, since at least  
+$G_{\texttt{sol}}$, but $G_{\texttt{sol}} \notin L^*$, since at least  
 one tile differs. Consequently, $L^*$ is \emph{not realisable}.
   
 With these constructions in place, we proceed to introduce the main  
@@ -203,65 +256,22 @@ string $S$, which will serve as the building block in the reduction.
 
 \bigskip
 
-\begin{definition}[$G_S$]\label{def:gs}
-	Given a string $S\in\Sigma^*$, and two integers $i, n$,
-	the global type $G_S$ is the global type composed of:
-	\begin{itemize}
-		\item $\mathbb{P}=\{p,q,r,s\}$;
-		\item $\mathbb{M}=\{m_1,m_2,m_3,m_{S_1},...,m_{S_c}\}$ where
-		      $m_1 = (i,n), m_2 = i, m_3 = (i,n),\\ m_{S_1} = S_1,...,m_{S_c} = S_c$ 
-		      with $c = |S|$;
-		\item Arr $=\{$\arrmess{p}{q}{m_1}, \arrmess{p}{s}{m_2}, \arrmess{s}{r}{m_3},
-		      \arrmess{q}{r}{m_{S_1}}, ..., \arrmess{q}{r}{m_{S_c}}$\}$ where each arrow
-		      denotes a synchronous message accompanied by an acknowledgment.
-	\end{itemize}
-	$G_S$'s automaton is depicted in Figure~\ref{fig:gtype}.
-	
-	\begin{figure}[!ht]
-		\centering
-		\begin{tikzpicture}[->, node distance=35mm, on grid, auto]
-			\node[state] (q0) {$q_0$};
-			\node[state] (q1) [right=of q0] {$q_1$};
-			\node[state] (q2) [right=of q1] {$q_2$};
-			\node[state] (q3) [below left=of q0] {$q_3$};
-			\node[state] (q4) [right=of q3] {$q_4$};
-			\node[state] (q5) [right=of q4] {$\cdots$};
-			\node[state,accepting] (q6) [right=of q5] {$q_x$};
-
-			\path (q0) edge[] node[above] {\arrmess{p}{q}{(i,n)}} (q1);
-			\path (q1) edge[] node[above] {\arrmess{p}{s}{i}} (q2);
-			\path (q2) edge[] node[above left] {\arrmess{s}{r}{(i,n)}} (q3.60);
-			\path (q3) edge[] node[above] {\arrmess{q}{r}{S_1}} (q4);
-			\path (q4) edge[] node[above] {\arrmess{q}{r}{...}} (q5);
-			\path (q5) edge[] node[above] {\arrmess{q}{r}{S_c}} (q6);
-		\end{tikzpicture}
-		\caption{The global type $G_S$.}
-		\label{fig:gtype}
-	\end{figure}
-
-\end{definition}
-
-Intuitively, $G_S$ specifies the same communication pattern as the MSC  
-$M^n_i$ introduced in Definition~\ref{def:mni}, with the string $S$  
-representing the transmitted sequence of characters. This structural  
-correspondence will be made precise in the next lemma (Lemma~\ref{lmm:msgs}).  
-
-\bigskip
-
 % TODO: check
 \begin{lemma}\label{lmm:msgs}
 The MSC $M^n_i$ (Definition~\ref{def:mni}) is included in 
-$\languageof{G_S}{}{}$ (Definition~\ref{def:gs}).
+$\languageof{G_S}{}{}$ (Definition~\ref{def:gni}).
 \end{lemma}
 
+% TODO: Da rifare meglio, non ha senso quel L(M) = L(G)
 \begin{proof}
-	Both $M^n_i$ and $G_S$ describe the same communication structure:
+	Assume $i,n$ are integers.
+	Both $M^n_i$ and $G_i^n$ describe the same communication structure:
 	process $p$ sends $(i,n)$ to $q$ and $i$ to $s$;
 	process $s$ relays $(i,n)$ to $r$;
-	process $q$ then sends the characters of $S$ (here matching $x_i$) to $r$.
-	If $i,n$ and $S$ are the same, the sequence of messages is identical in both 
-	$M^n_i$ and $G_S$. Since both models enforce synchronous communication, 
-	their linearisations coincide. Hence, $M^n_i \in L(G_S)$.
+	process $q$ then sends the characters of $x_i$ to $r$.
+	The sequence of messages is identical in both 
+	$M^n_i$ and $G_i^n$. Since both models enforce synchronous communication, 
+	their linearisations coincide. Hence, $L(M^n_i) = L(G_S)$.
 \end{proof}
 
 Having established the correspondence between an individual MSC and a  
@@ -272,6 +282,7 @@ construct the global type $L^*$.
 
 \bigskip
 
+% TODO DOMANDA: inutile? da rifare usando gni
 \begin{definition}[$G^*$]\label{def:gstar}
 	Given a set of MSCs $\mathcal{M} =\{M\ |\ M\in\mscsetofmodel{\synchmodel}\}$,
 	$G^*$ is the set of global types such that $G^*=\{G_M\ |\ M \in \setmsc\}$,
@@ -284,6 +295,7 @@ all the possible combinations and constructions of a set of MSCs.
 
 \bigskip
 
+% TODO DOMANDA: inutile? da rifare usando gni
 \begin{definition}[The $L^*$ global type]\label{def:lstar}
 	Assume a finite set $\setmsc$ of MSCs, where
 	$\setmsc = \{M\ |\ M \in \mscsetofmodel{\synchmodel}\}$. Let $G^*$
@@ -389,39 +401,48 @@ to present the proof for the undecidability result.
 		      $\Delta = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
 		      for a solution to a generic RPCP problem instance, and the bits $a_j$ and
 		      $b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into
-		      the two (left and right)
-		      long strings. Consider the new MSCs $M_x$ and $M_y$ obtained from the sequences
-		      $M_x = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ and $M_y = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
-		      Executions of both of these (sequences of) MSCs must exist in any
-		      realisation of $L^*$. Additionally, these MSCs are in $\mscsetofmodel{\synchmodel}$
-		      because they are sequence of $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
-		      $M_x$ corresponds to the construction of the left side of the equivalence of the RPCP
-		      problem, and, instead, $M_y$ represents the construction of the right side.
-		      We then look at the projections $M_x|_1$, $M_x|_2$, $M_x|_3$,
-		      and $M_x|_4$ of $M_x$, and $M_y|_1$, $M_y|_2$, $M_y|_3$, $M_y|_4$ of $M_y$ onto the
-		      4 processes. Now consider an MSC $M_{\texttt{sol}}$ formed from $M_y|_1$, $M_y|_2$,
-		      $M_x|_3$, and $M_x|_4$. This MSC represent the construction of the solution to
+		      the two (left and right) long strings. Let's also assume synchronous communication.
+			  Consider the new Global Types $G_x$ and $G_y$ obtained from the concatenation of
+		      $G_x = G^{a_1}_{i_1} \cdots G^{a_m}_{i_m}$ 
+			  and $G_y = G^{b_1}_{i_1} \cdots G^{b_m}_{i_m}$.
+		      The language of the executions of both of these (sequences of) Global Types 
+			  must be included in the language of execution of $L^*$. 
+			  Additionally, the language of MSCs of these Global Types are 
+			  in $\mscsetofmodel{\synchmodel}$ because they are sequence of 
+			  $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
+		      $G_x$ corresponds to the construction of the left side of the equivalence of the RPCP
+		      problem, and, instead, $G_y$ represents the construction of the right side.
+		      We then look at the projections $G_x|_{P1}$, $G_x|_{P2}$, $G_x|_{P3}$,
+		      and $G_x|_{P4}$ of $G_x$, and $G_y|_{P1}$, $G_y|_{P2}$, $G_y|_{P3}$, $G_y|_{P4}$ of $G_y$ onto the
+		      4 processes. Now consider a Global Type $G_{\texttt{sol}}$ 
+			  formed from $G_y|_{P1}$, $G_y|_{P2}$, $G_x|_{P3}$, and $G_x|_{P4}$.
+		      This Global Type represents the construction of the solution to
 		      the problem. Processes 1 and 2 construct the right part ($y_{i_1}...y_{i_m}$)
 		      and processes 3 and 4 construct the left part ($x_{i_1}...x_{i_m}$).
-		      The claim is that the combined MSC $M_{\texttt{sol}}$ is weakly
-		      implied by $L^*$. By definition, the only thing to establish is that $M_{\texttt{sol}}$
-		      is indeed an MSC, in the sense that it is acyclic, well-formed, complete
+		      The claim is that the combined Global Type $G_{\texttt{sol}}$ is 
+		      implied by $L^*$, but it is not part of its language. 
+			  In other words, the language of the execution of $G_{\texttt{sol}}$ is included
+			  in the execution of the system, but it is not included in the execution of $L^*$. 
+			  By definition, the only thing to establish is that $G_{\texttt{sol}}$
+		      is indeed a Global Type, in the sense that it is well-formed,
 		      and synchronous.
-		      The only new situation in terms of communication in $M_{\texttt{sol}}$ is the
+		      The only new situation in terms of communication in $G_{\texttt{sol}}$ is the
 		      communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
 		      But the communication between $P_1$ and $P_4$ is consistent in
-		      $M_y|_1$ and $M_x|_4$ (i.e., the sequence of messages sent from $P_1$ to
-		      $P_4$ in $M_y|_1$ is equal to the sequence of messages received in $M_x|_4$),
+		      $G_y|_{P1}$ and $G_x|_{P4}$ (i.e., the sequence of messages sent from $P_1$ to
+		      $P_4$ in $G_y|_{P1}$ is equal to the sequence of messages received in $G_x|_{P4}$),
 		      and the communication between $P_2$ and $P_3$ is consistent in
-		      $M_y|_2$ and $M_x|_3$ because $R$ is a solution to the RPCP.
-		      Furthermore, the acyclicity of $M_{\texttt{sol}}$ follows from the property of the
+		      $G_y|_{P2}$ and $G_x|_{P3}$ because $R$ is a solution to the RPCP.
+		      Furthermore, the acyclicity of $G_{\texttt{sol}}$ follows from the property of the
 		      solution that the string formed by the first $j$ words on processes 1
 		      and 2 is always a prefix of the string formed by the first $j$ words
 		      on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
 		      is sent before it needs to be received.
 
-		      Finally, we prove that $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
-		      Assume, for contradiction, that $M_{\texttt{sol}} \notin \mscsetofmodel{\synchmodel}$.
+		      Finally, we prove that 
+			  $\msclanguageof{G_{\texttt{sol}}}{\synchmodel} \in \mscsetofmodel{\synchmodel}$.
+		      Assume, for contradiction, that 
+			  $\msclanguageof{G_{\texttt{sol}}}{\synchmodel} \notin \mscsetofmodel{\synchmodel}$.
 		      Then, there should be a cycle of dependencies in the communication pattern.
 		      There are no communication between $P_2$ and $P_4$, and between $P_1$
 		      and $P_3$. Therefore, this cycle must involve all processes, starting
@@ -487,7 +508,7 @@ to present the proof for the undecidability result.
 		      \end{figure}
 
 		      For the communication between $P_2$ and $P_3$, the only possible cycle
-		      pattern is depicted in Fig.~\ref{fig:cycle2}.
+		      pattern is depicted in Figure~\ref{fig:cycle2} showed as an MSC.
 		      Suppose $P_2$ wants to send a character $c$, but $P_3$
 		      is not expecting any further characters. In order for
 		      $P_3$ to resume receiving, it must first receive an index
@@ -502,29 +523,35 @@ to present the proof for the undecidability result.
 		      $x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
 		      in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
 		      assumption that $y_1...y_{k-1} \leq x_1...x_{k-1}$.
-		      Therefore, we conclude that $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
+		      Therefore, we conclude that 
+			  $\msclanguageof{G_{\texttt{sol}}}{\synchmodel} \in \mscsetofmodel{\synchmodel}$.
 
-		      Note that $M_{\texttt{sol}}$ cannot itself be in $L^*$ because there must be
-		      some index $i_j$ where $a_j \neq b_j$, and no MSC exists in $L$ where,
+			  Assume that the system of CFMS $\cfsms_G$ is the system of $G_{\texttt{sol}}$.
+			  We need to prove that 	
+			  $\executionsof{\cfsms_G}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$.
+		      Note that $\executionsof{\cfsms_G}{\synchmodel}$ cannot 
+			  itself be in $\executionsof{L^*}{\synchmodel}$ because there must be
+		      some index $i_j$ where $a_j \neq b_j$, and no execution of the Global 
+			  Type exists in $L^*$ where,
 		      after $P_1$ announces the index, what $P_2$ sends is not
 		      identical to what $P_3$ receives.
 
 		\item[$\Leftarrow$]
-		      Suppose there is some MSC $M^@$ which
+		      Suppose there is some Global Type $G^@$ which
 		      exists in any realisation of $L^*$, but is not in $L^*$ itself. We want
-		      to derive a solution to $\Delta$ from $M^@$.
-		      First, it is clear that the projection $M^@|_1$ must consist of a sequence
+		      to derive a solution to $\Delta$ from $G^@$.
+		      First, it is clear that the projection $G^@|_{P1}$ must consist of a sequence
 		      of pairs of messages (the first of each pair acknowledged), sent from
 		      process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
 		      Likewise, it is clear that, in order for process 2 to receive those messages,
-		      $M^@|_2$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
+		      $G^@|_{P2}$ must consist of a sequence of receipts of $(i, b)$ pairs, and after
 		      each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
 		      $b = 0$ or $b = 1$, before the next index pair is received.
-		      Likewise, $M^@|_4$ consists of a sequence of receipts of index $i$ from
+		      Likewise, $G^@|_{P4}$ consists of a sequence of receipts of index $i$ from
 		      process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
-		      $M^@|_3$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
+		      $G^@|_{P3}$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
 		      by receipt of $v_i$ or $w_i$, respectively.
-		      Now, since $M^@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
+		      Now, since $G^@$ is not in $L^*$, for some index $i$ the choice of $v_i$ or
 		      $w_i$ must differ on process 2 and process 3. (Note, we are assuming that
 		      the buffers between processes are FIFO.)
 		      Furthermore, because of the precedences, the prefix formed by the first
@@ -533,7 +560,7 @@ to present the proof for the undecidability result.
 		      from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
 		      string formed by the first $j$ words on process 2 is a prefix of the string
 		      formed by the first $j$ words on process 3. Therefore, we can readily
-		      build a solution for $\Delta$ from $M^@$ by building the strings of the solution
+		      build a solution for $\Delta$ from $G^@$ by building the strings of the solution
 		      taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds 
 			  $y_{i_1}\cdots y_{i_m},$ and $P_4$ builds $x_{i_1}\cdots x_{i_m}$.
 
@@ -548,7 +575,7 @@ of $M_{\texttt{sol}}$ from Theorem~\ref{thm:main}.
 
 % TODO: dare un esempietto per far vedere che la prova regge
 % Fatto... Andrà bene?
-\begin{example}[$M_{\texttt{sol}}$ Example of Theorem~\ref{thm:main}]
+\begin{example}[$G_{\texttt{sol}}$ Example of Theorem~\ref{thm:main}]
 Consider the tiles and the solution of the RPCP instance 
 in Example~\ref{exmp:rpcp}, with the tile set and the solution
 with index sequence $(2,1,3)$
@@ -569,18 +596,18 @@ Therefore, the encoding of the solution is
 $$\Delta = (i_1=2,a_1=1,b_1=0,i_2=1,a_2=0,b_2=1,i_3=3,a_3=0,b_3=1)$$
 
 Recall that for each tile index \(i\) we have two synchronous MSCs
-\(M_i^0\) and \(M_i^1\) (see Definition~\ref{def:mni}), where the bit
+\(G_i^0\) and \(G_i^1\) (see Definition~\ref{def:gni}), where the bit
 indicates choosing \(v_i\) (0) or \(w_i\) (1) for the character stream.
 Using the concrete index sequence \((2,1,3)\) we form two
 concatenated MSCs:
 \[
-  M_x\;=\; M^{1}_{2}\ \cdot\ M^{0}_{1}\ \cdot\ M^{0}_{3},
+  G_x\;=\; G^{1}_{2}\ \cdot\ G^{0}_{1}\ \cdot\ G^{0}_{3},
 \qquad
-  M_y\;=\; M^{0}_{2}\ \cdot\ M^{1}_{1}\ \cdot\ M^{1}_{3}.
+  G_y\;=\; G^{0}_{2}\ \cdot\ G^{1}_{1}\ \cdot\ G^{1}_{3}.
 \]
-Here \(M\) encodes the \(\mathbf{x}\)-concatenation
+Here \(G_x\) encodes the \(\mathbf{x}\)-concatenation
 \((x_1,x_2,x_3)=(w_2,v_1,v_3)\) (depicted 
-in Figure~\ref{fig:exmp-mx}) and \(M_y\) encodes 
+in Figure~\ref{fig:exmp-mx}) and \(G_y\) encodes 
 the \(\mathbf{y}\)-concatenation (depicted in 
 Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 
@@ -608,7 +635,7 @@ Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 	\syncmscmess{$(3,0)$}{P4}{P3}
 	\syncmscmess{$c$}{P2}{P3}
 \end{msc}
-\caption{The MSC $M_x$}
+\caption{The Global Type $G_x$ showed as an MSC.}
 \label{fig:exmp-mx}
 \end{figure}
 
@@ -636,20 +663,20 @@ Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 	\syncmscmess{$(3,1)$}{P4}{P3}
 	\syncmscmess{$c$}{P2}{P3}
 \end{msc}
-\caption{The MSC $M_y$}
+\caption{The Global Type $G_y$ showed as an MSC.}
 \label{fig:exmp-my}
 \end{figure}
 
-Recall that $M|_p$ denote the projection of $M$ onto process $p$. We
+Recall that $G|_p$ denote the projection of $G$ onto process $p$. We
 construct the MSC
 $$
-  M_{\texttt{sol}} = (M_y|_{P1},\; M_y|_{P2},\; M_x|_{P3},\; M_x|_{P4}),
+  G_{\texttt{sol}} = (G_y|_{P1},\; G_y|_{P2},\; G_x|_{P3},\; G_x|_{P4}),
 $$
-i.e.\ processes $1,2$ follow $M_y$ while $3,4$ follow $M_x$.
-Intuitively, $M_{\texttt{sol}}$ pairs the right-side construction (from $M_y$)
-with the left-side construction (from $M_x$). 
+i.e.\ processes $1,2$ follow $G_y$ while $3,4$ follow $G_x$.
+Intuitively, $G_{\texttt{sol}}$ pairs the right-side construction (from $G_y$)
+with the left-side construction (from $G_x$). 
 Figure~\ref{fig:exmp-msol} illustrates the behaviour of the MSC
-$M_{\texttt{sol}}$. Observe that when process~3 expects to receive the
+$G_{\texttt{sol}}$. Observe that when process~3 expects to receive the
 second character $\texttt{b}$ right after $a$, 
 but process~2 cannot send it immediately:
 it must first obtain the corresponding index and bit from process~1.
@@ -661,10 +688,10 @@ semantics throughout the execution.
 \begin{figure}[!ht]
 \centering
 \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{}{$M_y|_{P1}$}
-	\declinst{P2}{}{$M_y|_{P2}$}
-	\declinst{P3}{}{$M_x|_{P3}$}
-	\declinst{P4}{}{$M_x|_{P4}$}
+	\declinst{P1}{}{$G_y|_{P1}$}
+	\declinst{P2}{}{$G_y|_{P2}$}
+	\declinst{P3}{}{$G_x|_{P3}$}
+	\declinst{P4}{}{$G_x|_{P4}$}
 
 	\syncmscmess{$(2,1)$}{P1}{P2}
 	\syncmscmess{$2$}{P1}{P4}
@@ -687,7 +714,7 @@ semantics throughout the execution.
 	\syncmscmess{$(3,1)$}{P4}{P3}
 	\syncmscmess{$c$}{P2}{P3}
 \end{msc}
-\caption{The MSC $M_\texttt{sol}$}
+\caption{The Global Type $G_\texttt{sol}$ showed as an MSC.}
 \label{fig:exmp-msol}
 \end{figure}
 

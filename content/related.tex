@@ -177,45 +177,45 @@ is comparable to our definition of $\synchmodel$ model, but there are
 some differences. For example, it does not accept \emph{orphan messages}, 
 which are instead accepted for the defintion of this thesis.
 
-\subsection{Realisability for Di Giusto et~al.}
-For the general model, we now recall the definition of 
-realisability. Recall that safe realisability correspond to weak 
-realisability with the addition of the deadlock freedom property.
+% \subsection{Realisability for Di Giusto et~al.}
+% For the general model, we now recall the definition of 
+% realisability. Recall that safe realisability correspond to weak 
+% realisability with the addition of the deadlock freedom property.
 
-\bigskip
+% \bigskip
 
-\begin{definition}[Deadlock-free realisability]\label{def:realisability}
-    A global type $\gt$ is \emph{deadlock-free realisable}
-    in the communication model
-    $\acommunicationmodel$
-    if there is a system $\cfsms$ such that the following two conditions hold:
-    \begin{enumerate}
-    \item $\executionsof{\cfsms}{\acommunicationmodel} = 
-                \executionsof{\gt}{\acommunicationmodel}$
-    \item $\cfsms$ is deadlock-free in $\acommunicationmodel$.
-    \end{enumerate}
-\end{definition}
+% \begin{definition}[Deadlock-free realisability]\label{def:realisability}
+%     A global type $\gt$ is \emph{deadlock-free realisable}
+%     in the communication model
+%     $\acommunicationmodel$
+%     if there is a system $\cfsms$ such that the following two conditions hold:
+%     \begin{enumerate}
+%     \item $\executionsof{\cfsms}{\acommunicationmodel} = 
+%                 \executionsof{\gt}{\acommunicationmodel}$
+%     \item $\cfsms$ is deadlock-free in $\acommunicationmodel$.
+%     \end{enumerate}
+% \end{definition}
 
-The first condition of Definition~\ref{def:realisability} corresponds to  
-the property of \emph{global type conformance}: all system executions 
-faithfully follow the behaviours prescribed by the global type.
-When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
-deadlock-free realisability coincides with the notion of 
-\emph{safe realisability} introduced in~\cite{alur2005realizability}.
-This equivalence does not extend to more general communication models, 
-such as the mailbox model, where 
-Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} 
-fails to apply. Nonetheless, even in such settings, global type 
-conformance can still be expressed in terms of MSCs.
+% The first condition of Definition~\ref{def:realisability} corresponds to  
+% the property of \emph{global type conformance}: all system executions 
+% faithfully follow the behaviours prescribed by the global type.
+% When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
+% deadlock-free realisability coincides with the notion of 
+% \emph{safe realisability} introduced in~\cite{alur2005realizability}.
+% This equivalence does not extend to more general communication models, 
+% such as the mailbox model, where 
+% Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} 
+% fails to apply. Nonetheless, even in such settings, global type 
+% conformance can still be expressed in terms of MSCs.
 
 
 \section{Realisability for Alur and Lohrey}
-We recall the definition of Safe Realsability for 
+We recall the definition of Safe Realisability for 
 Alur~et~al.~\cite{alur2005realizability}.
 
 \bigskip
 
-\begin{definition}[Safe Realsability~\cite{alur2005realizability}]
+\begin{definition}[Safe Realisability~\cite{alur2005realizability}]
 Let $L$ be a set of MSCs. Then $L$ is said to be \emph{safely realisable}
 if there exists a family of concurrent automata 
 $\langle A_i \mid 1 \leq i \leq n \rangle$ such that
