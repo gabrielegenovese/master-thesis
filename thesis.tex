@@ -165,27 +165,28 @@
 \phantomsection
 \addcontentsline{toc}{chapter}{Abstract in Italian}
 \chapter*{Abstract in Italian}
-I tipi comportamentali definiscono come le informazioni vengono scambiate nei
+I Behavioural Types definiscono come le informazioni vengono scambiate nei
 sistemi distribuiti. Un esempio sono i Multiparty Session Types (MPST),
 che descrivono le interazioni tra più partecipanti attraverso protocolli globali
 e le loro controparti locali. Garantire una corretta implementazione, inclusa
-l’assenza di deadlock e la conformità alla sessione, è una preoccupazione
-centrale negli MPST.  
+l’assenza di deadlock e la conformità alla sessione, è un problema di interesse
+primario nei MPST.  
 Mentre la maggior parte della ricerca si concentra sulla comunicazione
 peer-to-peer, i sistemi reali spesso utilizzano modelli di comunicazione
 differenti, come la messaggistica basata su mailbox o l’ordinamento
 causale dei messaggi. Una sfida fondamentale è che protocolli validi in un
-modello possono fallire in un altro.  
-In questo lavoro sviluppiamo un quadro MPST flessibile parametrizzato da diverse
-semantiche di rete, tra cui asincrona, peer-to-peer, con ordinamento
+modello di comunicazione possono fallire in un altro.  
+In questo lavoro, sviluppiamo un framework, basato sui MPST,
+flessibile e parametrizzato da diverse
+semantiche di comunicazione di rete, tra cui asincrona, peer-to-peer, con ordinamento
 causale e sincrona. Studiamo il problema dell’implementabilità da una
 prospettiva semantica ampia, con l’obiettivo di comprenderne i limiti
-fondamentali. I miei contributi includono una rassegna dei lavori correlati, una
-dimostrazione di indecidibilità per la debole implementabilità sotto semantica
-sincrona e miglioramenti allo strumento \textsc{ReSCu} per la verifica
+fondamentali. I miei contributi includono un studio sui lavori correlati, una
+dimostrazione di indecidibilità per la weak-implementability sotto semantica
+sincrona e miglioramenti al tool \textsc{ReSCu} per la verifica
 dell’assenza di deadlock nei sistemi sincroni.  
 Questo approccio incorpora i modelli di comunicazione come parametro e fornisce
-una base per la verifica dei sistemi distribuiti oltre gli scenari classici. 
+una base per la verifica dei sistemi distribuiti oltre i classici scenari. 
 \thispagestyle{plain}
 \topmargin=-1cm
 \cleardoublepage
@@ -193,7 +194,7 @@ una base per la verifica dei sistemi distribuiti oltre gli scenari classici.
 \phantomsection
 \addcontentsline{toc}{chapter}{Abstract in English}
 \chapter*{Abstract in English}
-Behavioural types define how information is exchanged in distributed systems.
+Behavioural Types define how information is exchanged in distributed systems.
 An example are Multiparty Session Types (MPST), which describe interactions between 
 multiple participants
 using global protocols and their local counterparts. Ensuring correct implementation,

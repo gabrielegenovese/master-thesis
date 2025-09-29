@@ -337,6 +337,95 @@ but it was first introduced by Castagna et al.~\cite{castagna2012global}.
 % TODO: Continuare menzionando che i chor automata sono simili alla nostra 
 % definizione di global type
 
+\section{Multiparty Session Types}
+Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
+provide a type-theoretic framework to specify and verify communication 
+protocols among multiple participants. They ensure that communication 
+follows a predefined structure, preventing errors such as deadlocks, 
+orphan messages, and unspecified receptions. The 
+\textbf{global specification} describes the overall communication 
+protocol. From this, one derives the \textbf{local behaviours} of each 
+participant via a \emph{projection} operation. The system's 
+\textbf{processes} form the \emph{implementation}, defining how 
+participants interact. With the definition of a \emph{typing system} 
+and suitable \emph{type-checking rules}, one ensures that the 
+implementation conforms to the local specification, thereby 
+guaranteeing properties such as \emph{well-formedness}.  
+Figure~\ref{fig:mpstschema} show a schema summarizing the principal
+parts of the framework.
+
+\begin{figure}[!ht]
+\centering
+\begin{tikzpicture}[
+      node distance=1.2cm,
+      every node/.style={font=\sffamily},
+      rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
+      circ/.style={circle, draw=black, minimum size=1cm},
+      arrow/.style={-{Stealth[scale=1.1]}, thick}
+  ]
+
+  % Nodes
+  \node[rect] (G) {\textcolor{red}{$\mathcal{G}$}};
+  \node[circ, below=of G] (TB) {\textcolor{blue}{$L_\text{B}$}};
+  \node[circ, left=of TB] (TA) {\textcolor{blue}{$L_\text{A}$}};
+  \node[circ, right=of TB] (TC) {\textcolor{blue}{$L_\text{C}$}};
+
+  \node[rect, below=of TA] (PA) {\textcolor{brown}{$P_\text{A}$}};
+  \node[rect, below=of TB] (PB) {\textcolor{brown}{$P_\text{B}$}};
+  \node[rect, below=of TC] (PC) {\textcolor{brown}{$P_\text{C}$}};
+
+  \node[rect,draw=none,right=of TC] (LC) {\textbf{\textcolor{blue}{2. Local type}}};
+  \node[rect,draw=none,above=of LC] (LG) {\textbf{\textcolor{red}{1. Global type}}};
+  \node[rect,draw=none,below=of LC] (LG) {\textbf{\textcolor{brown}{3. Processes}}};
+
+  % Arrows
+  \draw[arrow] (G) -- (TA) node[midway, left] {Projection};
+  \draw[arrow] (G) -- (TB);
+  \draw[arrow] (G) -- (TC);
+
+  \draw[arrow] (PA) -- (TA) node[midway, left] {Type checking};
+  \draw[arrow] (PB) -- (TB);
+  \draw[arrow] (PC) -- (TC);
+  \draw[arrow] (TC) -- (PC);
+  \draw[arrow] (TB) -- (PB);
+  \draw[arrow] (TA) -- (PA);
+
+\end{tikzpicture}
+\caption{Intuitive schema of MPST framework}
+\label{fig:mpstschema}
+\end{figure}
+
+% In this setting, the analogue of realisability is often called 
+% \emph{session fidelity}: a property ensuring that the combined local 
+% types behave exactly according to the global type. When the global 
+% type satisfies syntactic restrictions, its projection is guaranteed 
+% to be both realisable and deadlock-free, which corresponds to safe 
+% realisability in the MSC setting.  
+
+\subsection{Projectability}
+A central notion in MPST is \emph{projectability}, which asks whether 
+a global type can be faithfully projected into local specifications for 
+each participant. If projection succeeds, the resulting local types 
+interact without mismatches or unintended behaviours, effectively 
+bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
+Projectability is, therefore, comparable to the implementability
+problem as they have the same aim.
+Projection algorithms, however, often reject natural protocols that 
+fail to meet restrictive syntactic conditions. This difference between 
+expressivity and safety has motivated extensions of the theory, with 
+\cite{castagna2012global} being the only algorithm aiming for full 
+completeness.
+
+% \subsubsection{Mixed and Sender driven choice}
+A key restriction in the definition of MPST appears in branching. 
+In the original framework \cite{honda2008multiparty,carbone2012structured}, 
+choice is \textbf{sender-driven}: the first sender dictates the branch, 
+ensuring safety but excluding many common patterns where multiple 
+participants influence the decision~\cite{carbone2012structured}.  
+Allowing \textbf{mixed choice} increases expressivity by permitting 
+several initiators, but it also makes the implementability problem 
+undecidable in general~\cite{stutz2024implementability}.  
+
 \section{Other works}
 %citare il paper di Emilio su pomsets
 Stutz et al.~\cite{stutz2025automata} proposed \emph{Protocol State Machines} 

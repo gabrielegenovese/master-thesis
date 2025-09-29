@@ -14,8 +14,8 @@ services to an end user.
 Distributed systems make it possible to address challenges that are
 hard to solve without such an architecture, such as high availability
 and elastic scalability. However, these benefits come with their own
-set of difficulties that computer scientists have long sought to
-overcome-for example, ensuring reliability in the presence of failures
+set of challanges that computer scientists need to
+address, for example, ensuring reliability in the presence of failures
 in critical systems, and maintaining data consistency.
 Distributed systems are 
 widely adopted in domains such as \textit{cloud computing}, critical 
@@ -45,37 +45,39 @@ Different model are specialized in different aspects of a system, and we
 are interested in the ones about the exchange of information, such as
 Calculus of Communicating Systems (CCS), the $\pi$-calculus, and Petri nets.
 In this work, however, we focus on 
-\textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty} 
-and \textit{choreographies}~\cite{montesi2014choreographic}, 
-since these formalisms place particular emphasis on structured and 
+\textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty},
+% and \textit{choreographies}~\cite{montesi2014choreographic}, 
+since this formalism place particular emphasis on structured and 
 verifiable communication protocols, making them especially well suited 
 for protocol design.
 In MPST, communication is specified by a \emph{global type}, which 
-describes the entire interaction among participants. 
+describes the entire interaction among all participants. 
 This global type is then \emph{projected} into 
 \emph{local types}, one for each participant. 
-Local types serve as contracts that guarantee each component is compliant to 
-the described protocol, therefore ensuring certain properties, 
+Local types serve as contracts that guarantee each component is compliant 
+to the described protocol, therefore ensuring certain properties, 
 such as deadlock-freedom, at compile time. 
-The implementability problem in MPST is comparable to verifying 
-whether a given global type can be correctly projected into local 
-types, preserving the intended behaviour.
 
 \section{Goal}
 The goal of this work is to study the \textbf{implementability
-problem}, which concerns whether a global specification can be
-faithfully realised by a set of \textit{local processes} in a
+problem} for MPST, which concerns whether a global specification can be
+faithfully implemented by a set of \textit{local processes} in a
 distributed system.
 In essence, it asks: does an implementation really \textbf{respect}
 the behaviour described by a given specification model?
 
 To illustrate the relevance of this problem, consider the following
 example.
+
+\bigskip
+
 \begin{example}
 Given four processes $A, B, C, D$ distributed over
 a network, and four messages $x, y, z, w$ to be exchanged according to
 the description in Listing~\ref{lst:not-impl-exm}, is it possible to
 implement it in a real world system?
+
+\bigskip
 
 \begin{lstlisting}[caption={Example specification of message exchanges},
                    label={lst:not-impl-exm},
@@ -88,6 +90,7 @@ If A sends B message x,
 If A sends B message y,
 then C sends D message w.
 \end{lstlisting}
+
 While the specification can be expressed using several of the
 formalisms mentioned earlier, only some are capable of revealing that
 it is, in fact, impossible to implement in a real distributed system.
@@ -96,6 +99,9 @@ to $D$ without knowing which message $A$ sent to $B$, because this
 information is not locally available to $C$.
 \end{example}
 
+The implementability problem in MPST is comparable to verifying 
+whether a given global type can be correctly projected into local 
+types, preserving the intended behaviour.
 This problem is examined from a theoretical
 perspective to provide a more formal and precise understanding of
 the fundamental limits that exist and why syntactical constrains
@@ -107,54 +113,19 @@ peer-to-peer, causal ordering, and synchronous semantics) as explicit
 parameters of the framework. This parameterization allows flexible 
 analysis of different communication models within a unified setting.
 
-The main contributions of this work are: 
-\begin{itemize}
-    \item a proof of the \textbf{undecidability} of the 
-    \textit{weak implementability} problem under the synchronous 
-    semantics of our framework;
-    \item an extension and improvement of the model-checking tool 
-    \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
-    \textit{deadlock-freedom} and \textit{progress} for synchronous 
-    systems;
-    \item a related-work overview, highlighting existing research and 
-    results in this particular domain, providing a structured summary 
-    and comparison with our approach, and setting the perspective for 
-    the contributions that follow.
-\end{itemize}
+The \emph{implementability problem} was first introduced for MSC languages 
+in~\cite{alur2000inference,alur2003inference}. It asks whether there 
+exists a distributed implementation that can realise all behaviours of a 
+finite set of MSCs without introducing additional ones. A stronger variant, 
+called \emph{safe implementability}, requires the implementation to also be 
+\textbf{deadlock-free}. This problem has some synonyms in the term, with 
+slightly different definition, but it can be called also realisability and 
+projectability. We first recall the necessary informal background on MSCs.
 
-These two contributions are closely connected: they both address the 
-implementability problem, but from two complementary angles. The first 
-contribution establishes undecidability, showing that in the general 
-case the weak implementability problem cannot be solved for synchronous semantic. 
-This motivates the second contribution: once undecidability is proven, 
-there is a clear need to identify suitable restrictions of the problem 
-that yield decidability results. The model-checking framework presented 
-in the second part of the thesis is designed as a foundational step 
-towards this direction, providing practical verification techniques that 
-can serve as building blocks for further decidability analyses.  
-
-The thesis is structured as follows. 
-Chapter~\ref{chap:intro} (the present chapter) gives a high-level 
-description of the frameworks used, avoiding formal definitions and 
-proofs for accessibility. Chapters~\ref{sec:pre} and~\ref{sec:proof} 
-then introduce the formal definitions and present the main theoretical 
-contribution. Chapter~\ref{sec:rescu} develops the practical 
-contributions through the \textsc{ReSCu} tool. 
-Chapter~\ref{sec:rel} presents 
-a detailed overview of related work, comparing different approaches in 
-the literature and highlighting how this thesis departs from them. Finally, 
-Chapter~\ref{sec:end} concludes with a discussion of the results and 
-outlines directions for future research and development.
-
-The \emph{implementability problem} was originally introduced for 
-languages of Message Sequence Charts (MSCs). Before presenting it, 
-we first recall the necessary informal background on MSCs.
-
-\subsection{Message Sequence Charts}
 Message Sequence Charts (MSCs) are a standardised graphical formalism,
-introduced in 1992 \cite{MSCStandard}, used to describe trace languages for specifying
-communication behaviour. Thanks to their simplicity and intuitive
-semantics, MSCs have been widely adopted in industry.
+introduced in 1992 \cite{MSCStandard}, used to describe trace languages 
+for specifying communication behaviour. Thanks to their simplicity and 
+intuitive semantics, MSCs have been widely adopted in industry.
 Figure~\ref{fig:msc-cli-ser} illustrates a simple example based on a
 minimal client–server architecture. An extension of this formalism,
 known as High-Level Message Sequence Charts (HMSCs), was later
@@ -183,10 +154,9 @@ highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
 Definition~\ref{def:synchronous}. In Chapter~\ref{sec:rel}, the discussion
 continue presenting other communication semantics, and summarizing
-the relevance of the work by Di Giusto, et al.~\cite{di2023partial}.
-Some examples are shown in 
-Figure~\ref{fig:asy},~\ref{fig:p2p}~and~\ref{fig:sync},
-whose \emph{membership} 
+the relevance of the work by Di Giusto et al.~\cite{di2023partial}.
+Some examples are shown in Figure~\ref{fig:asy},~and~\ref{fig:sync},
+whose \emph{membership} to these classes
 can be verified with an online tool for MSCs~\cite{MSCTool}. 
 
 \paragraph{Fully asynchronous}
@@ -240,118 +210,7 @@ for this semantic (Definition~\ref{def:synchronous}).
   \label{fig:sync}
 \end{figure}
 
-% TODO: rimanere ad alto livello
-% ma aggiungere reference alle definizioni formali 
-% nella parte di definizioni formali fare un confronto.
-% citare il confronto qua e rimandare dopo
-
-\subsubsection{The implementability problem for MSCs}
-
-The \emph{implementability problem} was first introduced for MSC languages 
-in~\cite{alur2000inference,alur2003inference}. It asks whether there exists a distributed 
-implementation that can realise all behaviours of a finite set of MSCs 
-without introducing additional ones. A stronger variant, called 
-\emph{safe implementability}, requires the implementation to also be \textbf{deadlock-free}. 
-This problem has some synonyms in the term, with slightly different definition,
-but it can be called also realisability and projectability.
-% In this setting, distributed implementations are defined using communicating 
-% automata with explicit accepting states, and deadlock-freedom corresponds 
-% to the ability to reach an accepting state from any reachable configuration. 
-
-As already mentioned, the implementability problem in MPST is 
-analogous to checking whether a given global type can be soundly 
-projected into local types while preserving the intended behaviour.
-
-\subsection{Multiparty Session Types}
-Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
-provide a type-theoretic framework to specify and verify communication 
-protocols among multiple participants. They ensure that communication 
-follows a predefined structure, preventing errors such as deadlocks, 
-orphan messages, and unspecified receptions. The 
-\textbf{global specification} describes the overall communication 
-protocol. From this, one derives the \textbf{local behaviours} of each 
-participant via a \emph{projection} operation. The system's 
-\textbf{processes} form the \emph{implementation}, defining how 
-participants interact. With the definition of a \emph{typing system} 
-and suitable \emph{type-checking rules}, one ensures that the 
-implementation conforms to the local specification, thereby 
-guaranteeing properties such as \emph{well-formedness}.  
-Figure~\ref{fig:mpstschema} show a schema summarizing the principal
-parts of the framework.
-
-\begin{figure}[!ht]
-\centering
-\begin{tikzpicture}[
-      node distance=1.2cm,
-      every node/.style={font=\sffamily},
-      rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
-      circ/.style={circle, draw=black, minimum size=1cm},
-      arrow/.style={-{Stealth[scale=1.1]}, thick}
-  ]
-
-  % Nodes
-  \node[rect] (G) {\textcolor{red}{$\mathcal{G}$}};
-  \node[circ, below=of G] (TB) {\textcolor{blue}{$L_\text{B}$}};
-  \node[circ, left=of TB] (TA) {\textcolor{blue}{$L_\text{A}$}};
-  \node[circ, right=of TB] (TC) {\textcolor{blue}{$L_\text{C}$}};
-
-  \node[rect, below=of TA] (PA) {\textcolor{brown}{$P_\text{A}$}};
-  \node[rect, below=of TB] (PB) {\textcolor{brown}{$P_\text{B}$}};
-  \node[rect, below=of TC] (PC) {\textcolor{brown}{$P_\text{C}$}};
-
-  \node[rect,draw=none,right=of TC] (LC) {\textbf{\textcolor{blue}{2. Local type}}};
-  \node[rect,draw=none,above=of LC] (LG) {\textbf{\textcolor{red}{1. Global type}}};
-  \node[rect,draw=none,below=of LC] (LG) {\textbf{\textcolor{brown}{3. Processes}}};
-
-  % Arrows
-  \draw[arrow] (G) -- (TA) node[midway, left] {Projection};
-  \draw[arrow] (G) -- (TB);
-  \draw[arrow] (G) -- (TC);
-
-  \draw[arrow] (PA) -- (TA) node[midway, left] {Type checking};
-  \draw[arrow] (PB) -- (TB);
-  \draw[arrow] (PC) -- (TC);
-  \draw[arrow] (TC) -- (PC);
-  \draw[arrow] (TB) -- (PB);
-  \draw[arrow] (TA) -- (PA);
-
-\end{tikzpicture}
-\caption{Intuitive schema of MPST framework}
-\label{fig:mpstschema}
-\end{figure}
-
-% In this setting, the analogue of realisability is often called 
-% \emph{session fidelity}: a property ensuring that the combined local 
-% types behave exactly according to the global type. When the global 
-% type satisfies syntactic restrictions, its projection is guaranteed 
-% to be both realisable and deadlock-free, which corresponds to safe 
-% realisability in the MSC setting.  
-
-\subsubsection{Projectability}
-A central notion in MPST is \emph{projectability}, which asks whether 
-a global type can be faithfully projected into local specifications for 
-each participant. If projection succeeds, the resulting local types 
-interact without mismatches or unintended behaviours, effectively 
-bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
-Projectability is, therefore, comparable to the implementability
-problem as they have the same aim.
-Projection algorithms, however, often reject natural protocols that 
-fail to meet restrictive syntactic conditions. This difference between 
-expressivity and safety has motivated extensions of the theory, with 
-\cite{castagna2012global} being the only algorithm aiming for full 
-completeness.
-
-% \subsubsection{Mixed and Sender driven choice}
-A key restriction in the definition of MPST appears in branching. 
-In the original framework \cite{honda2008multiparty,carbone2012structured}, 
-choice is \textbf{sender-driven}: the first sender dictates the branch, 
-ensuring safety but excluding many common patterns where multiple 
-participants influence the decision~\cite{carbone2012structured}.  
-Allowing \textbf{mixed choice} increases expressivity by permitting 
-several initiators, but it also makes the implementability problem 
-undecidable in general~\cite{stutz2024implementability}.  
-
-\subsection{Reduction to synchronous semantic}
+\section{Reduction to synchronous semantic}
 The main idea of this work is that reasoning about implementability 
 becomes more tractable under \emph{synchronous} 
 semantics for automata-based solutions to the implementability problem. 
@@ -399,3 +258,43 @@ results should be understood as building blocks toward identifying
 restricted subclasses of synchronous systems that admit decidable 
 implementability checks, complementing the undecidability findings of 
 the theoretical contribution.
+
+\section{Contributions}
+The main contributions of this work are: 
+\begin{itemize}
+    \item a proof of the \textbf{undecidability} of the 
+    \textit{weak implementability} problem under the synchronous 
+    semantics of our framework;
+    \item an extension and improvement of the model-checking tool 
+    \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
+    \textit{deadlock-freedom} and \textit{progress} for synchronous 
+    systems;
+    \item a related-work overview, highlighting existing research and 
+    results in this particular domain, providing a structured summary 
+    and comparison with our approach, and setting the perspective for 
+    the contributions that follow.
+\end{itemize}
+
+These two contributions are closely connected: they both address the 
+implementability problem, but from two complementary angles. The first 
+contribution establishes undecidability, showing that in the general 
+case the weak implementability problem cannot be solved for synchronous semantic. 
+This motivates the second contribution: once undecidability is proven, 
+there is a clear need to identify suitable restrictions of the problem 
+that yield decidability results. The model-checking framework presented 
+in the second part of the thesis is designed as a foundational step 
+towards this direction, providing practical verification techniques that 
+can serve as building blocks for further decidability analyses.  
+
+The thesis is structured as follows. 
+Chapter~\ref{chap:intro} (the present chapter) gives a high-level 
+description of the frameworks used, avoiding formal definitions and 
+proofs for accessibility. Chapters~\ref{sec:pre} and~\ref{sec:proof} 
+then introduce the formal definitions and present the main theoretical 
+contribution. Chapter~\ref{sec:rescu} develops the practical 
+contributions through the \textsc{ReSCu} tool. 
+Chapter~\ref{sec:rel} presents 
+a detailed overview of related work, comparing different approaches in 
+the literature and highlighting how this thesis departs from them. Finally, 
+Chapter~\ref{sec:end} concludes with a discussion of the results and 
+outlines directions for future research and development.
