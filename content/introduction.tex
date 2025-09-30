@@ -23,6 +23,10 @@ infrastructures, and telecommunication-oriented applications (i.e.\
 autonomous cars, aerospace systems, etc.). Given their ubiquity, it is 
 crucial to study every aspect of their \textbf{design}, \textbf{execution}, 
 and \textbf{verification}.
+To manage these complexities in a mathematical way, researchers rely on
+formal abstractions and rigorous methodologies. These allow us to move
+from ad-hoc engineering practices to systematic approaches with
+provable guarantees.
 
 One recurring difficulty is writing \textbf{correct programs} in this 
 context. Avoiding programming and logical errors is inherently hard, even 
@@ -31,7 +35,12 @@ introduced, and computer scientists have focused their efforts on developing
 \textit{formal frameworks} that provide developers with guarantees about 
 their programs. Formal methods for distributed systems offer 
 mathematically rigorous techniques to specify, design, and 
-verify such systems. They are valuable during development, helping 
+verify such systems.
+% Among the many existing formal frameworks, some focus on concurrency,
+% others on resource management, and others still on communication. Since
+% our interest lies in how processes exchange information, we narrow our
+% attention to models that explicitly capture communication behaviour.
+They are valuable during development, helping 
 detect errors early, and during analysis, enabling the study of critical 
 properties such as \textbf{safety}, \textbf{liveness}, and 
 \textbf{deadlock-freedom}. Two primary verification approaches are 
@@ -59,23 +68,36 @@ to the described protocol, therefore ensuring certain properties,
 such as deadlock-freedom, at compile time. 
 
 \section{Goal}
-The goal of this work is to study the \textbf{implementability
-problem} for MPST, which concerns whether a global specification can be
-faithfully implemented by a set of \textit{local processes} in a
-distributed system.
-In essence, it asks: does an implementation really \textbf{respect}
-the behaviour described by a given specification model?
+The goal of this work is to investigate the \textbf{implementability
+problem} for MPST, which asks whether a global specification can be
+faithfully realised by a collection of \textit{local processes} in a
+distributed system. This question naturally arises in top-down
+development methodologies, such as MPST or choreographic
+frameworks~\cite{montesi2014choreographic}, where the design begins
+from a \emph{global perspective} and the local behaviour of each
+participant is derived afterwards.
 
+The implementability problem is central to ensuring that the
+distributed implementation does not diverge from the intended
+specification. In essence, the challenge is to determine whether the
+set of projected local processes can really \textbf{respect} the
+behaviour prescribed by the global model, while preserving essential
+properties such as correctness, progress, and deadlock-freedom. 
+
+A releted-work analysis is provided in
+Chapter~\ref{sec:rel}, where we examine how similar problems have been
+addressed in other formal frameworks.
 To illustrate the relevance of this problem, consider the following
 example.
 
 \bigskip
 
 \begin{example}
-Given four processes $A, B, C, D$ distributed over
-a network, and four messages $x, y, z, w$ to be exchanged according to
-the description in Listing~\ref{lst:not-impl-exm}, is it possible to
-implement it in a real world system?
+Consider four processes $A, B, C,$ and $D$ communicating over an
+asynchronous network, with four messages $x, y, z,$ and $w$ to be
+exchanged as specified in Listing~\ref{lst:not-impl-exm}. A natural
+question arises: can such a specification be faithfully implemented in a
+real distributed system?
 
 \bigskip
 
@@ -113,14 +135,11 @@ peer-to-peer, causal ordering, and synchronous semantics) as explicit
 parameters of the framework. This parameterization allows flexible 
 analysis of different communication models within a unified setting.
 
-The \emph{implementability problem} was first introduced for MSC languages 
-in~\cite{alur2000inference,alur2003inference}. It asks whether there 
-exists a distributed implementation that can realise all behaviours of a 
-finite set of MSCs without introducing additional ones. A stronger variant, 
-called \emph{safe implementability}, requires the implementation to also be 
-\textbf{deadlock-free}. This problem has some synonyms in the term, with 
-slightly different definition, but it can be called also realisability and 
-projectability. We first recall the necessary informal background on MSCs.
+To properly situate the MPST implementability problem, it is useful to
+recall similar questions studied for Message Sequence Charts 
+(MSCs)~\cite{alur2000inference,alur2003inference}.
+These formalisms provide both historical context and technical insights, 
+as some known results will be used in this work.
 
 Message Sequence Charts (MSCs) are a standardised graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages 
@@ -148,7 +167,15 @@ or iterations of atomic MSC scenarios.
 \label{fig:msc-cli-ser}
 \end{figure}
 
-With MSCs, \cite{di2023partial} presents some interesting communication
+The \emph{weak implementability problem} for MSCs asks whether there 
+exists a distributed implementation that can realise all behaviours of a 
+finite set of MSCs without introducing additional ones. A stronger variant, 
+called \emph{safe implementability}, requires the implementation to also be 
+\textbf{deadlock-free}. This problem has some synonyms in the term, with 
+slightly different definition, but it can be called also realisability and 
+projectability.
+
+With MSCs, the work \cite{di2023partial} presents some interesting communication
 semantics. I will describe a few them informally, using examples to
 highlight the differences from the main semantics considered in this work,
 which is \verb|synch|, that is also the only one formally defined in 
@@ -185,6 +212,30 @@ communication.
   \label{fig:asy}
 \end{figure}
 
+\paragraph{Peer-to-peer} 
+In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
+process to another are always received in the same order as they are sent.
+An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
+
+\begin{figure}[!ht]
+    \centering
+      \begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+                    head height=0px, label distance=0.5ex, 
+                    foot height=0px, foot distance=0px]{}
+            \declinst{p}{p}{}
+            \declinst{q}{q}{}
+            \declinst{r}{r}{}
+
+            \mess[pos=0.15]{$m_1$}{p}{r}[3]
+            \nextlevel
+            \mess[pos=0.8]{$m_2$}{p}{q}
+            \nextlevel
+            \mess[pos=0.8]{$m_3$}{q}{r}
+        \end{msc}
+  \caption{Peer-to-peer semantic example.}
+  \label{fig:p2p}
+\end{figure}
+
 \paragraph{Synchronous}
 The synchronous (\verb|synch|) communication model imposes 
 the existence of a scheduling such that any send event is 
@@ -210,6 +261,11 @@ for this semantic (Definition~\ref{def:synchronous}).
   \label{fig:sync}
 \end{figure}
 
+The definition of these models will become central in
+the reduction techniques explored in this work: 
+simplifying the study of implementability
+by reducing richer semantics to the synchronous case.
+
 \section{Reduction to synchronous semantic}
 The main idea of this work is that reasoning about implementability 
 becomes more tractable under \emph{synchronous} 
@@ -232,7 +288,7 @@ The following theorem, currently a work in progress by my
 supervisors~\cite[Theorem 5.3]{di2025realisability}, 
 provides a characterization of a connection between 
 peer-to-peer semantics and synchronous semantics:
-a global type $G$ is deadlock-free realisable in p2p iff
+a global type $G$ is deadlock-free realisable in \verb|p2p| iff
 the following four conditions hold
 \begin{itemize}
   \item the language of $G$'s local type is in synchronous semantics;
@@ -258,6 +314,11 @@ results should be understood as building blocks toward identifying
 restricted subclasses of synchronous systems that admit decidable 
 implementability checks, complementing the undecidability findings of 
 the theoretical contribution.
+
+Given the context, the developments presented in this thesis can be 
+grouped into two main
+contributions, one theoretical and one practical, both closely
+connected.
 
 \section{Contributions}
 The main contributions of this work are: 
