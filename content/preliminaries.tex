@@ -1,7 +1,7 @@
 \chapter{Preliminaries}\label{sec:pre}
 In this section, the fundamental concepts and definitions necessary 
 to contextualize the main contributions of this work are presented. 
-I, first, introduce automaton, executions, and
+We, first, introduce automaton, executions, and
 Message Sequence Charts (MSC), followed by 
 an examination of communication model's semantics that are particularly 
 interesting. 
@@ -122,7 +122,7 @@ $\eventsof{w} = \sendeventsof{w} \cup \receiveeventsof{w}$.
 When all events are labelled with distinct actions, 
 we identify an event with its action.  
 
-\subsubsection*{Executions.}
+\paragraph{Executions.}
 An execution is a well-defined sequence of actions $e\in\Act^*$, where a
 receive action is always preceded by a unique corresponding send action. % TODO : in che senso?
 
@@ -200,9 +200,7 @@ The label $\actionof{\event}$ of an event $\event=(p,i)$ is the action
 $w_p[i]$. The event $\event$ is a send (resp. receive) event if it is  
 labelled with a send (resp. receive) action.  
 We write $\sendeventsof{\mmsc}$ (resp. $\receiveeventsof{\mmsc}$)  
-for the set of send (resp. receive) events of $\mmsc$. We also write  
-$\messageof{\event}$ for the message sent or received at $\event$, and  
-$\processof{\event}$ for the process executing $\event$.  
+for the set of send (resp. receive) events of $\mmsc$.
 Finally, we write $\verticalorderstrict{\event_1}{\event_2}$ if there  
 exists a process $p$ and indices $i<j$ such that  
 $\event_1=(p,i)$ and $\event_2=(p,j)$.  
@@ -395,7 +393,6 @@ receive events.
 
 \subsubsection*{Communicating finite state machines.}
 We recall the definition of communicating finite state machines~\cite{BrandZafiropulo}.
-These definitions will later be used also for Chapter~\ref{sec:rescu}.
 
 \bigskip
 
@@ -515,37 +512,6 @@ $e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel}$.
 % 	$$
 % \end{remark}
 
-% TODO: capire se serve
-% MODIFICATO SOLO PER SYNC
-The following result shows that, for
-$\synchmodel$ communication model, the deadlock-freedom property 
-of a system of CFSMs can be expressed as a property on the MSCs
-of the system. 
-%The proof can be found in Appendix \ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
-
-\bigskip
-
-\begin{lemma}[Deadlock-freedom as an MSC property]\label{lem:ddlckmsc}
-	\label{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
-	Assume $\acommunicationmodel$ is $\synchmodel$.
-	Then a system of CFSMs $\cfsms$ is deadlock-free for $\acommunicationmodel$ if and only if
-	$$
-	\mscsofcfsms{\acceptcompletion\cfsms}{\acommunicationmodel}
-	\subseteq
-	\prefixclosureof{\mscsofcfsms{\cfsms}{\acommunicationmodel}}.
-	$$
-\end{lemma}
-
-The proof for Lemma~\ref{lem:ddlckmsc} can be found in \cite[Proposition 2.1]{di2025realisability}.
-
-% %\input{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch.tex}
-
-% %\iflong
-% %\include{proofs/prop-deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}
-% %\else
-% %The proof of Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} can be found in Appendix~\ref{app:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch}.
-% %\fi
-
 \section{Global Types}
 This part will further highlight the basic notions to understand the formal proof 
 for the theorem presented in Chapter~\ref{sec:proof} and, in particular, Global Type
@@ -565,9 +531,8 @@ as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability
 \begin{definition}[Global Type]
 	An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ 
 	with $p\ne q$; we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and 
-	write $\labelalphabet$ to denote the finite set of arrows.
-	A Global Type $\gt$ is a deterministic finite state automaton over the 
-	alphabet $\labelalphabet$.
+	write $\labelalphabet$ to denote the finite set of arrosws.
+	A Global Type $\gt$ is a DFA over the alphabet $\labelalphabet$.
 \end{definition}
 % TODO: dare più contesto ad esempio
 
@@ -607,26 +572,20 @@ Global Type in Figure~\ref{fig:gt-exm}.
 
 % --------------relationship between MSCs and Global Types--------------
 
-I can now formally define the relationship between MSCs and Global Types. 
+We can now formally define the relationship between MSCs and Global Types. 
 Intuitively, Global Types represent a set of MSCs, allowing us to reason 
 about multiple message sequence scenarios. 
 
 A Global Type defines a language of MSCs in two different ways, one
 existential and one universal. Let $\labellanguageof{\gt}$ be the set of
-sequences of arrows $w$ accepted by $\gt$. Note that for $w \in \Arrows^*$,
-the function $w \mapsto \labeltomsc{w}$ with
-$\labeltomsc{w} \in \mscsetofmodel{\synchmodel}$ is not injective, as two
-arrows with disjoint pairs of processes commute. We write $w_1 \sim w_2$ if
-$\labeltomsc{w_1} = \labeltomsc{w_2}$, and $[w]$ for the equivalence class
-of $w$ with respect to $\sim$.
-
+sequences of arrows $w$ accepted by $\gt$.
 Informally, the existential MSC language $\existentialmsclanguageof{\gt}{}$ of a 
 Global Type $\gt$ is the set of MSCs that admit at least one representation as a
 sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC
 language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
 MSCs whose representations as sequences of arrows are all in
-$\labellanguageof{\gt}$:
-% TODO: ivan dice di controllare? la def di chor automata (o forse hanno una roba simile)
+$\labellanguageof{\gt}$. We will just give the formal definition of
+$\existentialmsclanguageof{\gt}{}$:
 
 \bigskip
 
@@ -634,29 +593,10 @@ $\labellanguageof{\gt}$:
 	$$
 		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
 		w \in \labellanguageof{\gt}\}
-  $$
+  	$$
 \end{definition}
 
-\bigskip
-
-\begin{definition}[$\universalmsclanguageof{\gt}$]
-  $$
-		\universalmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
-		[w] \subseteq \labellanguageof{\gt}\}.
-	$$
-\end{definition}
 % TODO: dare più contesto ed esempio
-
-\bigskip
-
-\begin{definition}[Commutation-closed]
-    A global type $\gt$ is \emph{commutation-closed} if
-    $$
-    \existentialmsclanguageof{\gt} = \universalmsclanguageof{\gt}.
-    $$
-\end{definition}
-% TODO: togliere exist e forall dalla nozione
-% We write $\msclanguageofcc{\gt}$ for the common language. % TODO: mi serve?
 
 When a global type is implemented in a concrete system,
 its behaviour depends on the chosen communication model.
@@ -671,7 +611,7 @@ its behaviour depends on the chosen communication model.
 \end{definition}
 
 % TODO: FARE UN CONFRONTO CON LE DUE DEFINIZIONI
-Let's now give the defintions of waek and safe realisability.
+We now give the definitions of weak and safe realisability.
 
 \bigskip
 
@@ -682,6 +622,10 @@ system CFSM $\cfsms$ such that the following condition hold:
 $\executionsof{\cfsms}{\acommunicationmodel} = \executionsof{\gt}{\acommunicationmodel}$
 \end{definition}
 
+Although this work does not focus on safe realisability, we will still
+define it formally to highlight the main differences and similarities 
+with other works in Chapter~\ref{sec:rel}.
+
 \bigskip
 
 \begin{definition}[Safe realisability]\label{def:gt-safe-realis}
@@ -690,152 +634,5 @@ $\executionsof{\cfsms}{\acommunicationmodel} = \executionsof{\gt}{\acommunicatio
     if there is a system $\cfsms$ that is \emph{weak realisable} and  
     $\cfsms$ is deadlock-free in $\acommunicationmodel$.
 \end{definition}
-
-I now introduce the definition of implementability following the one given 
-by Alur, et al. \cite{alur2005realizability}, referred to as 
-\textit{Weak-realisability}.
-To formalize it, we first define the notions of 
-\textit{weak implication} and \textit{weak closure}.
-
-%% TODO: Spiegare meglio con intuizioni
-
-\bigskip
-
-\begin{definition}[Weakly-imply]
-	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
-	\textit{weakly implies} $M$, if for any sequence of automata
-	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
-	$L(\prod_i A_i)$ then $M \in L(\prod_i A_i)$.
-\end{definition}
-
-In order to understand the meaning of \emph{weak implication},
-consider the following example.
-
-\bigskip
-
-\begin{example}
-Define two MSCs, MSC1 and MSC2. Both perform the same four
-communications, but in different orders.  
-MSC1 first sends message $a$ from P1 to P2, then from P1 to P3, 
-then sends $b$ from P4 to P2, and finally from P4 to P3.  
-MSC2 instead starts with P4 sending $b$ to P2, then to P3, 
-followed by P1 sending $a$ to P2 and then to P3.  
-
-Now define a third MSC $M$ with the same four messages but in a
-different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends 
-$b$ to P3, and finally P1 sends $a$ to P3.  
-
-We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
-at each process projection we recover the same behaviour in one of
-them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
-Figure~\ref{fig:weak-impl} illustrates the three MSCs.
-
-\begin{figure}[!ht]
-\centering
-\begin{tabular}{ccc}
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-	\nextlevel
-	\nextlevel
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\mess{b}{P4}{P3}
-\end{msc}
-} 
-\end{minipage}
-&
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\mess{b}{P4}{P3}
-	\nextlevel
-	\nextlevel
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-\end{msc}
-}
-\end{minipage}
-&
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\nextlevel
-	\mess{b}{P4}{P3}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-\end{msc}
-}
-\end{minipage} \\
-MSC1 & MSC2 & $M$
-\end{tabular}
-\caption{The MSC $M$ is weakly implied by MSC1 and MSC2}
-\label{fig:weak-impl}
-\end{figure}
-\end{example}
-
-\bigskip
-
-\begin{definition}[Weakly-closure $\setmsc^w$]
-	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
-	weakly implied by $\setmsc$.
-\end{definition}
-
-% todo: esempio
-
-\bigskip
-
-\begin{definition}[Weakly-realisable]\label{def:weak-realisability}
-	An MSC $M$ is said to be weakly-realisable if the set of MSCs
-	$L(M)$ is weakly realisable. A set of MSCs $\setmsc$ is said to be weakly
-	realisable if $\setmsc=\setmsc^w$.
-\end{definition}
-It is important to note that this definition does not include the
-property of deadlock-freedom. 
-
-
-% todo: esempio
-
-% CINZIA, X TESI:
-% sarebbe interessante mettere la definizione di PPDP e mostrare 
-% l'equivalenza tra le due
-
-% VERSIONE ALTERNATIVA VECCHIA
-% \begin{definition}[Projection]
-% For an MSC $M$ and a process $P_i$, let $M|_i$ denote the sequence of events be
-% belonging to the process $P_i$ in $M$.
-% \end{definition}
-% \begin{definition}[Weakly-imply]
-% The set of MSCs $\setmsc$ weakly implies an MSC $M$ iff for all $1\leq i\leq n$, there
-% exist an MSC $M_i\in L$ such that $M|_i=M_i|_i$
-% \end{definition}
-% \begin{definition}[Weakly-realisable]
-% ? TODO ?
-% \end{definition}
 
 We are now ready to present the main contributions of this work.

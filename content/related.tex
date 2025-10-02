@@ -151,7 +151,7 @@ Figure~\ref{fig:coms} shows \verb|rsc| as the last block of the hierarchy.
 \verb|rsc| stands for \emph{Realisable in Synchronous Communication}, therefore, 
 is comparable to our definition of $\synchmodel$ model, but there are 
 some differences. For example, it does not accept \emph{orphan messages}, 
-which are instead accepted for the defintion of this thesis.
+which are instead accepted for the definition of this thesis.
 
 % \subsection{Realisability for Di Giusto et~al.}
 % For the general model, we now recall the definition of 
@@ -188,6 +188,134 @@ which are instead accepted for the defintion of this thesis.
 \section{Realisability for Alur and Lohrey}
 We recall the definition of Safe Realisability for 
 Alur~et~al.~\cite{alur2005realizability}.
+
+
+We now introduce the definition of implementability following the one given 
+by Alur, et al. \cite{alur2005realizability}, referred to as 
+\textit{Weak-realisability}.
+To formalize it, we first define the notions of 
+\textit{weak implication} and \textit{weak closure}.
+
+%% TODO: Spiegare meglio con intuizioni
+
+\bigskip
+
+\begin{definition}[Weakly-imply]
+	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
+	\textit{weakly implies} $M$, if for any sequence of automata
+	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
+	$L(\prod_i A_i)$ then $M \in L(\prod_i A_i)$.
+\end{definition}
+
+In order to understand the meaning of \emph{weak implication},
+consider the following example.
+
+\bigskip
+
+\begin{example}
+Define two MSCs, MSC1 and MSC2. Both perform the same four
+communications, but in different orders.  
+MSC1 first sends message $a$ from P1 to P2, then from P1 to P3, 
+then sends $b$ from P4 to P2, and finally from P4 to P3.  
+MSC2 instead starts with P4 sending $b$ to P2, then to P3, 
+followed by P1 sending $a$ to P2 and then to P3.  
+
+Now define a third MSC $M$ with the same four messages but in a
+different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends 
+$b$ to P3, and finally P1 sends $a$ to P3.  
+
+We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
+at each process projection we recover the same behaviour in one of
+them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
+Figure~\ref{fig:weak-impl} illustrates the three MSCs.
+
+\begin{figure}[!ht]
+\centering
+\begin{tabular}{ccc}
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+	\nextlevel
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+\end{msc}
+} 
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\nextlevel
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage}
+&
+\begin{minipage}{0.32\textwidth}
+\scalebox{0.55}{%
+\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+	\declinst{P1}{P1}{}
+	\declinst{P2}{P2}{}
+	\declinst{P3}{P3}{}
+	\declinst{P4}{P4}{}
+
+	\mess{a}{P1}{P2}
+	\nextlevel
+	\mess[pos=0.25]{b}{P4}{P2}
+	\nextlevel
+	\nextlevel
+	\mess{b}{P4}{P3}
+	\nextlevel
+	\mess[pos=0.25]{a}{P1}{P3}
+\end{msc}
+}
+\end{minipage} \\
+MSC1 & MSC2 & $M$
+\end{tabular}
+\caption{The MSC $M$ is weakly implied by MSC1 and MSC2}
+\label{fig:weak-impl}
+\end{figure}
+\end{example}
+
+\bigskip
+
+\begin{definition}[Weakly-closure $\setmsc^w$]
+	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
+	weakly implied by $\setmsc$.
+\end{definition}
+
+% todo: esempio
+
+\bigskip
+
+\begin{definition}[Weakly-realisable]\label{def:weak-realisability}
+	An MSC $M$ is said to be weakly-realisable if the set of MSCs
+	$L(M)$ is weakly realisable. A set of MSCs $\setmsc$ is said to be weakly
+	realisable if $\setmsc=\setmsc^w$.
+\end{definition}
+It is important to note that this definition does not include the
+property of deadlock-freedom. 
 
 \bigskip
 

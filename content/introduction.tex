@@ -28,44 +28,39 @@ formal abstractions and rigorous methodologies. These allow us to move
 from ad-hoc engineering practices to systematic approaches with
 provable guarantees.
 
-One recurring difficulty is writing \textbf{correct programs} in this 
-context. Avoiding programming and logical errors is inherently hard, even 
-for experienced developers. To mitigate this, many abstractions have been 
-introduced, and computer scientists have focused their efforts on developing 
-\textit{formal frameworks} that provide developers with guarantees about 
-their programs. Formal methods for distributed systems offer 
-mathematically rigorous techniques to specify, design, and 
-verify such systems.
-% Among the many existing formal frameworks, some focus on concurrency,
-% others on resource management, and others still on communication. Since
-% our interest lies in how processes exchange information, we narrow our
-% attention to models that explicitly capture communication behaviour.
-They are valuable during development, helping 
-detect errors early, and during analysis, enabling the study of critical 
-properties such as \textbf{safety}, \textbf{liveness}, and 
-\textbf{deadlock-freedom}. Two primary verification approaches are 
-\textit{model checking} and \textit{by-construction} verification. Model 
-checking systematically explores a system's state space to confirm 
-properties, while by-construction verification guarantees correctness 
-through the design process itself, preventing errors from being introduced. 
+One recurring difficulty in distributed systems' development is writing 
+\textbf{correct programs}. Avoiding programming and logical errors is 
+inherently hard, even for experienced developers. To mitigate this, many 
+abstractions have been introduced, and computer scientists have focused their 
+efforts on developing \textit{formal frameworks} that provide guarantees 
+about program behavior. 
 
-There exists several models to reason about distributed systems.
-Different model are specialized in different aspects of a system, and we
-are interested in the ones about the exchange of information, such as
-Calculus of Communicating Systems (CCS), the $\pi$-calculus, and Petri nets.
-In this work, however, we focus on 
-\textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty},
-% and \textit{choreographies}~\cite{montesi2014choreographic}, 
-since this formalism place particular emphasis on structured and 
-verifiable communication protocols, making them especially well suited 
-for protocol design.
-In MPST, communication is specified by a \emph{global type}, which 
-describes the entire interaction among all participants. 
-This global type is then \emph{projected} into 
-\emph{local types}, one for each participant. 
-Local types serve as contracts that guarantee each component is compliant 
-to the described protocol, therefore ensuring certain properties, 
-such as deadlock-freedom, at compile time. 
+Formal methods for distributed systems offer mathematically rigorous 
+techniques to specify, design, and verify such systems. They are valuable 
+both during development, by helping detect errors early, and during analysis, 
+by enabling the study of critical properties such as \textbf{safety}, 
+\textbf{liveness}, and \textbf{deadlock-freedom}. Two primary verification 
+approaches are \textit{model checking} and \textit{by-construction} 
+verification. Model checking systematically explores a system's state space 
+to confirm properties, while by-construction verification ensures correctness 
+through the design process itself, preventing errors from being introduced.  
+
+Among the many aspects of distributed systems, communication is particularly 
+prone to subtle errors and inconsistencies. To reason formally about 
+communication protocols, several models have been proposed, including the 
+Calculus of Communicating Systems (CCS), the $\pi$-calculus, and choreographies. 
+In this context, \textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty} 
+stand out as a powerful framework. MPST are designed specifically to formalize 
+and verify structured communication among multiple participants, providing 
+strong guarantees about protocol correctness.  
+
+MPST describe communication through a \emph{global type}, which specifies 
+the entire interaction among all participants. This global type is then 
+\emph{projected} into \emph{local types}, one for each participant. Local 
+types act as contracts, ensuring that each component adheres to the protocol. 
+As a result, MPST allow developers to guarantee properties such as 
+deadlock-freedom and protocol compliance at compile time, making them an 
+especially appealing tool for designing robust communication protocols.
 
 \section{Goal}
 The goal of this work is to investigate the \textbf{implementability
@@ -113,40 +108,43 @@ If A sends B message y,
 then C sends D message w.
 \end{lstlisting}
 
-While the specification can be expressed using several of the
-formalisms mentioned earlier, only some are capable of revealing that
-it is, in fact, impossible to implement in a real distributed system.
+While the specification can be expressed using several of the formalisms
+mentioned earlier, only some of them in some cases are capable of revealing 
+that it is, in fact, \emph{impossible} to implement in a real distributed system.
 The reason is that process $C$ cannot determine which message to send
 to $D$ without knowing which message $A$ sent to $B$, because this 
 information is not locally available to $C$.
 \end{example}
 
-The implementability problem in MPST is comparable to verifying 
-whether a given global type can be correctly projected into local 
-types, preserving the intended behaviour.
-This problem is examined from a theoretical
-perspective to provide a more formal and precise understanding of
-the fundamental limits that exist and why syntactical constrains
-of certain models work.
-In this work, we use an \textit{automata-based} approach to Global Types. 
-This formalism is designed to be highly modular, 
-incorporating various \textit{network semantics} (such as asynchronous, 
-peer-to-peer, causal ordering, and synchronous semantics) as explicit 
-parameters of the framework. This parameterization allows flexible 
-analysis of different communication models within a unified setting.
+The implementability problem in this work is examined from a theoretical
+perspective to provide a more formal and precise understanding of the
+fundamental limits that exist and why syntactical constraints of certain
+models work.  
 
-To properly situate the MPST implementability problem, it is useful to
-recall similar questions studied for Message Sequence Charts 
-(MSCs)~\cite{alur2000inference,alur2003inference}.
+Unlike the standard approach to \textit{Global Types} in MPST, which often
+relies on a purely syntactic representation, in this work we adopt a more
+\textit{semantic approach}. Specifically, we represent global types as
+\textit{automata}. This automata-based
+representation is highly modular, incorporating various
+\textit{network semantics} (such as asynchronous, peer-to-peer, causal
+ordering, and synchronous semantics) as explicit parameters of the
+framework. Such parameterization allows a flexible analysis of different
+communication models within a unified setting.
+In this framework, we interpret the semantics of a global type as a set of
+Message Sequence Charts (MSCs). It is therefore useful to recall related
+questions that have been studied in the context of 
+MSCs~\cite{alur2000inference,alur2003inference}. 
 These formalisms provide both historical context and technical insights, 
-as some known results will be used in this work.
+and several known results from this line of work will be directly leveraged 
+in the present study.
 
 Message Sequence Charts (MSCs) are a standardised graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages 
 for specifying communication behaviour. Thanks to their simplicity and 
 intuitive semantics, MSCs have been widely adopted in industry.
 Figure~\ref{fig:msc-cli-ser} illustrates a simple example based on a
-minimal client–server architecture. An extension of this formalism,
+minimal client–server architecture. To give more context, 
+an extension of this formalism,
 known as High-Level Message Sequence Charts (HMSCs), was later
 introduced \cite{HMSCStandard}. HMSCs enable the definition of
 MSCs as nodes connected by transitions and are used to model more
@@ -171,23 +169,37 @@ The \emph{weak implementability problem} for MSCs asks whether there
 exists a distributed implementation that can realise all behaviours of a 
 finite set of MSCs without introducing additional ones. A stronger variant, 
 called \emph{safe implementability}, requires the implementation to also be 
-\textbf{deadlock-free}. This problem has some synonyms in the term, with 
-slightly different definition, but it can be called also realisability and 
-projectability.
+\textbf{deadlock-free}. 
 
-With MSCs, the work \cite{di2023partial} presents some interesting communication
-semantics. I will describe a few them informally, using examples to
-highlight the differences from the main semantics considered in this work,
-which is \verb|synch|, that is also the only one formally defined in 
-Definition~\ref{def:synchronous}. In Chapter~\ref{sec:rel}, the discussion
-continue presenting other communication semantics, and summarizing
-the relevance of the work by Di Giusto et al.~\cite{di2023partial}.
-Some examples are shown in Figure~\ref{fig:asy},~and~\ref{fig:sync},
-whose \emph{membership} to these classes
-can be verified with an online tool for MSCs~\cite{MSCTool}. 
+\textbf{Remark.} The term ``implementability'' has several synonyms in the
+literature. In other works, it is often referred to as \emph{realisability}, 
+\emph{projectability}, or \emph{knowledge of choices}. Each of these terms, 
+depending on the formal model considered, comes with slightly different 
+definitions. Some of these variations will be analysed in 
+Chapter~\ref{sec:rel}.
 
-\paragraph{Fully asynchronous}
+With MSCs, the work of Di Giusto et al.~\cite{di2023partial} introduces
+interesting communication semantics and a hierarchy among them. The main
+goal of their study was to establish a hierarchy that preserves
+\emph{monotonic} properties: if a property holds for a given communication
+semantics, it should also hold for all semantics contained within it.
+However, they showed that this monotonicity only applies to certain
+properties. In this work, we continue the study within the same framework,
+focusing on the implementability property.  
 
+In the following paragraphs, we describe some of these communication
+semantics informally, using examples to highlight the differences between
+them. In particular, we will later formally define \verb|synch| in
+Definition~\ref{def:synchronous}, as this communication semantics is used
+in the main contribution of this thesis. Chapter~\ref{sec:rel} continues
+the discussion by presenting additional communication semantics and
+summarizing the relevance of the work by Di Giusto et
+al.~\cite{di2023partial}. Some examples of different communication semantics
+are illustrated in Figures~\ref{fig:asy} and~\ref{fig:sync}, whose
+\emph{membership} in these classes can be verified using an online MSC
+tool~\cite{MSCTool}.
+
+\paragraph{Fully asynchronous.}
 In the fully asynchronous communication model (\verb|asy|), messages can be 
 received at any time after they have been sent, and send events are 
 non-blocking. This model can be viewed as an unordered ``bag'' in which 
@@ -212,7 +224,7 @@ communication.
   \label{fig:asy}
 \end{figure}
 
-\paragraph{Peer-to-peer} 
+\paragraph{Peer-to-peer.} 
 In the peer-to-peer (\verb|p2p|) communication model, any two messages sent from one 
 process to another are always received in the same order as they are sent.
 An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
@@ -236,7 +248,7 @@ An alternative name is FIFO. An example is shown in Figure~\ref{fig:p2p}.
   \label{fig:p2p}
 \end{figure}
 
-\paragraph{Synchronous}
+\paragraph{Synchronous.}
 The synchronous (\verb|synch|) communication model imposes 
 the existence of a scheduling such that any send event is 
 immediately followed by its corresponding receive event. 
@@ -267,31 +279,25 @@ simplifying the study of implementability
 by reducing richer semantics to the synchronous case.
 
 \section{Reduction to synchronous semantic}
-The main idea of this work is that reasoning about implementability 
-becomes more tractable under \emph{synchronous} 
-semantics for automata-based solutions to the implementability problem. 
-In synchronous communication, send and receive actions 
-are tightly coupled, effectively removing nondeterminism 
-caused by asynchronous message buffering. Several results exploit this 
-observation by reducing the implementability problem under richer 
-communication models (e.g.\ asynchronous or peer-to-peer FIFO) to the 
-simpler synchronous case~\cite{alur2005realizability,di2023partial}.
+Theorem~\cite[Theorem 5.3]{di2025realisability} suggests that reasoning about
+implementability could become more tractable under \emph{synchronous}
+semantics for automata-based solutions to the implementability problem. In
+synchronous communication, send and receive actions are tightly coupled,
+effectively eliminating the nondeterminism introduced by asynchronous
+message buffering.
 
-Formally, one can show that if a global type is implementable in 
-synchronous semantics, then under certain conditions it is also 
-implementable in more general models such as peer-to-peer or mailbox 
-semantics. This reduction requires constraints such as 
-\emph{orphan-freedom} (no message is left unmatched) and
-\emph{deadlock-freedom}.  
+Formally, the theorem shows that if a global type is implementable under
+synchronous semantics, then, under certain conditions, it is also
+implementable in more general models, such as peer-to-peer semantics. This
+reduction requires constraints such as \emph{orphan-freedom} (no message is
+left unmatched) and \emph{deadlock-freedom}.  
 
-The following theorem, currently a work in progress by my 
-supervisors~\cite[Theorem 5.3]{di2025realisability}, 
-provides a characterization of a connection between 
-peer-to-peer semantics and synchronous semantics:
+We present the theorem here informally, using the standard meanings of
+terms that have already been introduced:
 a global type $G$ is deadlock-free realisable in \verb|p2p| iff
 the following four conditions hold
 \begin{itemize}
-  \item the language of $G$'s local type is in synchronous semantics;
+  \item the language generated by $G$'s local type has synchronous semantics;
   \item all $G$'s projections are orphan-free;
   \item all the traces of the MSCs' language of $G$ are deadlock-free
   in \verb|p2p|;
@@ -329,11 +335,7 @@ The main contributions of this work are:
     \item an extension and improvement of the model-checking tool 
     \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
     \textit{deadlock-freedom} and \textit{progress} for synchronous 
-    systems;
-    \item a related-work overview, highlighting existing research and 
-    results in this particular domain, providing a structured summary 
-    and comparison with our approach, and setting the perspective for 
-    the contributions that follow.
+    systems.
 \end{itemize}
 
 These two contributions are closely connected: they both address the 
@@ -343,9 +345,9 @@ case the weak implementability problem cannot be solved for synchronous semantic
 This motivates the second contribution: once undecidability is proven, 
 there is a clear need to identify suitable restrictions of the problem 
 that yield decidability results. The model-checking framework presented 
-in the second part of the thesis is designed as a foundational step 
+in the second part of the thesis could be a foundational step 
 towards this direction, providing practical verification techniques that 
-can serve as building blocks for further decidability analyses.  
+can serve as building blocks for further decidability analyses.
 
 The thesis is structured as follows. 
 Chapter~\ref{chap:intro} (the present chapter) gives a high-level 
