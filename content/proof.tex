@@ -24,13 +24,14 @@ solution to an RPCP instance into the (non-)realisability of our formal
 specification. In the original proof, they use MSCs, therefore, 
 defining an HMSC called $M^*$. In my case, I will define a
 \emph{global type} (called $L^*$) built from synchronous global types.
-Therefore, we need to prove:
+A generic solution for the RPCP problem will correspond to the global
+type $L^*$. Therefore, we need to prove:
 $$
 \Delta \in \text{RPCP} \quad\iff\quad L^* \text{ is not realisable}.
 $$
-In the original proof, $L^*$ is not a global type, but an MSC.
-Then, we need to change some base definitions of the original paper
-to fit the model. 
+Given that, in the original proof, $L^*$ is not a global type, but an MSC
+we need to make some changes to the base definitions to fit our formal
+framework. 
 
 \bigskip
 
@@ -41,7 +42,8 @@ to fit the model.
 	where $x_{i_j}, y_{i_j} \in \{v_{i_j}, w_{i_j}\}$, such that:
 	\begin{itemize}
 		\item there exists at least one index $i_\ell$ for which $x_{i_\ell}\neq y_{i_\ell}$, and
-		\item for all $j \leq m$, $y_{i_1}\cdots y_{i_j}$ is a prefix of $x_{i_1}\cdots x_{i_j}$.
+		\item for all $j \leq m$, $y_{i_1}\cdots y_{i_j}$ is a strict or 
+		not-strict prefix of $x_{i_1}\cdots x_{i_j}$.
 	\end{itemize}
 \end{definition}
 
@@ -143,7 +145,7 @@ construction of a string given some tiles through the interaction of four proces
 Processes~2 and~3 are responsible for building the string itself,  
 while Processes~1 and~4 transmit the index information to Processes~2  
 and~3, respectively. In particular, Process~1 initiates the choice and  
-forwards it to Process~4.
+forwards it to Process~4. This encoding applies equally to Defintion~\ref{def:gni}.
 
 \bigskip
 
@@ -179,7 +181,7 @@ We now give the same definition of the encoding, but in a Global Type format.
         \item Arr $=\{$\arrmess{p}{q}{m_1}, \arrmess{p}{s}{m_2},
               \arrmess{s}{r}{m_3}, \arrmess{q}{r}{m_{x_i^1}}, $\ldots$,
               \arrmess{q}{r}{m_{x_i^c}}$\}$, where each arrow denotes
-              a synchronous message with acknowledgment.
+              a synchronous message with acknowledgment. % TODO : CHIEDERE CINZIA : avendo semantica syncrona ho bisogno dei messaggi di ack?
     \end{itemize}
     The automaton of $G_i^n$ is shown in Figure~\ref{fig:gtype}.
 	
@@ -256,10 +258,10 @@ string $S$, which will serve as the building block in the reduction.
 
 \bigskip
 
-% TODO: check
 \begin{lemma}\label{lmm:msgs}
+Assume the $\synchmodel$ model.
 The MSC $M^n_i$ (Definition~\ref{def:mni}) is included in 
-$\languageof{G_S}{}{}$ (Definition~\ref{def:gni}).
+$\msclanguageof{G_i^n}{\synchmodel}$ (Definition~\ref{def:gni}).
 \end{lemma}
 
 % TODO: Da rifare meglio, non ha senso quel L(M) = L(G)
@@ -271,7 +273,8 @@ $\languageof{G_S}{}{}$ (Definition~\ref{def:gni}).
 	process $q$ then sends the characters of $x_i$ to $r$.
 	The sequence of messages is identical in both 
 	$M^n_i$ and $G_i^n$. Since both models enforce synchronous communication, 
-	their linearisations coincide. Hence, $L(M^n_i) = L(G_S)$.
+	their linearisations coincide. 
+	Hence, $M^n_i \in \msclanguageof{G_i^n}{\synchmodel}$.
 \end{proof}
 
 Having established the correspondence between an individual MSC and a  
@@ -367,7 +370,7 @@ structure used to demonstrate non-realisability.
 
 \section{Undecidability proof}
 
-Given the definitions and lemmas state in the last section, I am now ready
+Given the definitions and lemmas stated in the last section, I am now ready
 to present the proof for the undecidability result.
 
 \bigskip
@@ -382,8 +385,8 @@ to present the proof for the undecidability result.
 
 	Given an instance $\Delta = \{(v_1, w_1), \ldots, (v_m, w_m)\}$ of RPCP, we
 	construct a set $L$ of MSCs over four processes as follows. For each pair
-	$(v_i, w_i)$, we define two MSCs, $M^0_i$ and $M^1_i$, as illustrated in
-	Figure~\ref{fig:mni}.
+	$(v_i, w_i)$, we define two MSCs, $M^0_i$ and $M^1_i$, as defined in 
+	Definition~\ref{def:mni} and illustrated in	Figure~\ref{fig:mni}.
 	Observe that the communication graph of each MSC is strongly connected and
 	involves all four processes. Therefore, the MSC represented from
 	$L^*$ and derived from $L$ is bounded.
@@ -408,8 +411,8 @@ to present the proof for the undecidability result.
 		      The language of the executions of both of these (sequences of) Global Types 
 			  must be included in the language of execution of $L^*$. 
 			  Additionally, the language of MSCs of these Global Types are 
-			  in $\mscsetofmodel{\synchmodel}$ because they are sequence of 
-			  $\mscsetofmodel{\synchmodel}$ MSC (Lemma~\ref{lemma:minsynch}).
+			  in $\mscsetofmodel{\synchmodel}$ because they are sequences of MSCs included in
+			  $\mscsetofmodel{\synchmodel}$ (Lemma~\ref{lemma:minsynch}).
 		      $G_x$ corresponds to the construction of the left side of the equivalence of the RPCP
 		      problem, and, instead, $G_y$ represents the construction of the right side.
 		      We then look at the projections $G_x|_{P1}$, $G_x|_{P2}$, $G_x|_{P3}$,
@@ -448,7 +451,7 @@ to present the proof for the undecidability result.
 		      and $P_3$. Therefore, this cycle must involve all processes, starting
 		      for example from $P_1$ and having this dependency graph
 		      $P_1\leftrightarrow P_2\leftrightarrow P_3\leftrightarrow P_4\leftrightarrow P_1$.
-		      The only new situation that we now that can cause a cycle are the communication
+		      The only new situation that can cause a cycle are the communication
 		      between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
 		      We don't need to analyse the new communication between $P_1$ and $P_4$ because
 		      it's not feasible in any communication model, but we need to analyse the one
@@ -667,7 +670,7 @@ Figure~\ref{fig:exmp-my}) \((y_1,y_2,y_3)=(v_2,w_1,w_3)\).
 \label{fig:exmp-my}
 \end{figure}
 
-Recall that $G|_p$ denote the projection of $G$ onto process $p$. We
+Recall that $G|_p$ denotes the projection of $G$ onto process $p$. We
 construct the MSC
 $$
   G_{\texttt{sol}} = (G_y|_{P1},\; G_y|_{P2},\; G_x|_{P3},\; G_x|_{P4}),

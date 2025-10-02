@@ -1,10 +1,25 @@
 \chapter{ReSCu}\label{sec:rescu}
-I now present \textsc{ReSCu} (first introduced in \cite{desgeorges2023rsc, di2023multiparty, guizouarn2023communicating}),
-describing its features, the input
-language it uses, its implementation, and the modifications I introduced to
-extend its functionality~\cite{rescuoriginalrepo}. The updated
-public repository with 
-the new features and examples is available at 
+In the previous chapter, I examined the theoretical aspects of the
+implementability problem for MPST, culminating in the main result: the
+\textbf{undecidability} of weak implementability under synchronous
+semantics. That analysis not only establishes a fundamental limitation,
+but also highlights the need to explore alternative approaches, such as
+identifying restricted subclasses or designing practical techniques that
+can still support verification in real-world scenarios.  
+This chapter changes the focus from undecidability to decidability. I present
+\textsc{ReSCu} (first introduced in
+\cite{desgeorges2023rsc,di2023multiparty,guizouarn2023communicating}),
+a verification tool that provides automated support for reasoning about
+realizability. The tool enables the analysis of properties such as
+\textit{deadlock-freedom} and \textit{progress}, serving as a
+\emph{building block} toward the broader goal of decidable
+implementability checks.  
+
+I describe the features of \textsc{ReSCu}, the input language it adopts,
+and its implementation details, with particular emphasis on the
+extensions and modifications I introduced to improve its capabilities
+\cite{rescuoriginalrepo}. The updated public repository, which includes
+the new features and illustrative examples, is available at:
 \begin{center}
 \verb|https://github.com/gabrielegenovese/rescu|~\cite{rescurepo}.
 \end{center}
@@ -19,21 +34,54 @@ bag buffers. The tool provides several options:
 bad configurations. Both checks can be combined in a single run. The \verb|-fifo| option 
 overrides buffer types by treating all as FIFO. When a system is unsafe, the 
 \verb|-counter| option (used with \verb|-mc|) produces an RSC execution that leads 
-to the bad configuration, while the same option used with \verb|-isrsc| outputs the 
-borderline violation execution if the system is not RSC. Additional features include 
+to the bad configuration, while the same option used with \verb|-isrsc| outputs the %borderline
+violation execution if the system is not RSC. Additional features include 
 a progress display to estimate remaining runtime during long computations, and 
 \verb|-to_dot|, which exports the system to DOT format for visualization.
 One of the most similar tools is \textsc{McScm} \cite{heussner2012mcscm}, that
-uses a framework with for different verification techniques. 
+uses a framework with different verification techniques. 
 Symbolic Communicating Machines (SCM), defined and used in \cite[Definition 5.1]{le2008abstract}
 serve as the input format of the tool. SCMs are Communicating 
 Finite-State Machines (CFSM, Definition~\ref{def:cfsm}) 
-extended with a finite set of variables.
+extended with the use of channels and a finite set of variables (that 
+corresponds to message).
 The grammar has been updated to provide greater flexibility and clarity. In
 particular, transition guards have been made optional (with a default value
 \verb|: when true|), and a new \verb|final| keyword has been introduced to
 explicitly specify final states. The updated grammar is shown in
 Listing~\ref{lst:scm-grammar}. 
+
+% \bigskip
+% \begin{definition}[SCM]\label{def:scm}
+% A \emph{Symbolic Communicating Machine} (SCM) with $N$ queues is defined by a tuple 
+% $\langle C, V, c_0, \Theta_0, P, \Delta \rangle$ where:
+% \begin{itemize}
+%     \item $C$ is a nonempty finite set of \emph{locations} (control states).
+%     \item $V = \{v_1, \ldots, v_n\}$ is a finite set of variables.  
+%     The domain of values of a variable $v$ is denoted by $D_v$, and the set of valuations 
+%     of all variables in $V$ by $D_V$.
+%     \item $c_0 \in C$ is the initial control state, and $\Theta_0 \subseteq D_V$, 
+%     a predicate on $V$, is the initial condition.
+%     \item $P = \{p_1, \ldots, p_l\}$ is a finite set of formal parameters that are used 
+%     to send/receive values to/from FIFO queues.  
+%     We assume that all queues use the same set of parameters $D_P$.
+%     \item $\Delta$ is a finite set of \emph{transitions}.  
+%     A transition $\delta$ is either an input 
+%     $\langle c_1, G, i? \vec{p}, A, c_2 \rangle$ 
+%     or an output $\langle c_1, G, i! \vec{p}, A, c_2 \rangle$, where:
+%     \begin{enumerate}
+%         \item $c_1$ and $c_2$ are respectively the origin and destination locations;
+%         \item $i \in [1..N]$ is a queue number;
+%         \item $\vec{p}$ is the vector of formal parameters, which holds the values sent or 
+%         received to/from the queue $i$;
+%         \item $G(\vec{v}, \vec{p}) \subseteq D_V \times D_P$ is a predicate on the variables 
+%         and the formal parameters (also called \emph{guard});
+%         \item $A$ is an assignment of the form $\vec{v}' := A(\vec{v}, \vec{p})$, 
+%         where $A : D_V \times D_P \to D_V$, which defines the values of the variables 
+%         after the transition.
+%     \end{enumerate}
+% \end{itemize}
+% \end{definition}
 
 \bigskip
 
@@ -70,7 +118,13 @@ bad_buffers  ::= <regular_expression>
 nothing      ::= 
 \end{lstlisting}
 
-Let's make a simple example.
+Given the definition of SCM and the newly introduced input grammar, 
+I now present an example to illustrate how these concepts are applied 
+in practice with the tool. For clarity, the example is expressed in the 
+CFSM notation rather than in the SCM formalism. Consequently, channels 
+and variables are omitted and replaced directly by messages. However, 
+the figures are displayed in SCM format, as they are automatically 
+generated by the tool.
 
 \bigskip
 
@@ -107,7 +161,7 @@ with
 \end{itemize}
 
 This CFSM system $\cfsms$ is showed in Figure~\ref{fig:ping}. The corresponding
-input for the tool is showed in Listing~\ref{lst:ping}.
+input as SCM format for the tool is showed in Listing~\ref{lst:ping}.
 
 \bigskip
 
@@ -234,13 +288,32 @@ state 2 :
 I extended \textsc{ReSCu} with verification routines that focus on two
 fundamental correctness properties of distributed systems: \emph{progress} and
 \emph{deadlock-freedom}. To enable this, the tool constructs the synchronous
-system using the synchronous product whenever the input SCM is recognized as an
-RSC. These two verification routines are triggered only after another check: 
-once the system is proven to be RSC, we can safely construct a well-formed 
-synchronous product from it. We consider the definitions given in Chapter~\ref{sec:pre}.
-Definition~\ref{def:cfsm} corresponds to the concept of an SCM. We now present the
-definition of the Synchronous Product for CFSMs, which has been implemented in the
-tool and serves as a key component for analysing.
+system using the synchronous product operation whenever the input SCM is recognized 
+as realisable in synchronous communication semantic (RSC). 
+Once the system is proven to be RSC, we can safely construct a 
+well-formed synchronous product from it, and, given the synchronous product, 
+the tool elaborates the other two additional checks.
+
+\textbf{Remark.} 
+The discussion in this chapter assumes \emph{complete nondeterministic 
+fairness} over choices. In other words, whenever the system encounters 
+a nondeterministic branching, all possible continuations are treated 
+equally and none of them can be ignored. This assumption ensures that the 
+verification does not overlook executions simply because they are less 
+probable, and it avoids trivial counterexamples where a branch is never 
+explored. In practice, relaxing fairness assumptions can yield more 
+realistic analyses (e.g.\ prioritising certain branches or modelling 
+schedulers with biases), but at the cost of complicating the 
+verification procedures. Exploring weaker or alternative fairness models 
+is therefore an interesting direction for future work, especially for 
+applications where nondeterminism is influenced by external constraints 
+such as message delays or resource contention.
+
+% We consider the definitions given in Chapter~\ref{sec:pre}.
+% Definition~\ref{def:cfsm} corresponds to the concept of an SCM.
+We now present the
+definition of the Synchronous Product for CFSMs, which I have implemented in the
+tool, and it serves as a key component for the analysis.
 
 \bigskip
 
@@ -284,7 +357,8 @@ where
 Thus, the synchronous product captures the joint behaviour: process $A$ 
 sends $\texttt{ping}$ to $B$, then $B$ responds with $\texttt{pong}$ 
 to $A$, and both processes reach their final states simultaneously.
-Figure~\ref{fig:syncping} illustrates the $\mathrm{prod}_s(\cfsms)$'s automaton.
+Figure~\ref{fig:syncping} illustrates the product's automaton 
+$\mathrm{prod}_s(\cfsms)$.
 
 \begin{figure}[!ht]
   \centering
@@ -343,15 +417,18 @@ After constructing the synchronous product, the tool performs several
 important post-processing operations. In particular, it removes any
 unreachable nodes from the resulting product, simplifying the structure
 and ensuring that only relevant states are retained for further analysis.
-We can now define the two properties added to the tool.
+We can now define the two SCM properties implemented as verification 
+routines in the tool.
 
-Let's consider Definition~\ref{def:deadlock-free}. I will copy the 
-definition here, changing only the semantic of the system. This implies 
-that the system uses the synchronous product (Definition~\ref{def:syncprod}).
+Let's consider the defintion of deadlock-freedom for CFSMs 
+(Definition~\ref{def:deadlock-free}). I will instanciate the semantic of 
+the system, which is $\synchmodel$. This implies 
+that the system uses the synchronous product when analysing the 
+executions of the system (Definition~\ref{def:syncprod}).
 
 \bigskip
 
-\begin{definition}[Deadlock-free]
+\begin{definition}[Deadlock-freedom in $\synchmodel$]
 A system $\cfsms$ is \emph{deadlock-free} in $\synchmodel$  
 if for every execution 
 $e \in \executionsofcfsms{\acceptcompletion{\cfsms}}{\synchmodel}$,  
@@ -359,8 +436,14 @@ there exists a completion $e'$ with $e \prefixorder e'$ and
 $e' \in \executionsofcfsms{\cfsms}{\synchmodel}$.  
 \end{definition}
 
-%% nella tesi mettere la def di ppdp spiegata bene che è quella che
-%% include tutte le semantiche di network
+\textbf{Remark.} The notation $\acceptcompletion{\cfsms}$ denotes the 
+system obtained by treating every state as an accepting (or final) state. 
+In this way, all possible partial executions of the system are taken 
+into account. The deadlock-freedom condition then requires that each 
+such partial execution can be extended to a complete execution of the 
+original system $\cfsms$. Intuitively, this ensures that the system 
+cannot ``get stuck'' in the middle of a computation, i.e.\ every 
+execution fragment can always be continued.  
 
 More precisely, a system that can reach, from its initial states, some state
 that does not lead to a final state is not deadlock-free. Under this definition,
@@ -395,11 +478,78 @@ violate deadlock-freedom.
 
 % TODO: mostrare pseudo codice dell'algoritmo?
 
-Additionally, the synchronized system can be exported in DOT format
+% \section{Verification Algorithms}
+
+% The verification of \emph{deadlock-freedom} and \emph{progress}
+% properties in \textsc{ReSCu} are based on a classical
+% \emph{reverse search} algorithm~\cite{avis1996reverse}.
+% The idea is to initialise the search from ``bad'' states
+% (deadlock or non-progress states) and traverse the system graph
+% backwards, collecting all states that can eventually reach one of these
+% bad states. If the initial state is discovered during the traversal,
+% the property does not hold. Otherwise, the property is satisfied.  
+
+% This approach is widely used in model checking since it reduces the
+% problem to a systematic graph exploration, avoiding redundant
+% re-computation~\cite{padovani2014deadlock}. The two algorithms below
+% are specialisations of this method.
+
+% \begin{algorithm}[H]
+% \caption{Deadlock Freedom via Reverse Search}
+% \label{alg:reverse-search-deadlock}
+% \KwIn{System $\mathcal{S}$, initial state $s_0$}
+% \KwOut{True if $\mathcal{S}$ is deadlock-free, False otherwise}
+
+% $Visited \gets \emptyset$\;
+% $Worklist \gets \{ \text{deadlock states of } \mathcal{S} \}$\;
+
+% \While{$Worklist \neq \emptyset$}{
+%     remove $s$ from $Worklist$\;
+%     \If{$s \notin Visited$}{
+%         add $s$ to $Visited$\;
+%         \ForEach{predecessor $p$ of $s$ in $\mathcal{S}$}{
+%             add $p$ to $Worklist$\;
+%         }
+%     }
+% }
+
+% \If{$s_0 \in Visited$}{
+%     \Return False \tcp*{deadlock is reachable}
+% }
+% \Return True \tcp*{system is deadlock-free}
+% \end{algorithm}
+
+% \begin{algorithm}[H]
+% \caption{Progress via Reverse Search}
+% \label{alg:reverse-search-progress}
+% \KwIn{System $\mathcal{S}$, initial state $s_0$}
+% \KwOut{True if $\mathcal{S}$ ensures progress, False otherwise}
+
+% $Visited \gets \emptyset$\;
+% $Worklist \gets \{ \text{non-final states with no outgoing transitions} \}$\;
+
+% \While{$Worklist \neq \emptyset$}{
+%     remove $s$ from $Worklist$\;
+%     \If{$s \notin Visited$}{
+%         add $s$ to $Visited$\;
+%         \ForEach{predecessor $p$ of $s$ in $\mathcal{S}$}{
+%             add $p$ to $Worklist$\;
+%         }
+%     }
+% }
+
+% \If{$s_0 \in Visited$}{
+%     \Return False \tcp*{initial state can lead to non-progress}
+% }
+% \Return True \tcp*{system guarantees progress}
+% \end{algorithm}
+
+Lastly, the synchronized system can be exported in DOT format
 (with a default filename of \verb|sync.dot|), which allows for graphical 
 visualization of its structure and behaviour. Some illustrative examples 
 demonstrating these new features are included in the
 \verb|examples/deadlock| folder from the online repository~\cite{rescurepo}.
+Two of them are showed and explained with details in the next section.
 
 % TODO: CINZIA, X TESI:
 % pensare ad un esempio che fa vedere che non è vero in generale
@@ -999,6 +1149,12 @@ Figure~\ref{fig:loop-sync}. In the
 generated figure, yellow states highlight the deadlocked executions,
 while the terminal output provides the configuration of each detected
 deadlock.
+
+\textbf{Remark.} 
+If the system contains a loop with at least one possible way out, this 
+execution is still considered without a deadlock thanks to the 
+\textbf{fairness} assumption. 
+Fairness ensures that the exit path will eventually be taken.
 
 
 \begin{figure}[!ht]
