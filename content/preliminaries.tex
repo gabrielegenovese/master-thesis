@@ -619,7 +619,8 @@ We now give the definitions of weak and safe realisability.
 A global type $\gt$ is \emph{weak realisable} in the
 communication model $\acommunicationmodel$ if there is a
 system CFSM $\cfsms$ such that the following condition hold:
-$\executionsof{\cfsms}{\acommunicationmodel} = \executionsof{\gt}{\acommunicationmodel}$
+$\executionsof{\cfsms}{\acommunicationmodel} =
+\executionsof{\gt}{\acommunicationmodel}$.
 \end{definition}
 
 Although this work does not focus on safe realisability, we will still
@@ -635,4 +636,13 @@ with other works in Chapter~\ref{sec:rel}.
     $\cfsms$ is deadlock-free in $\acommunicationmodel$.
 \end{definition}
 
+The first condition of Definition~\ref{def:gt-safe-realis} corresponds to  
+the property of \emph{global type conformance}: all system executions 
+faithfully follow the behaviours prescribed by the global type.
+When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
+our notion of safe realisability coincides with the notion of 
+\emph{safe realisability} introduced in~\cite{alur2005realizability}.
+This equivalence does not extend to more general communication models, 
+such as the mailbox model.
+% TODO: come dare supporto a queste affermazioni?
 We are now ready to present the main contributions of this work.

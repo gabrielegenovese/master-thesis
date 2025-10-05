@@ -1,11 +1,11 @@
-
 \chapter{Related work}\label{sec:rel}
 This thesis is centred around the study of the \emph{implementability 
-problem} for \emph{global types} and MSC-based formal models.  
+problem} for \emph{global types}.
 In this chapter, I review related works addressing this problem, 
 both within the same formal framework and in comparable models.  
 
-In particular, this thesis forms part of a broader line of research 
+In particular, our work uses a definition of global types that rapresents
+a set of MSCs. This thesis forms part of a broader line of research 
 originating from~\cite{di2023partial} and later expanded in 
 \cite{di2025realisability}, which aims to develop a general framework 
 for communication models. I first present and discuss the results of 
@@ -23,16 +23,20 @@ Automata~\cite{barbanera2020choreography}, highlighting similarities
 and differences with respect to the problem addressed in this thesis.
 
 \section{Hierarchy of communication model's semantics}\label{sec:hier}
-We defined early some communication semantics of out interest.
+We defined early some communication semantics of out interest, informally, 
+in Chapter~\ref{chap:intro} and, formally, the $\synchmodel$ 
+in Definition~\ref{def:synchronous}.
 Furthermore, \cite{di2023partial} show some other interesting 
 semantics. It also introduces a hierarchy of communication
 semantics, illustrated in Figure~\ref{fig:coms}. The main objective of
-this work was to establish a hierarchy that preserves monotonic
+this work was to establish a hierarchy that preserves \emph{monotonic}
 properties: if a property holds for a given communication semantic, it
 should also hold for all semantics contained within it. However, it was
 shown that this monotonicity only applies to specific properties, such
 as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
-extend to the implementability problem.
+extend to the implementability problem, that is why we focused in particular
+on certain semantics. We define subsequently some of the other useful and
+well known communication semantics.
 
 \begin{figure}[!ht]
 \centering
@@ -119,11 +123,11 @@ In Figure~\ref{fig:mailbox}, an example for this communication model is shown.
 
 %% TODO: Esistono nella pratica? forse si possono togliere?
 
-\paragraph{FIFO 1-n}
-This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
-receivers. Any two messages sent by a process must be received in the same 
-order as they are sent. These two messages might be received by different 
-processes and the two receive events might be concurrent.
+% \paragraph{FIFO 1-n}
+% This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
+% receivers. Any two messages sent by a process must be received in the same 
+% order as they are sent. These two messages might be received by different 
+% processes and the two receive events might be concurrent.
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
 % $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
@@ -133,12 +137,12 @@ processes and the two receive events might be concurrent.
 % $r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
-\paragraph{FIFO n-n}
-In this model (\verb|nn|), messages are globally ordered and delivered according to 
-their emission order. Any two messages must be received in the same order 
-as they are sent. These two messages might be sent or receives by any process 
-and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-coordinates all the senders with all the receivers.
+% \paragraph{FIFO n-n}
+% In this model (\verb|nn|), messages are globally ordered and delivered according to 
+% their emission order. Any two messages must be received in the same order 
+% as they are sent. These two messages might be sent or receives by any process 
+% and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
+% coordinates all the senders with all the receivers.
 
 % An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
 % $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
@@ -153,211 +157,63 @@ is comparable to our definition of $\synchmodel$ model, but there are
 some differences. For example, it does not accept \emph{orphan messages}, 
 which are instead accepted for the definition of this thesis.
 
-% \subsection{Realisability for Di Giusto et~al.}
-% For the general model, we now recall the definition of 
-% realisability. Recall that safe realisability correspond to weak 
-% realisability with the addition of the deadlock freedom property.
 
-% \bigskip
+\section{Realisability for Alur}
+In this section, we compare our framework with one of the earliest and
+most influential works on realisability, the one of 
+Alur~et~al.~\cite{alur2005realizability}, which also inspired part of our
+approach. Their notion of \emph{Weak Realisability} captures the idea that
+a specification of Message Sequence Charts (MSCs) should already include
+all behaviours that are consistent with the local views of processes. 
+Intuitively, a set of MSCs is weakly realisable when, for every process,
+the events it observes in any MSC of the specification are compatible
+with those in some MSC already in the set. This closure condition ensures
+that the global behaviour can be reconstructed from the projections of
+individual processes, so that every implied MSC is already part of the
+language. Alur~et~al. also provided an equivalent characterisation of
+weak realisability in terms of closure over prefixes of MSCs. Our own definition
+of weak realisability coincides with theirs, as it expresses the same
+closure property over the set of MSCs and abstracts from any
+deadlock-related concern. In both cases, weak realisability focuses on
+the alignment between local and global behaviours rather than on safety
+properties such as deadlock-freedom. For safe realisability, we recall an
+informal definition of Alur~et~al.~\cite{alur2005realizability} and discuss
+the differences.
 
-% \begin{definition}[Deadlock-free realisability]\label{def:realisability}
-%     A global type $\gt$ is \emph{deadlock-free realisable}
-%     in the communication model
-%     $\acommunicationmodel$
-%     if there is a system $\cfsms$ such that the following two conditions hold:
-%     \begin{enumerate}
-%     \item $\executionsof{\cfsms}{\acommunicationmodel} = 
-%                 \executionsof{\gt}{\acommunicationmodel}$
-%     \item $\cfsms$ is deadlock-free in $\acommunicationmodel$.
-%     \end{enumerate}
-% \end{definition}
+Intuitively, let $L$ be a set of MSCs. Then $L$ is said to be 
+\emph{safely realisable} if there exists a family of concurrent automata 
+$\langle A_i \mid 1 \leq i \leq n \rangle$ such that $L = L(\prod_i A_i)$ 
+and the product automaton $\prod_i A_i$ is \emph{deadlock-free}. 
+In this setting, a \emph{deadlock state} is a configuration of the global 
+system from which no accepting state can be reached. 
+Practically, this corresponds to a situation where all processes are 
+waiting to receive messages that are no longer available in their 
+communication buffers, preventing further progress. 
+Hence, a system is deadlock-free if no such state is reachable from its 
+initial configuration. This notion captures the safety aspect of 
+realisability by ensuring that the system never reaches a globally 
+stalled state during execution. This definition of safe realizability 
+correspond to ours in $\ppmodel$ or $\synchmodel$.
 
-% The first condition of Definition~\ref{def:realisability} corresponds to  
-% the property of \emph{global type conformance}: all system executions 
-% faithfully follow the behaviours prescribed by the global type.
-% When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
-% deadlock-free realisability coincides with the notion of 
-% \emph{safe realisability} introduced in~\cite{alur2005realizability}.
-% This equivalence does not extend to more general communication models, 
-% such as the mailbox model, where 
-% Proposition~\ref{prop:deadlock-free-as-a-property-on-mscs-for-p2p-and-synch} 
-% fails to apply. Nonetheless, even in such settings, global type 
-% conformance can still be expressed in terms of MSCs.
-
-
-\section{Realisability for Alur and Lohrey}
-We recall the definition of Safe Realisability for 
-Alur~et~al.~\cite{alur2005realizability}.
-
-
-We now introduce the definition of implementability following the one given 
-by Alur, et al. \cite{alur2005realizability}, referred to as 
-\textit{Weak-realisability}.
-To formalize it, we first define the notions of 
-\textit{weak implication} and \textit{weak closure}.
-
-%% TODO: Spiegare meglio con intuizioni
-
-\bigskip
-
-\begin{definition}[Weakly-imply]
-	Let $\setmsc$ be a set of MSCs and $M$ an MSC. $\setmsc$
-	\textit{weakly implies} $M$, if for any sequence of automata
-	$\langle A_i \ |\ 1\leq i\leq n\rangle$, if every MSC in $\setmsc$ is in
-	$L(\prod_i A_i)$ then $M \in L(\prod_i A_i)$.
-\end{definition}
-
-In order to understand the meaning of \emph{weak implication},
-consider the following example.
-
-\bigskip
-
-\begin{example}
-Define two MSCs, MSC1 and MSC2. Both perform the same four
-communications, but in different orders.  
-MSC1 first sends message $a$ from P1 to P2, then from P1 to P3, 
-then sends $b$ from P4 to P2, and finally from P4 to P3.  
-MSC2 instead starts with P4 sending $b$ to P2, then to P3, 
-followed by P1 sending $a$ to P2 and then to P3.  
-
-Now define a third MSC $M$ with the same four messages but in a
-different order: P1 sends $a$ to P2, P4 sends $b$ to P2, P4 sends 
-$b$ to P3, and finally P1 sends $a$ to P3.  
-
-We say $M$ is weakly implied by MSC1 and MSC2. Indeed, by looking
-at each process projection we recover the same behaviour in one of
-them: for P1 and P4 in both, for P2 in MSC1, and for P3 in MSC2.  
-Figure~\ref{fig:weak-impl} illustrates the three MSCs.
-
-\begin{figure}[!ht]
-\centering
-\begin{tabular}{ccc}
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-	\nextlevel
-	\nextlevel
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\mess{b}{P4}{P3}
-\end{msc}
-} 
-\end{minipage}
-&
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\mess{b}{P4}{P3}
-	\nextlevel
-	\nextlevel
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-\end{msc}
-}
-\end{minipage}
-&
-\begin{minipage}{0.32\textwidth}
-\scalebox{0.55}{%
-\begin{msc}[left environment distance=0cm, draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-	\declinst{P1}{P1}{}
-	\declinst{P2}{P2}{}
-	\declinst{P3}{P3}{}
-	\declinst{P4}{P4}{}
-
-	\mess{a}{P1}{P2}
-	\nextlevel
-	\mess[pos=0.25]{b}{P4}{P2}
-	\nextlevel
-	\nextlevel
-	\mess{b}{P4}{P3}
-	\nextlevel
-	\mess[pos=0.25]{a}{P1}{P3}
-\end{msc}
-}
-\end{minipage} \\
-MSC1 & MSC2 & $M$
-\end{tabular}
-\caption{The MSC $M$ is weakly implied by MSC1 and MSC2}
-\label{fig:weak-impl}
-\end{figure}
-\end{example}
-
-\bigskip
-
-\begin{definition}[Weakly-closure $\setmsc^w$]
-	The weak-closure $\setmsc^w$ of a set $\setmsc$ of MSCs contains all the MSCs
-	weakly implied by $\setmsc$.
-\end{definition}
-
-% todo: esempio
-
-\bigskip
-
-\begin{definition}[Weakly-realisable]\label{def:weak-realisability}
-	An MSC $M$ is said to be weakly-realisable if the set of MSCs
-	$L(M)$ is weakly realisable. A set of MSCs $\setmsc$ is said to be weakly
-	realisable if $\setmsc=\setmsc^w$.
-\end{definition}
-It is important to note that this definition does not include the
-property of deadlock-freedom. 
-
-\bigskip
-
-\begin{definition}[Safe Realisability~\cite{alur2005realizability}]
-Let $L$ be a set of MSCs. Then $L$ is said to be \emph{safely realisable}
-if there exists a family of concurrent automata 
-$\langle A_i \mid 1 \leq i \leq n \rangle$ such that
-$ L = L(\prod_i A_i)$ and 
-$\prod_i A_i$ is deadlock-free.
-
-Equivalently, $L$ is safely realisable iff it satisfies the following two
-closure conditions, where $\mathit{pref}(L)$ denotes the set of prefixes 
-of the MSCs (or words) in $L$:
-\begin{enumerate}
-  \item For every well-formed word $w$ (a partial MSC), if for all 
-  $1 \leq i \leq n$ there exists a word $v_i \in \mathit{pref}(L)$ 
-  such that $w{\upharpoonright_i} = v_i{\upharpoonright_i}$, then 
-  $w \in \mathit{pref}(L)$.
-  \item For every well-formed and complete word $w$ (an MSC) in 
-  $\mathit{pref}(L)$, if for all $1 \leq i \leq n$ there exists a 
-  word $v_i \in L$ such that $w{\upharpoonright_i} = v_i{\upharpoonright_i}$, 
-  then $w \in L$.
-\end{enumerate}
-\end{definition}
-
-
-For finite sets of MSCs, weakly realisability as defined in 
-\cite{alur2005realizability}, as defined in this thesis 
-(Definition~\ref{def:weak-realisability}), is \verb|coNP|-complete and safe 
-realisability is shown to be decidable in \verb|P|-time~\cite{alur2005realizability}.
-The problem was subsequently studied for HMSCs. For bounded HMSCs, safe realisability 
-remains decidable, but weak realisability 
-is undecidable~\cite{alur2005realizability}. Extensions of these results to non-FIFO 
-semantics were investigated in~\cite{morin2002recognizable}, corresponding 
-to bag semantics under peer-to-peer communication. 
-Later, Lohrey proved, with a technique that involves five processes, 
-that in the general case, safe realisability 
-is undecidable~\cite{lohrey2003realizability}, though it is decidable (and 
-\verb|EXPSPACE|-complete) for globally cooperative HMSCs. % TODO: capire cos'è globally cooperative
+The study of Alur~et~al. went on defining specific complexity classes 
+for different kind of assumptions. For finite sets of MSCs,
+weakly realisability is shown to be \verb|coNP|-complete and safe 
+realisability is shown to be decidable in \verb|P|-time. The problem
+was subsequently studied for HMSCs. For \emph{bounded} HMSCs, safe realisability 
+remains decidable and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+becomes undecidable. For \emph{unbounded} HMSCs, 
+safe realisability and weak realisability are undecidable
+remains decidable and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+becomes undecidable~\cite{alur2005realizability}. 
+Later, Lohrey~et~al~\cite{lohrey2003realizability} proved, with a technique
+that involves five processes, that in the general case, safe realisability 
+is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
+for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
 Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
 a new class of HMSCs that allows unbounded channels while maintaining implementability.
 A summary of the main complexity results is given in Table~\ref{tab:realisability}.
+
+\bigskip
 
 \begin{table}[!ht]
 	\centering
@@ -370,7 +226,7 @@ A summary of the main complexity results is given in Table~\ref{tab:realisabilit
 		\textbf{Safe} & P-time & \verb|EXPSPACE|-complete & undecidable \\
 		\hline
 	\end{tabular}
-	\caption{Summary of results on realisability.}
+	\caption{Summary of results on realisability in~\cite{alur2005realizability}.}
 	\label{tab:realisability}
 \end{table}
 
