@@ -1,23 +1,38 @@
 \chapter{ReSCu}\label{sec:rescu}
-In the previous chapter, I examined the theoretical aspects of the
-implementability problem for MPST, culminating in the main result: the
-\textbf{undecidability} of weak implementability under synchronous
-semantics. That analysis not only establishes a fundamental limitation,
-but also highlights the need to explore alternative approaches, such as
-identifying restricted subclasses or designing practical techniques that
-can still support verification in real-world scenarios.  
-This chapter changes the focus from undecidability to decidability. I present
-\textsc{ReSCu} (first introduced in
-\cite{desgeorges2023rsc,di2023multiparty,guizouarn2023communicating}),
-a verification tool that provides automated support for reasoning about
-realizability. The tool enables the analysis of properties such as
-\textit{deadlock-freedom} and \textit{progress}, serving as a
-\emph{building block} toward the broader goal of decidable
-implementability checks.  
+In the previous chapter, we examined the theoretical aspects of the
+realisability problem for MPST, culminating in the main result: the
+\textbf{undecidability} of weak realisability under synchronous
+semantics. This analysis not only establishes a fundamental limitation
+but also motivates the exploration of complementary directions, such as
+identifying restricted, decidable subclasses or developing practical
+verification techniques that can be effectively applied in real-world
+settings.  
 
-I describe the features of \textsc{ReSCu}, the input language it adopts,
+In this chapter, we shift our focus from undecidability to decidability.
+Our goal is to realise a fully automated verification framework capable
+of analysing multiple properties within our modular system model. To
+achieve this, we present \textsc{ReSCu}
+(first introduced 
+in~\cite{desgeorges2023rsc,di2023multiparty,guizouarn2023communicating}),
+a verification tool designed to reason about communication models and
+eventually design them. 
+Originally, \textsc{ReSCu} was born with the goal to verify
+membership in the class of synchronous systems and to check reachability
+of configurations through synchronous executions.  
+
+Building on this foundation, we extend the tool to assess key behavioural
+properties, specifically, \textit{deadlock-freedom} and
+\textit{progress}, which play a crucial role in the broader study of
+realisability. Analysing deadlock-freedom within this context is
+particularly valuable, as it helps narrow the range of possible
+executions and often corresponds to a \emph{decidable} verification
+problem. By incorporating these analyses, \textsc{ReSCu} serves as a
+\emph{building block} toward achieving practical, decidable
+realisability checks within our framework.
+
+We describe the features of \textsc{ReSCu}, the input language it adopts,
 and its implementation details, with particular emphasis on the
-extensions and modifications I introduced to improve its capabilities
+extensions and modifications we introduced to improve its capabilities
 \cite{rescuoriginalrepo}. The updated public repository, which includes
 the new features and illustrative examples, is available at:
 \begin{center}
@@ -28,8 +43,8 @@ the new features and illustrative examples, is available at:
 \textsc{ReSCu} is a command-line tool that can check both membership in the 
 class of \verb|synch| systems (called Realisable with Synchronous Communication 
 or, in brief, RSC from now on) and reachability of regular sets of configurations. It 
-accepts input systems with arbitrary topologies and supports both FIFO and 
-bag buffers. The tool provides several options: 
+accepts input systems with arbitrary topologies and supports FIFO and 
+bag buffers among others. The tool provides several options: 
 \verb|-isrsc| checks whether the system is RSC, and \verb|-mc| checks reachability of 
 bad configurations. Both checks can be combined in a single run. The \verb|-fifo| option 
 overrides buffer types by treating all as FIFO. When a system is unsafe, the 
@@ -119,7 +134,7 @@ nothing      ::=
 \end{lstlisting}
 
 Given the definition of SCM and the newly introduced input grammar, 
-I now present an example to illustrate how these concepts are applied 
+We now present an example to illustrate how these concepts are applied 
 in practice with the tool. For clarity, the example is expressed in the 
 CFSM notation rather than in the SCM formalism. Consequently, channels 
 and variables are omitted and replaced directly by messages. However, 
@@ -285,7 +300,7 @@ state 2 :
 \end{example}
 
 \section{Progress and Deadlock-Freedom}
-I extended \textsc{ReSCu} with verification routines that focus on two
+We extended \textsc{ReSCu} with verification routines that focus on two
 fundamental correctness properties of distributed systems: \emph{progress} and
 \emph{deadlock-freedom}. To enable this, the tool constructs the synchronous
 system using the synchronous product operation whenever the input SCM is recognized 
@@ -309,10 +324,8 @@ is therefore an interesting direction for future work, especially for
 applications where nondeterminism is influenced by external constraints 
 such as message delays or resource contention.
 
-% We consider the definitions given in Chapter~\ref{sec:pre}.
-% Definition~\ref{def:cfsm} corresponds to the concept of an SCM.
-We now present the
-definition of the Synchronous Product for CFSMs, which I have implemented in the
+We now present the definition of the
+Synchronous Product for CFSMs, which I have implemented in the
 tool, and it serves as a key component for the analysis.
 
 \bigskip
@@ -322,7 +335,7 @@ Let $\mathcal{S} = (\mathcal{A}_p)_{p \in \mathbb{P}}$ be a system of CFSMs, whe
 $\mathcal{A}_p = (L_p, \mathit{Act}_p, \delta_p, l_{0,p}, F_p)$ is the CFSM associated 
 to process $p$.  
 
-The \emph{synchronous product} of $\mathcal{S}$ is the global type 
+The \emph{synchronous product} of $\mathcal{S}$ is the FSA 
 $P = \mathrm{prod}_s(\mathcal{S}) = (L, \mathit{Arr}, \delta, l_0, F)$,
 where
 \begin{itemize}
@@ -420,9 +433,9 @@ and ensuring that only relevant states are retained for further analysis.
 We can now define the two SCM properties implemented as verification 
 routines in the tool.
 
-Let's consider the definition of deadlock-freedom for CFSMs 
-(Definition~\ref{def:deadlock-free}). I will instanciate the semantic of 
-the system, which is $\synchmodel$. This implies 
+Consider the definition of deadlock-freedom for CFSMs 
+(Definition~\ref{def:deadlock-free}). We will report the same
+definition focusing on the $\synchmodel$ communication semantic. This implies 
 that the system uses the synchronous product when analysing the 
 executions of the system (Definition~\ref{def:syncprod}).
 
@@ -438,12 +451,12 @@ $e' \in \executionsofcfsms{\cfsms}{\synchmodel}$.
 
 \textbf{Remark.} The notation $\acceptcompletion{\cfsms}$ denotes the 
 system obtained by treating every state as an accepting (or final) state. 
-In this way, all possible partial executions of the system are taken 
+This way, all possible partial executions of the system are taken 
 into account. The deadlock-freedom condition then requires that each 
 such partial execution can be extended to a complete execution of the 
 original system $\cfsms$. Intuitively, this ensures that the system 
 cannot ``get stuck'' in the middle of a computation, i.e.\ every 
-execution fragment can always be continued.  
+execution fragment can always be continued to reach a final state.  
 
 More precisely, a system that can reach, from its initial states, some state
 that does not lead to a final state is not deadlock-free. Under this definition,
@@ -459,12 +472,14 @@ reverse search algorithm starting from the final states.
 \bigskip
 
 \begin{definition}[Progress]\label{def:progress}
-A system of CFSMs $\cfsms$ satisfies the \emph{progress} property in $\rscmodel$
+A system of CFSMs $\cfsms$ satisfies the \emph{progress} property in $\synchmodel$
 if for every execution $e \in \executionsofcfsms{\acceptcompletion{P}}{}$, 
 with $P = \mathrm{prod}_s(\cfsms)$,
 \begin{itemize}
-    \item the execution $e$ is also a valid execution of $e\in \executionsofcfsms{P}{}$, or
-    \item there exists another execution $e'\in\executionsofcfsms{\acceptcompletion{P}}{}$
+    \item the execution $e$ is also a valid execution of 
+          $e\in \executionsofcfsms{P}{\synchmodel}$, or
+    \item there exists another execution 
+          $e'\in\executionsofcfsms{\acceptcompletion{P}}{\synchmodel}$
           such that $e \prefixorder e'$, with $e \neq e'$.
 \end{itemize}
 \end{definition}
@@ -556,7 +571,7 @@ Two of them are showed and explained with details in the next section.
 
 \section{Examples}
 
-To illustrate these notions, I present two examples. The first is the
+To illustrate these notions, we present two examples. The first is the
 classical \emph{Dining Philosophers} problem, which shows how resource
 contention can lead to deadlock. The second is a minimal looping system
 that demonstrates how a process may satisfy the progress property while
@@ -1159,7 +1174,7 @@ Fairness ensures that the exit path will eventually be taken.
 
 \begin{figure}[!ht]
     \centering
-\begin{tikzpicture}[>=latex',line join=bevel,scale=1.05]
+\begin{tikzpicture}[>=latex',line join=bevel,scale=1.06]
   \pgfsetlinewidth{1bp}
 %%
 \pgfsetcolor{black}
