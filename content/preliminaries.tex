@@ -200,7 +200,9 @@ The label $\actionof{\event}$ of an event $\event=(p,i)$ is the action
 $w_p[i]$. The event $\event$ is a send (resp. receive) event if it is  
 labelled with a send (resp. receive) action.  
 We write $\sendeventsof{\mmsc}$ (resp. $\receiveeventsof{\mmsc}$)  
-for the set of send (resp. receive) events of $\mmsc$.
+for the set of send (resp. receive) events of $\mmsc$. We also write  
+$\messageof{\event}$ for the message sent or received at $\event$, and  
+$\processof{\event}$ for the process executing $\event$.  
 Finally, we write $\verticalorderstrict{\event_1}{\event_2}$ if there  
 exists a process $p$ and indices $i<j$ such that  
 $\event_1=(p,i)$ and $\event_2=(p,j)$.  
@@ -285,14 +287,10 @@ $M_2=((w_p^2)_{p\in\Procs},\source_2)$. Then:
 
 \subsubsection*{Happens-before relation and linearisations}
 In a given MSC $M$, an event $\event$ happens before $\event'$, if 
- \begin{itemize}
-	\item $\event$ and $\event'$ are events
-	of a same process $p$ and happen in that order on 
-	the timeline of $p$
-	\item  $\event$ is send event matched by $\event'$
-	\item a sequence of such situations defines
-	a path from $\event$ to $\event'$
-\end{itemize}
+$\event$ and $\event'$ are events
+of a same process $p$ and happen in that order on 
+the timeline of $p$; $\event$ is send event matched by $\event'$; and
+a sequence of such situations defines a path from $\event$ to $\event'$.
 
 \bigskip
 
@@ -636,13 +634,13 @@ with other works in Chapter~\ref{sec:rel}.
     $\cfsms$ is deadlock-free in $\acommunicationmodel$.
 \end{definition}
 
-The first condition of Definition~\ref{def:gt-safe-realis} corresponds to  
+The definition of Weak realisability corresponds to  
 the property of \emph{global type conformance}: all system executions 
 faithfully follow the behaviours prescribed by the global type.
 When $\acommunicationmodel$ is $\ppmodel$ or $\synchmodel$, 
 our notion of safe realisability coincides with the notion of 
 \emph{safe realisability} introduced in~\cite{alur2005realizability}.
 This equivalence does not extend to more general communication models, 
-such as the mailbox model.
+such as the mailbox model~\cite{di2025realisability}.
 % TODO: come dare supporto a queste affermazioni?
 We are now ready to present the main contributions of this work.

@@ -38,6 +38,8 @@ extend to the implementability problem, that is why we focused in particular
 on certain semantics. We define subsequently some of the other useful and
 well known communication semantics.
 
+\bigskip
+
 \begin{figure}[!ht]
 \centering
 \begin{tikzpicture}[scale=0.6]
@@ -121,8 +123,6 @@ In Figure~\ref{fig:mailbox}, an example for this communication model is shown.
 % $s \lhd r$ and $s' \lhd r'$,
 % - or $s' \in \text{unmatched}(M)$.
 
-%% TODO: Esistono nella pratica? forse si possono togliere?
-
 % \paragraph{FIFO 1-n}
 % This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
 % receivers. Any two messages sent by a process must be received in the same 
@@ -170,10 +170,12 @@ the events it observes in any MSC of the specification are compatible
 with those in some MSC already in the set. This closure condition ensures
 that the global behaviour can be reconstructed from the projections of
 individual processes, so that every implied MSC is already part of the
-language. Alur~et~al. also provided an equivalent characterisation of
-weak realisability in terms of closure over prefixes of MSCs. Our own definition
+language. 
+% Alur~et~al. also provided an equivalent characterisation of
+% weak realisability in terms of closure over prefixes of MSCs. 
+Our own definition
 of weak realisability coincides with theirs, as it expresses the same
-closure property over the set of MSCs and abstracts from any
+fidelity concept over the local behaviour and abstracts from any
 deadlock-related concern. In both cases, weak realisability focuses on
 the alignment between local and global behaviours rather than on safety
 properties such as deadlock-freedom. For safe realisability, we recall an
@@ -186,26 +188,26 @@ $\langle A_i \mid 1 \leq i \leq n \rangle$ such that $L = L(\prod_i A_i)$
 and the product automaton $\prod_i A_i$ is \emph{deadlock-free}. 
 In this setting, a \emph{deadlock state} is a configuration of the global 
 system from which no accepting state can be reached. 
-Practically, this corresponds to a situation where all processes are 
+This corresponds to a situation where all processes are 
 waiting to receive messages that are no longer available in their 
 communication buffers, preventing further progress. 
 Hence, a system is deadlock-free if no such state is reachable from its 
 initial configuration. This notion captures the safety aspect of 
 realisability by ensuring that the system never reaches a globally 
-stalled state during execution. This definition of safe realizability 
+stalled state during execution. This definition of safe realisability 
 correspond to ours in $\ppmodel$ or $\synchmodel$.
 
-The study of Alur~et~al. went on defining specific complexity classes 
+The work of Alur~et~al. went on further, defining specific complexity classes 
 for different kind of assumptions. For finite sets of MSCs,
 weakly realisability is shown to be \verb|coNP|-complete and safe 
 realisability is shown to be decidable in \verb|P|-time. The problem
 was subsequently studied for HMSCs. For \emph{bounded} HMSCs, safe realisability 
-remains decidable and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
 becomes undecidable. For \emph{unbounded} HMSCs, 
 safe realisability and weak realisability are undecidable
-remains decidable and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
 becomes undecidable~\cite{alur2005realizability}. 
-Later, Lohrey~et~al~\cite{lohrey2003realizability} proved, with a technique
+Later, Lohrey~et al.~\cite{lohrey2003realizability} proved, with a technique
 that involves five processes, that in the general case, safe realisability 
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
 for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
@@ -230,72 +232,6 @@ A summary of the main complexity results is given in Table~\ref{tab:realisabilit
 	\label{tab:realisability}
 \end{table}
 
-\section{Realisability for MPST}
-
-Recent work has focused on addressing the connection between MPST 
-and automata-theoretic formalisms. Stutz and Zufferey 
-showed that implementability is decidable by encoding global types 
-into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
-Building on this, Li et al.~\cite{li2023complete} proposed a complete 
-projection function for MPST, guaranteeing that every implementable 
-global type admits a correct distributed implementation.
-
-Stutz’s thesis~\cite{stutz2024implementability} connects MPST to 
-High-level MSCs (HMSCs), introducing a generalized projection operator 
-for sender-driven choice where a sender may branch towards different 
-receivers. This captures patterns beyond classical MPST projection.  
-He also proves that while syntactic projection is incomplete, 
-an automata-theoretic encoding into HMSCs yields decidability for 
-sender-driven choice, with implementability shown to be in 
-\verb|PSPACE|-the first precise complexity bound for this fragment.
-
-We recall the definition of the \emph{Implementability Problem} as 
-introduced by Stutz et al.~\cite{stutz2024implementability}.  
-
-\bigskip
-
-\begin{definition}[Implementability Problem~\cite{stutz2024implementability}]
-A language $L \subseteq \Gamma^\omega$ is said to be 
-\emph{implementable} if there exists a CSM 
-$\{A_p\}_{p \in \mathbb{P}}$ such that
-\begin{itemize}
-    \item \textbf{deadlock freedom:} 
-    $\{A_p\}_{p \in \mathbb{P}}$ is deadlock-free, and
-    \item \textbf{protocol fidelity:} 
-    $L$ is the language of $\{A_p\}_{p \in \mathbb{P}}$.
-\end{itemize}
-\end{definition}
-
-where the definition of deadlock freedom is:
-
-\bigskip
-
-\begin{definition}[Deadlock freedom~\cite{stutz2024implementability}]
-A configuration for an automaton is a deadlock if it is not final and  
-has no outgoing transitions while it is reachable if it occurs on some 
-run of A. A CSM is deadlock-free if no reachable configuration is a
-deadlock. We say a CSM is sink-final if all its state machines are.
-\end{definition}
-
-\section{Choreographies}
-Choreographies \cite{montesi2014choreographic} are another formalism to describe  
-distributed communication protocols. Unlike MSCs or MPST, which focus either on 
-trace-based semantics or type systems, choreographies emphasize the 
-global specification of interactions as a high-level description of the 
-intended message exchanges. Similarly to MPST, their goal is to ensure that
-a distributed  implementation can be derived in which each participant 
-follows a local behaviour consistent with the global description, called
-respectively \emph{local} and \emph{global-view}. This setting naturally 
-connects to the realisability problem, since the key question is whether 
-a choreography can be faithfully implemented by a system of local 
-processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
-and it is derived throughout a projection operation from the global-view.
-The \emph{knowledge of choice} problem is similar to the implementability one,
-and explored also in choreographies,
-but it was first introduced by Castagna et al.~\cite{castagna2012global}.
-% https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
-% TODO: Continuare menzionando che i chor automata sono simili alla nostra 
-% definizione di global type
 
 \section{Multiparty Session Types}
 Multiparty Session Types (MPST)~\cite{honda2008multiparty} 
@@ -385,6 +321,73 @@ participants influence the decision~\cite{carbone2012structured}.
 Allowing \textbf{mixed choice} increases expressivity by permitting 
 several initiators, but it also makes the implementability problem 
 undecidable in general~\cite{stutz2024implementability}.  
+
+
+\section{Realisability for MPST}
+Recent work has focused on addressing the connection between MPST 
+and automata-theoretic formalisms. Stutz and Zufferey 
+showed that implementability is decidable by encoding global types 
+into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
+Building on this, Li et al.~\cite{li2023complete} proposed a complete 
+projection function for MPST, guaranteeing that every implementable 
+global type admits a correct distributed implementation.
+
+Stutz’s thesis~\cite{stutz2024implementability} connects MPST to 
+High-level MSCs (HMSCs), introducing a generalized projection operator 
+for sender-driven choice where a sender may branch towards different 
+receivers. This captures patterns beyond classical MPST projection.  
+He also proves that while syntactic projection is incomplete, 
+an automata-theoretic encoding into HMSCs yields decidability for 
+sender-driven choice, with implementability shown to be in 
+\verb|PSPACE|-the first precise complexity bound for this fragment.
+
+We recall the definition of the \emph{Implementability Problem} as 
+introduced by Stutz et al.~\cite{stutz2024implementability}.  
+
+\bigskip
+
+\begin{definition}[Implementability Problem~\cite{stutz2024implementability}]
+A language $L \subseteq \Gamma^\omega$ is said to be 
+\emph{implementable} if there exists a CSM 
+$\{A_p\}_{p \in \mathbb{P}}$ such that
+\begin{itemize}
+    \item \textbf{deadlock freedom:} 
+    $\{A_p\}_{p \in \mathbb{P}}$ is deadlock-free, and
+    \item \textbf{protocol fidelity:} 
+    $L$ is the language of $\{A_p\}_{p \in \mathbb{P}}$.
+\end{itemize}
+\end{definition}
+
+where the definition of deadlock freedom is:
+
+\bigskip
+
+\begin{definition}[Deadlock freedom~\cite{stutz2024implementability}]
+A configuration for an automaton is a deadlock if it is not final and  
+has no outgoing transitions while it is reachable if it occurs on some 
+run of A. A CSM is deadlock-free if no reachable configuration is a
+deadlock. We say a CSM is sink-final if all its state machines are.
+\end{definition}
+
+\section{Choreographies}
+Choreographies \cite{montesi2014choreographic} are another formalism to describe  
+distributed communication protocols. Unlike MSCs or MPST, which focus either on 
+trace-based semantics or type systems, choreographies emphasize the 
+global specification of interactions as a high-level description of the 
+intended message exchanges. Similarly to MPST, their goal is to ensure that
+a distributed  implementation can be derived in which each participant 
+follows a local behaviour consistent with the global description, called
+respectively \emph{local} and \emph{global-view}. This setting naturally 
+connects to the realisability problem, since the key question is whether 
+a choreography can be faithfully implemented by a system of local 
+processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
+and it is derived throughout a projection operation from the global-view.
+The \emph{knowledge of choice} problem is similar to the implementability one,
+and explored also in choreographies,
+but it was first introduced by Castagna et al.~\cite{castagna2012global}.
+% https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
+% TODO: Continuare menzionando che i chor automata sono simili alla nostra 
+% definizione di global type
 
 \section{Other works}
 %citare il paper di Emilio su pomsets
