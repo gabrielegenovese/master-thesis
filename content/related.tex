@@ -1,5 +1,5 @@
 \chapter{Related work}\label{sec:rel}
-This thesis is centred around the study of the \emph{implementability 
+This thesis is centred around the study of the \emph{realisability 
 problem} for \emph{global types}.
 In this chapter, We review related works addressing this problem, 
 both within the same formal framework and in comparable models.  
@@ -13,7 +13,7 @@ these works, positioning my own contributions in relation to them.
 
 Subsequently, We analyse recent results by 
 Stutz~et~al.~\cite{stutz2024implementability}, who extensively study 
-the implementability problem, while also tracing the line of research 
+the realisability problem, while also tracing the line of research 
 back to early contributions such as Alur~et~al.~\cite{alur2000inference} 
 and Lohrey~et~al.~\cite{lohrey2003realizability}.  
 
@@ -34,8 +34,8 @@ properties: if a property holds for a given communication semantic, it
 should also hold for all semantics contained within it. However, it was
 shown that this monotonicity only applies to specific properties, such
 as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
-extend to the implementability problem, that is why we focused in particular
-on certain semantics. We define subsequently some of the other useful and
+extend to the realisability problem, that is why we focused in particular
+on certain semantics. We define subsequently some other useful and
 well known communication semantics.
 
 \bigskip
@@ -212,7 +212,7 @@ that involves five processes, that in the general case, safe realisability
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
 for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
 Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
-a new class of HMSCs that allows unbounded channels while maintaining implementability.
+a new class of HMSCs that allows unbounded channels while maintaining realisability.
 A summary of the main complexity results is given in Table~\ref{tab:realisability}.
 
 \bigskip
@@ -304,7 +304,7 @@ a global type can be faithfully projected into local specifications for
 each participant. If projection succeeds, the resulting local types 
 interact without mismatches or unintended behaviours, effectively 
 bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
-Projectability is, therefore, comparable to the implementability
+Projectability is, therefore, comparable to the realisability
 problem as they have the same aim.
 Projection algorithms, however, often reject natural protocols that 
 fail to meet restrictive syntactic conditions. This difference between 
@@ -319,14 +319,14 @@ choice is \textbf{sender-driven}: the first sender dictates the branch,
 ensuring safety but excluding many common patterns where multiple 
 participants influence the decision~\cite{carbone2012structured}.  
 Allowing \textbf{mixed choice} increases expressivity by permitting 
-several initiators, but it also makes the implementability problem 
+several initiators, but it also makes the realisability problem 
 undecidable in general~\cite{stutz2024implementability}.  
 
 
 \section{Realisability for MPST}
 Recent work has focused on addressing the connection between MPST 
 and automata-theoretic formalisms. Stutz and Zufferey 
-showed that implementability is decidable by encoding global types 
+showed that realisability is decidable by encoding global types 
 into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
 Building on this, Li et al.~\cite{li2023complete} proposed a complete 
 projection function for MPST, guaranteeing that every implementable 
@@ -338,10 +338,10 @@ for sender-driven choice where a sender may branch towards different
 receivers. This captures patterns beyond classical MPST projection.  
 He also proves that while syntactic projection is incomplete, 
 an automata-theoretic encoding into HMSCs yields decidability for 
-sender-driven choice, with implementability shown to be in 
+sender-driven choice, with realisability shown to be in 
 \verb|PSPACE|-the first precise complexity bound for this fragment.
 
-We recall the definition of the \emph{Implementability Problem} as 
+We recall the definition of the \emph{Realisability Problem} as 
 introduced by Stutz et al.~\cite{stutz2024implementability}.  
 
 \bigskip
@@ -382,7 +382,7 @@ connects to the realisability problem, since the key question is whether
 a choreography can be faithfully implemented by a system of local 
 processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
 and it is derived throughout a projection operation from the global-view.
-The \emph{knowledge of choice} problem is similar to the implementability one,
+The \emph{knowledge of choice} problem is similar to the realisability one,
 and explored also in choreographies,
 but it was first introduced by Castagna et al.~\cite{castagna2012global}.
 % https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
@@ -394,7 +394,7 @@ but it was first introduced by Castagna et al.~\cite{castagna2012global}.
 Stutz et al.~\cite{stutz2025automata} proposed \emph{Protocol State Machines} 
 (PSMs), an automata-based formalism subsuming both MPST and HMSCs. 
 PSMs show that many syntactic restrictions of global types are not 
-true expressivity limits. Yet, the implementability problem for PSMs 
+true expressivity limits. Yet, the realisability problem for PSMs 
 with unrestricted mixed choice remains undecidable, resolving the 
 open question that mixed-choice global types are undecidable in general.  
 

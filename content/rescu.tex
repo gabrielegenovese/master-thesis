@@ -19,7 +19,6 @@ eventually design them.
 Originally, \textsc{ReSCu} was born with the goal to verify
 membership in the class of synchronous systems and to check reachability
 of configurations through synchronous executions.  
-
 Building on this foundation, we extend the tool to assess key behavioural
 properties, specifically, \textit{deadlock-freedom} and
 \textit{progress}, which play a crucial role in the broader study of
@@ -158,17 +157,14 @@ The system of CFSMs is $\cfsms = (\acfsm_A, \acfsm_B)$, where:
 $$
 \acfsm_A = (Q_A, \Sigma, \delta_A, q_{0,A}, F_A)
 $$
-
 with
 \begin{itemize}
 \item $Q_A = \{0,1,2\}$, initial state $q_{0,A} = 0$, final state $F_A = \{2\}$,
 \item transitions: $0 \xrightarrow{(A,B,!,\texttt{ping})} 1 \xrightarrow{(B,A,?,\texttt{pong})} 2$.
 \end{itemize}
-
 $$
 \acfsm_B = (Q_B, \Sigma, \delta_B, q_{0,B}, F_B)
 $$
-
 with
 \begin{itemize}
 \item $Q_B = \{0,1,2\}$, initial state $q_{0,B} = 0$, final state $F_B = \{2\}$,

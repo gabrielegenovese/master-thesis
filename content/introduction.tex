@@ -3,8 +3,9 @@
 \setcounter{page}{1}
 
 Informally, a \textit{distributed system} is a collection of independent 
-computing entities (interchangeably called processes, actors, 
-nodes, or participants) that communicate and coordinate their 
+computing entities (called also processes, actors, 
+nodes, or participants; with slightly differences in the meaning) 
+that communicate and coordinate their 
 actions through message passing over a medium of communication 
 (typically an \textbf{asynchronous network}), with the goal of solving a 
 common problem. For example, a client-server application can be seen 
@@ -37,11 +38,12 @@ about program behavior.
 
 Formal methods for distributed systems offer mathematically rigorous 
 techniques to specify, design, and verify such systems. They are valuable 
-both during development, by helping detect errors early, and during analysis, 
+both during design and development, by helping detect errors early, and during analysis, 
 by enabling the study of critical properties such as \textbf{safety}, 
-\textbf{liveness}, and \textbf{deadlock-freedom}. Two primary verification 
-approaches are \textit{model checking} and \textit{by-construction} 
-verification. Model checking systematically explores a system's state space 
+\textbf{liveness}, and \textbf{deadlock-freedom}. Two primary 
+approaches are \textit{model checking} verification and 
+\textit{correctness by-construction}.
+Model checking systematically explores a system's state space 
 to confirm properties, while by-construction verification ensures correctness 
 through the design process itself, preventing errors from being introduced.  
 
@@ -63,7 +65,7 @@ deadlock-freedom and protocol compliance at compile time, making them an
 especially appealing tool for designing robust communication protocols.
 
 \section{Goal}
-The goal of this work is to investigate the \textbf{implementability
+The goal of this work is to investigate the \textbf{realisability
 problem} for MPST, which asks whether a global specification can be
 faithfully realised by a collection of \textit{local processes} in a
 distributed system. This question naturally arises in top-down
@@ -72,7 +74,7 @@ frameworks~\cite{montesi2014choreographic}, where the design begins
 from a \emph{global perspective} and the local behaviour of each
 participant is derived afterwards.
 
-The implementability problem is central to ensuring that the
+The realisability problem is central to ensuring that the
 distributed implementation does not diverge from the intended
 specification. In essence, the challenge is to determine whether the
 set of projected local processes can really \textbf{respect} the
@@ -109,14 +111,14 @@ then C sends D message w.
 \end{lstlisting}
 
 While the specification can be expressed using several of the formalisms
-mentioned earlier, only some of them in some cases are capable of revealing 
+mentioned earlier, some of them are capable of revealing 
 that it is, in fact, \emph{impossible} to implement in a real distributed system.
 The reason is that process $C$ cannot determine which message to send
 to $D$ without knowing which message $A$ sent to $B$, because this 
 information is not locally available to $C$.
 \end{example}
 
-The implementability problem in this work is examined from a theoretical
+The realisability problem in this work is examined from a theoretical
 perspective to provide a more formal and precise understanding of the
 fundamental limits that exist and why syntactical constraints of certain
 models work.  
@@ -165,15 +167,15 @@ or iterations of atomic MSC scenarios.
 \label{fig:msc-cli-ser}
 \end{figure}
 
-The \emph{weak implementability problem} for MSCs asks whether there 
+The \emph{weak realisability problem} for MSCs asks whether there 
 exists a distributed implementation that can realise all behaviours of a 
 finite set of MSCs without introducing additional ones. A stronger variant, 
-called \emph{safe implementability}, requires the implementation to also be 
+called \emph{safe realisability}, requires the implementation to also be 
 \textbf{deadlock-free}. 
 
-\textbf{Remark.} The term ``implementability'' has several synonyms in the
-literature. In other works, it is often referred to as \emph{realisability}, 
-\emph{projectability}, or \emph{knowledge of choices}. Each of these terms, 
+\textbf{Remark.} The term ``realisability'' has several synonyms in the
+literature. In other works, it is often referred to as 
+\emph{implementability} or \emph{projectability}. Each of these terms, 
 depending on the formal model considered, comes with slightly different 
 definitions. Some of these variations will be analysed in 
 Chapter~\ref{sec:rel}.
@@ -185,7 +187,7 @@ goal of their study was to establish a hierarchy that preserves
 semantics, it should also hold for all semantics contained within it.
 However, they showed that this monotonicity only applies to certain
 properties. In this work, we continue the study within the same framework,
-focusing on the implementability property.  
+focusing on the realisability property.  
 
 In the following paragraphs, we describe some of these communication
 semantics informally, using examples to highlight the differences between
@@ -275,22 +277,22 @@ for this semantic (Definition~\ref{def:synchronous}).
 
 The definition of these models will become central in
 the reduction techniques explored in this work: 
-simplifying the study of implementability
+simplifying the study of realisability
 by reducing richer semantics to the synchronous case.
 
 \section{Reduction to synchronous semantic}
-Theorem~\cite[Theorem 5.3]{di2025realisability} suggests that reasoning about
-implementability could become more tractable under \emph{synchronous}
-semantics for automata-based solutions to the implementability problem. In
+Theorem~\cite[Theorem 5.3]{di2025realisability} suggests that reasoning
+about realisability could become more tractable under \emph{synchronous}
+semantics for automata-based solutions. In
 synchronous communication, send and receive actions are tightly coupled,
 effectively eliminating the nondeterminism introduced by asynchronous
 message buffering.
 
-Formally, the theorem shows that if a global type is implementable under
+Formally, the theorem shows that if a global type is realisable under
 synchronous semantics, then, under certain conditions, it is also
-implementable in more general models, such as peer-to-peer semantics. This
-reduction requires constraints such as \emph{orphan-freedom} (no message is
-left unmatched) and \emph{deadlock-freedom}.  
+realisable in more general models, such as peer-to-peer semantics. This
+reduction requires constraints such as \emph{orphan-freedom} (no message 
+sent is left unmatched) and \emph{deadlock-freedom}.  
 
 We present the theorem here informally, using the standard meanings of
 terms that have already been introduced:
@@ -307,7 +309,7 @@ the following four conditions hold
 The second and third conditions are already known to be decidable and 
 can be automatically verified. The focus of this thesis is instead on 
 the fourth condition, namely checking whether a global type is 
-implementable in synchronous semantics. The undecidability result 
+realisable in synchronous semantics. The undecidability result 
 presented in Chapter~\ref{sec:proof} shows that this condition cannot 
 be verified in general. Consequently, the theorem above must be refined 
 by introducing further restrictions that ensure decidability.  
@@ -318,7 +320,7 @@ Chapter~\ref{sec:rescu} presents the extension of the
 properties such as \emph{deadlock-freedom} and \emph{progress}. These 
 results should be understood as building blocks toward identifying 
 restricted subclasses of synchronous systems that admit decidable 
-implementability checks, complementing the undecidability findings of 
+realisability checks, complementing the undecidability findings of 
 the theoretical contribution.
 
 Given the context, the developments presented in this thesis can be 
@@ -330,7 +332,7 @@ connected.
 The main contributions of this work are: 
 \begin{itemize}
     \item a proof of the \textbf{undecidability} of the 
-    \textit{weak implementability} problem under the synchronous 
+    \textit{weak realisability} problem under the synchronous 
     semantics of our framework;
     \item an extension and improvement of the model-checking tool 
     \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
@@ -339,9 +341,9 @@ The main contributions of this work are:
 \end{itemize}
 
 These two contributions are closely connected: they both address the 
-implementability problem, but from two complementary angles. The first 
+realisability problem, but from two complementary angles. The first 
 contribution establishes undecidability, showing that in the general 
-case the weak implementability problem cannot be solved for synchronous semantic. 
+case the weak realisability problem cannot be solved for synchronous semantic. 
 This motivates the second contribution: once undecidability is proven, 
 there is a clear need to identify suitable restrictions of the problem 
 that yield decidability results. The model-checking framework presented 
@@ -350,9 +352,7 @@ towards this direction, providing practical verification techniques that
 can serve as building blocks for further decidability analyses.
 
 The thesis is structured as follows. 
-Chapter~\ref{chap:intro} (the present chapter) gives a high-level 
-description of the frameworks used, avoiding formal definitions and 
-proofs for accessibility. Chapters~\ref{sec:pre} and~\ref{sec:proof} 
+Chapters~\ref{sec:pre} and~\ref{sec:proof} 
 then introduce the formal definitions and present the main theoretical 
 contribution. Chapter~\ref{sec:rescu} develops the practical 
 contributions through the \textsc{ReSCu} tool. 

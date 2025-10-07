@@ -92,7 +92,7 @@
 \theoremstyle{definition}
 \newtheorem{exmp}{Example}[section]
 
-\title{On the Implementability of Global Types}
+\title{Realisability of Global Types: Decidability and Verification}
 \author{Gabriele Genovese}
 \date{\today}
 
@@ -184,7 +184,7 @@ modello di comunicazione possono fallire in un altro.
 In questo lavoro, sviluppiamo un framework, basato sui MPST,
 flessibile e parametrizzato da diverse
 semantiche di comunicazione di rete, tra cui asincrona, punto-a-punto, con ordinamento
-causale e sincrona. Studiamo il problema dell’implementabilità da una
+causale e sincrona. Studiamo il problema dell’realizabilità da una
 prospettiva semantica ampia, con l’obiettivo di comprenderne i limiti
 fondamentali. I miei contributi includono un studio sui lavori correlati, una
 dimostrazione di indecidibilità per la realizabilità debole sotto semantica
@@ -209,9 +209,9 @@ use different communication models such as mailbox-based or causally ordered mes
 A key challenge is that protocols valid in one model may fail in another.
 In this work, we develop a flexible MPST framework parameterized by different network
 semantics, including asynchronous, peer-to-peer, causal ordering, and synchronous.
-We study the implementability problem from a broad semantic perspective, aiming to
+We study the realisability problem from a broad semantic perspective, aiming to
 understand its fundamental limits. My contributions include a survey
-of related work, a proof of undecidability for weak implementability under synchronous
+of related work, a proof of undecidability for weak realisability under synchronous
 semantics, and enhancements to the \textsc{ReSCu} tool for checking deadlock freedom in
 synchronous systems. This approach embeds communication models as a parameter, and it
 provides a basis for verifying distributed systems beyond classical settings.
