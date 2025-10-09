@@ -15,7 +15,7 @@ Subsequently, We analyse recent results by
 Stutz~et~al.~\cite{stutz2024implementability}, who extensively study 
 the realisability problem, while also tracing the line of research 
 back to early contributions such as Alur~et~al.~\cite{alur2000inference} 
-and Lohrey~et~al.~\cite{lohrey2003realizability}.  
+and Lohrey~et~al.~\cite{lohrey2003s}.  
 
 Finally, We briefly review related approaches in comparable formal 
 models, such as Multiparty Session Types (MPST) and Choreography 
@@ -161,7 +161,7 @@ which are instead accepted for the definition of this thesis.
 \section{Realisability for Alur}
 In this section, we compare our framework with one of the earliest and
 most influential works on realisability, the one of 
-Alur~et~al.~\cite{alur2005realizability}, which also inspired part of our
+Alur~et~al.~\cite{alur2005s}, which also inspired part of our
 approach. Their notion of \emph{Weak Realisability} captures the idea that
 a specification of Message Sequence Charts (MSCs) should already include
 all behaviours that are consistent with the local views of processes. 
@@ -179,7 +179,7 @@ fidelity concept over the local behaviour and abstracts from any
 deadlock-related concern. In both cases, weak realisability focuses on
 the alignment between local and global behaviours rather than on safety
 properties such as deadlock-freedom. For safe realisability, we recall an
-informal definition of Alur~et~al.~\cite{alur2005realizability} and discuss
+informal definition of Alur~et~al.~\cite{alur2005s} and discuss
 the differences.
 
 Intuitively, let $L$ be a set of MSCs. Then $L$ is said to be 
@@ -206,8 +206,8 @@ remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability
 becomes undecidable. For \emph{unbounded} HMSCs, 
 safe realisability and weak realisability are undecidable
 remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
-becomes undecidable~\cite{alur2005realizability}. 
-Later, Lohrey~et al.~\cite{lohrey2003realizability} proved, with a technique
+becomes undecidable~\cite{alur2005s}. 
+Later, Lohrey~et al.~\cite{lohrey2003s} proved, with a technique
 that involves five processes, that in the general case, safe realisability 
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
 for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
@@ -228,7 +228,7 @@ A summary of the main complexity results is given in Table~\ref{tab:realisabilit
 		\textbf{Safe} & P-time & \verb|EXPSPACE|-complete & undecidable \\
 		\hline
 	\end{tabular}
-	\caption{Summary of results on realisability in~\cite{alur2005realizability}.}
+	\caption{Summary of results on realisability in~\cite{alur2005s}.}
 	\label{tab:realisability}
 \end{table}
 
@@ -371,35 +371,95 @@ deadlock. We say a CSM is sink-final if all its state machines are.
 
 \section{Choreographies}
 Choreographies \cite{montesi2014choreographic} are another formalism to describe  
-distributed communication protocols. Unlike MSCs or MPST, which focus either on 
-trace-based semantics or type systems, choreographies emphasize the 
+distributed communication protocols. Choreographies emphasize the 
 global specification of interactions as a high-level description of the 
 intended message exchanges. Similarly to MPST, their goal is to ensure that
-a distributed  implementation can be derived in which each participant 
+a distributed implementation can be derived in which each participant 
 follows a local behaviour consistent with the global description, called
-respectively \emph{local} and \emph{global-view}. This setting naturally 
+respectively \emph{local} and \emph{global}-view. This setting naturally 
 connects to the realisability problem, since the key question is whether 
 a choreography can be faithfully implemented by a system of local 
-processes. In choreographies, the local-view is called \textbf{End-Point Projection} (EPP),
-and it is derived throughout a projection operation from the global-view.
-The \emph{knowledge of choice} problem is similar to the realisability one,
-and explored also in choreographies,
-but it was first introduced by Castagna et al.~\cite{castagna2012global}.
-% https://www.fabriziomontesi.com/bliki/KnowledgeOfChoice#CHY12
-% TODO: Continuare menzionando che i chor automata sono simili alla nostra 
-% definizione di global type
+processes. 
+In choreographies, the local-view is called 
+\textbf{End-Point Projection} (EPP),
+and it is derived via a projection operation from the global-view.
+In particular, \emph{Choreography Automata}~\cite{barbanera2020choreography}  
+share many conceptual similarities with our notion of Global Types.  
+Both formalisms model global interaction structures through automata  
+over communication actions, capturing the causal dependencies among  
+participants. The main difference lies in the underlying semantics and  
+the intended use: Choreography Automata focus on synthesis and  
+verification within choreographic frameworks, while our Global Types  
+are tailored to the study of realisability under different
+communication semantics.  
+
+One important challenge studied in choreographic design is the 
+\textbf{knowledge of choice} problem, introduced in the context of 
+MPST \cite{castagna2012global}. This problem can be seen as a 
+specific instance of the general projection problem: it arises when 
+translating a global description into consistent local behaviours. 
+In particular, it captures the difficulty of maintaining coherence 
+when decisions made by one participant must be known by others.  
+
+Informally, a choreography has knowledge of choice if, whenever a 
+branching (conditional) decision is made by one participant, all 
+other affected participants are made aware of that decision. Without 
+proper communication of the choice, a participant may behave 
+inconsistently because it lacks information to distinguish which 
+branch was taken. For example, if process \(A\) chooses between two 
+branches that lead to different sub-protocols with process \(B\), 
+then \(B\) must receive a signal (a ``selection'') that lets it 
+synchronize on the correct continuation.  
+
+If the choreography lacks such a mechanism, it becomes 
+\emph{unprojectable}: EPP cannot generate local behaviours that 
+correctly coordinate the branching. This issue 
+is addressed, typically, by adding explicit selection messages to 
+propagate the choice, and how this can be automated via 
+\emph{amendment} or \emph{repair} algorithms 
+\cite{lanese2013amending}, which insert minimal extra communications 
+to guarantee knowledge of choice.  
+
+Conceptually, this problem closely resembles the \emph{sender-driven 
+choice} policy highlighted before in the MPST framework, where 
+multiple senders make independent choices that must be reconciled to 
+ensure a coherent global behaviour. In both cases, the challenge lies 
+in ensuring that all participants have sufficient knowledge to follow 
+the same branch, preserving consistency across local projections.  
+
 
 \section{Other works}
-%citare il paper di Emilio su pomsets
-Stutz et al.~\cite{stutz2025automata} proposed \emph{Protocol State Machines} 
-(PSMs), an automata-based formalism subsuming both MPST and HMSCs. 
-PSMs show that many syntactic restrictions of global types are not 
-true expressivity limits. Yet, the realisability problem for PSMs 
-with unrestricted mixed choice remains undecidable, resolving the 
-open question that mixed-choice global types are undecidable in general.  
+Stutz et al.~\cite{stutz2025automata} introduce \emph{Protocol State  
+Machines} (PSMs), an automata-based formalism that generalises both  
+MPST and HMSC. Their approach bears resemblance to choreography-automata  
+models, specifying interactions via state machines over communication  
+labels. Crucially, they investigate the computational complexity of  
+type checking and realisability: when restricted to choice-free or  
+single-choice fragments, checking realisability or well-formedness is  
+decidable (often in PTIME), but once \emph{mixed choice} is permitted,  
+the realisability problem becomes undecidable. This result lends further  
+evidence to the hypothesis that unrestricted mixed-choice global types  
+are intrinsically hard to implement in distributed systems.
 
-In summary, projectability is well understood for sender-driven choice, 
-where decidability and complexity bounds are established, but moving 
-towards mixed choice inevitably leads to undecidability. Automata-based 
-techniques such as HMSCs and PSMs provide the most powerful tools for 
-extending the theory while preserving decidability in restricted cases.
+Another relevant contribution is by Guanciale et al.~ 
+\cite{guanciale2018realisability}, who study the 
+\emph{realisability of pomsets} via communicating automata. 
+Pomsets, or partially ordered multisets, generalise MSCs by 
+capturing causal dependencies among events rather than total 
+orders. Their work defines realisability conditions ensuring 
+both communication correctness and termination soundness, 
+supporting participants with internal concurrency.  
+% Compared to our setting, their approach is more abstract and 
+% syntax-independent, relying on partial-order semantics instead 
+% of trace languages. However, their communication model does not 
+% assume FIFO ordering, while our results focus on synchronous or 
+% FIFO semantics, which are stricter and lead to undecidability 
+% in the general case. Hence, their decidability results and our 
+% undecidability proof complement each other, addressing different 
+% levels of communication abstraction.
+
+% In summary, projectability is well understood for sender-driven choice, 
+% where decidability and complexity bounds are established, but moving 
+% towards mixed choice inevitably leads to undecidability. Automata-based 
+% techniques such as HMSCs and PSMs provide the most powerful tools for 
+% extending the theory while preserving decidability in restricted cases.
