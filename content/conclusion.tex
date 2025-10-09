@@ -1,39 +1,70 @@
 \chapter{Conclusion}\label{sec:end}
 This work addressed the \emph{realisability problem} for Global 
 Types, a central concern in the verification of distributed systems. 
-After surveying the state of the art, I positioned our contribution 
+After a brief overview of the problem, we positioned our contribution 
 within an ongoing research effort, bridging well-established 
 theoretical foundations with practical tool development.  
 
-On the theoretical side, I introduced the necessary background 
-notions (i.e. CFSMs, Global Types, MSCs, and communication models) and 
-formalized weak realisability. The main contribution was to connect 
+On the theoretical side, we introduced the necessary background 
+notions (i.e.\ CFSMs, Global Types, MSCs, and communication models) and 
+formalised weak realisability. The main contribution was to connect 
 the realisability problem to classical undecidability results, in 
 particular through a reduction to the Relaxed Post Correspondence 
-Problem (RPCP).  
+Problem (RPCP). This result, presented in 
+Chapter~\ref{sec:proof}, establishes a fundamental limitation 
+of realisability under synchronous semantics and lays the groundwork 
+for exploring decidable subclasses and practical approximations.
 
-On the practical side, I improved and extended the 
-\textsc{ReSCu} tool, used for checking realisability and other semantic 
-properties of Symbolic Communicating Machines (SCMs). The input grammar 
-was refined for greater usability, and new verification routines were 
-implemented, including checks for progress and deadlock-freedom. The tool 
-now also generates visual representations of synchronous systems, along 
-with illustrative examples. These extensions strengthen 
-\textsc{ReSCu} both as a research prototype and as a practical aid for 
-automated verification.  
+On the practical side, detailed in Chapter~\ref{sec:rescu}, we improved 
+and extended the \textsc{ReSCu} tool, used for checking realisability 
+and other semantic properties of Symbolic Communicating Machines 
+(SCMs). The input grammar was refined for greater usability, and new 
+verification routines were implemented, including checks for progress 
+and deadlock-freedom. The tool now also generates visual 
+representations of synchronous systems, along with illustrative 
+examples. These extensions strengthen \textsc{ReSCu} both as a research 
+prototype and as a practical aid for automated verification.ù
 
-Overall, the contributions span two complementary directions: a refined 
-theoretical understanding of realisability, and concrete advances in 
-tool support for experimenting with increasingly expressive models. 
+In Chapter~\ref{sec:rel}, we analysed part of the state of the art on 
+realisability, comparing our definitions and results with existing 
+approaches in the literature. This analysis helped clarify how our 
+formalisation of weak and safe realisability fits within, and extends, 
+previous frameworks, particularly those by 
+Alur~et~al.~\cite{alur2005realizability}, 
+Lohrey~et~al.~\cite{lohrey2003realizability}, and 
+Stutz~et~al.~\cite{stutz2024implementability}. The comparison also 
+highlighted key conceptual differences, especially in how communication 
+semantics and closure properties are handled, further motivating our 
+formal treatment.
 
 \section{Future Work}
-Future directions include extending the theoretical results beyond weak 
-realisability toward a decidability result of \emph{safe realisability} 
-(therefore, including deadlock-freedom) for 
-Global Types, building on the techniques developed here and extending
-an existing proof made by Lohrey, et al. \cite{lohrey2003realizability}.
-On the practical side, a natural goal is to further enhance \textsc{ReSCu} to  
-support these results, ultimately aiming for a complete algorithm to decide 
-realisability for restricted classes of Global Types. This would 
-enable systematic benchmarking against existing methods and real-world 
-protocols.
+Future research directions include extending the theoretical results
+beyond weak realisability toward a decidability result for
+\emph{safe realisability}, thereby incorporating properties such as
+deadlock-freedom directly into the analysis of Global Types. This line
+of investigation will build upon the techniques developed in this work
+and extend the existing results of Lohrey~et~al.~\cite{lohrey2003realizability}.  
+
+Another important direction is the exploration of alternative
+communication semantics, such as causal-order and mailbox-based models,
+which were mentioned throughout this work. Investigating the
+realisability problem under these semantics could shed light on how
+communication constraints and buffering behaviours affect implementability
+and decidability. Establishing precise connections between synchronous
+semantics and these more general models may also lead to new transfer
+results, showing under which conditions realisability in one model
+implies realisability in another.  
+
+On the practical side, a natural objective is to further enhance
+\textsc{ReSCu} to support these theoretical extensions, ultimately
+aiming for a complete and automated framework to decide realisability
+for restricted classes of Global Types. This would enable systematic
+benchmarking against existing tools and the validation of the approach
+on real-world communication protocols.  
+
+Finally, it would be valuable to investigate the role of \emph{fairness}
+and other semantic variants, within the verification process. 
+These extensions could help
+model more realistic distributed environments and provide a deeper
+understanding of how fairness assumptions influence the decidability and
+correctness of realisable systems.

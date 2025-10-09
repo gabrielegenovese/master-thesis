@@ -10,6 +10,9 @@ defined within the scope of this work, along with the foundational
 elements required to understand the theoretical contributions.
 
 \section{Standard notions on automata}
+
+\textbf{Words and alphabet.} $\Sigma$ is used to denote a set of finite words.
+$\labelalphabet$ denotes a set of finite action used for a global type.
 For a string $s$, let $s^l$ denote the $l$-th character of the string.
 
 \bigskip
@@ -35,11 +38,6 @@ A deterministic finite automaton (DFA) is an NFA where the transition
 relation $\delta$ is a partial function  
 $\delta : Q \times \Sigma \to Q$. The DFA is complete if $\delta$ is  
 total.  
-
-% Every DFA $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$ accepts the same  
-% language as the complete DFA $\mathcal{A}' = (Q \cup \{\perp\}, \Sigma,  
-% \delta', q_0, F)$, where $\delta'(q,a) = \perp$ if $\delta(q,a)$ is  
-% undefined, and $\delta'(\perp,a) = \perp$.  
 \end{definition}
 
 \bigskip
@@ -122,7 +120,7 @@ $\eventsof{w} = \sendeventsof{w} \cup \receiveeventsof{w}$.
 When all events are labelled with distinct actions, 
 we identify an event with its action.  
 
-\paragraph{Executions.}
+\subsubsection*{Executions.}
 An execution is a well-defined sequence of actions $e\in\Act^*$, where a
 receive action is always preceded by a unique corresponding send action. % TODO : in che senso?
 
@@ -475,8 +473,8 @@ We write $\mscsofcfsms{\cfsms}{\acommunicationmodel}$ for the set
 $\{\mscof{e} \mid e\in\executionsofcfsms{\cfsms}{\acommunicationmodel}\}$.
 
 A system is orphan-free if, whenever all machines have reached 
-an accepting state, no message
-remains in transit, i.e., no message is sent but not received.
+an accepting state, no sent message
+remains in transit, i.e. no message is sent but not received.
 
 \bigskip
 
@@ -486,20 +484,31 @@ if all its executions in $\executionsofcfsms{\cfsms}{\acommunicationmodel}$
 are orphan-free.  
 \end{definition}
 
-All synchronous executions are orphan-free by definition.
+\textbf{Remark.} All synchronous executions are orphan-free by definition.
 
-A system is deadlock-free if, 
-any \emph{partial} execution can be extended/completed to an accepting execution.
+A system is said to be \emph{deadlock-free} if every \emph{partial} execution 
+(i.e., an execution that may have stopped before reaching a final state) 
+can always be extended to a complete or accepting execution.  
+Intuitively, this means that the system can never reach a state in which all 
+processes are waiting indefinitely, and no further progress is possible.  
 
 \bigskip
 
-\begin{definition}[Deadlock-free]\label{def:deadlock-free}
+\begin{definition}[Deadlock-freedom]\label{def:deadlock-free}
 A system $\cfsms$ is \emph{deadlock-free} in $\acommunicationmodel$  
-if for every execution 
+if, for every execution 
 $e \in \executionsofcfsms{\acceptcompletion{\cfsms}}{\acommunicationmodel}$,  
-there exists a completion $e'$ with $e \prefixorder e'$ and  
+there exists a completion $e'$ such that $e \prefixorder e'$ and  
 $e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel}$.  
 \end{definition}
+
+\textbf{Remark.} This definition captures the idea that, in a deadlock-free system, 
+no reachable configuration represents a permanent waiting state, every 
+intermediate behaviour can eventually lead to a valid full execution.  
+In other words, the system’s communication and synchronisation structure 
+guarantees continuous potential for progress.  
+For a detailed discussion of this property and its verification within 
+our framework, refer to Chapter~\ref{sec:rescu}.
 
 % \begin{remark}\label{rem:equivalent-formulation-of-deadlock-free-cfsms}
 % 	A system of CFSMs $\cfsms$ is \emph{deadlock-free} for a communication model
@@ -511,45 +520,75 @@ $e' \in \executionsofcfsms{\cfsms}{\acommunicationmodel}$.
 % \end{remark}
 
 \section{Global Types}
-This part will further highlight the basic notions to understand the formal proof 
-for the theorem presented in Chapter~\ref{sec:proof} and, in particular, Global Type
-and Weakly-realisable. We begin by extending the definition of linearisability so 
-that it applies to all communication models.
-In our setting, Global Types are automata that describe a language of MSCs, 
-as considered in this recent work by Di Giusto, et al.~\cite{di2025realisability}.
-
-%% TODO: commenti di ivan: non è proprio un type, lui definisce 
-%% così i choreography automata , magari specificare che le definizioni corrispondono
-%% e citare il paper che usa questa nozione
-
-%% !! CA da citare nei related 
+This section introduces the fundamental notions required to understand the 
+formal proof presented in Chapter~\ref{sec:proof}, focusing in particular 
+on the concepts of \emph{Global Types} and \emph{Weak Realisability}. 
 
 \bigskip
 
-\begin{definition}[Global Type]
+\begin{definition}[Global Type]\label{def:gt}
 	An \emph{arrow} is a triple $(p,q,m)\in\Procs\times\Procs\times\Messages$ 
 	with $p\ne q$; we often write $\marrow{p}{q}{m}$ instead of $(p,q,m)$, and 
-	write $\labelalphabet$ to denote the finite set of arrosws.
-	A Global Type $\gt$ is a DFA over the alphabet $\labelalphabet$.
+	use $\labelalphabet$ to denote the finite set of arrows.
+	A \emph{Global Type} $\gt$ is a \emph{deterministic finite automaton} (DFA) over 
+	the alphabet $\labelalphabet$.
 \end{definition}
-% TODO: dare più contesto ad esempio
 
 We use the notation $p \xleftrightarrow{m} q$ to denote the
 \emph{round-trip} exchange of a message $m$: first $p$ sends $m$
 to $q$, and then $q$ sends back the same message $m$ to $p$.
-This will serve as an acknowledgment message for $p$.
+This serves as an acknowledgment message for $p$, ensuring that both 
+directions of communication are explicitly represented in the model.
+
+\textbf{Remark.}
+In our setting, Global Types are viewed as automata that generate a 
+language of MSCs (Definition~\ref{def:gt} and~\ref{def:langexist}), 
+following the line of work by 
+Di~Giusto~et~al.~\cite{di2025realisability}. 
+It is important to note that this notion of Global Types differs 
+significantly from the one commonly adopted in the Multiparty Session 
+Types (MPST) literature, where Global Types are usually defined as 
+structured syntactic descriptions of communication protocols. 
+Here, the automata-based interpretation aligns with other lines of work that 
+study of the \emph{realisability problem}, providing a formal foundation for 
+reasoning about synchrony, causality, and implementability. 
+For a comparison and discussion of similarities and differences 
+with other formalisms, refer to Chapter~\ref{sec:rel}.
 
 \bigskip
 
 \begin{example}
 An example of a Global Type expressed as an automaton is the following.
 Consider the not-realisable specification stated in 
-Listing~\ref{lst:not-impl-exm}. The protocol can be modelled with the 
-Global Type in Figure~\ref{fig:gt-exm}.
+Listing~\ref{lst:not-impl-exm}. 
+The specification automaton depicted in Figure~\ref{fig:gt-exm} is a DFA
+$\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$, where:
+\begin{itemize}
+	\item $\mathbb{P} = \{A, B, C, D\}$;
+    \item $Q = \{1, 2, 3, 4, 5\}$ is the set of states;
+    \item $\Sigma = \{\marrow{A}{B}{x}, \marrow{A}{B}{y}, 
+	\marrow{C}{D}{z}, \marrow{C}{D}{w}\}$ is the alphabet $\labelalphabet$;
+    \item The transition function $\delta : Q \times \Sigma \to Q$ is defined as:
+          \[
+          \delta(1, \marrow{A}{B}{x}) = 2, \quad
+          \delta(1, \marrow{A}{B}{y}) = 3, \quad
+          \delta(2, \marrow{C}{D}{z}) = 4, \quad
+          \delta(3, \marrow{C}{D}{w}) = 5;
+          \]
+    \item The initial state is $q_0 = 1$;
+    \item The set of accepting states is $F = \{4, 5\}$.
+\end{itemize}
+
+% Hence, the automaton accepts the language:
+% \[
+% \mathcal{L}_{\text{words}}(\mathcal{A}) =
+% \{\marrow{A}{B}{x}\marrow{C}{D}{z},\ \marrow{A}{B}{y}\marrow{C}{D}{w}\}.
+% \]
+\bigskip
 
 \begin{figure}[!ht]
 	\centering
-	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.8]
+	\begin{tikzpicture}[node distance=1.5cm, auto, scale=0.9]
 		\node[state, initial, initial text={}] (s0) {1};
 		\node[state] (s1) [above right=of s0] {2};
 		\node[state] (s2) [below right=of s0] {3};
@@ -561,7 +600,7 @@ Global Type in Figure~\ref{fig:gt-exm}.
 		\draw[->] (s1) to node[above,sloped]{$\gtlabel{C}{D}{z}$}(s3);
 		\draw[->] (s2) to node[above,sloped]{$\gtlabel{C}{D}{w}$}(s4);
 	\end{tikzpicture}
-	\caption{An automaton representing the specification's global type given in Listing~\ref{lst:not-impl-exm}.}
+	\caption{Listing~\ref{lst:not-impl-exm}'s global type.}
 	\label{fig:gt-exm}
 \end{figure}
 \end{example}
@@ -587,7 +626,7 @@ $\existentialmsclanguageof{\gt}{}$:
 
 \bigskip
 
-\begin{definition}[$\existentialmsclanguageof{\gt}$]
+\begin{definition}[$\existentialmsclanguageof{\gt}$]\label{def:langexist}
 	$$
 		\existentialmsclanguageof{\gt} \eqdef \{\labeltomsc{w} \mid
 		w \in \labellanguageof{\gt}\}
@@ -596,8 +635,8 @@ $\existentialmsclanguageof{\gt}{}$:
 
 % TODO: dare più contesto ed esempio
 
-When a global type is implemented in a concrete system,
-its behaviour depends on the chosen communication model.
+When a Global Type is implemented in a concrete system,
+its semantics depends on the chosen communication model.
 
 \bigskip
 
@@ -608,8 +647,7 @@ its behaviour depends on the chosen communication model.
     \bigcup\{\linearizationsof{M}{\acommunicationmodel}\mid M\in\existentialmsclanguageof{\gt}\}$.
 \end{definition}
 
-% TODO: FARE UN CONFRONTO CON LE DUE DEFINIZIONI
-We now give the definitions of weak and safe realisability.
+We now give the definitions of \emph{weak} and \emph{safe} realisability.
 
 \bigskip
 
@@ -631,7 +669,8 @@ with other works in Chapter~\ref{sec:rel}.
     A global type $\gt$ is \emph{safe realisable}
     in the communication model $\acommunicationmodel$
     if there is a system $\cfsms$ that is \emph{weak realisable} and  
-    $\cfsms$ is deadlock-free in $\acommunicationmodel$.
+    $\cfsms$ is deadlock-free in $\acommunicationmodel$ 
+	(Def.~\ref{def:deadlock-free}).
 \end{definition}
 
 The definition of Weak realisability corresponds to  
