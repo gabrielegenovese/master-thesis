@@ -15,7 +15,7 @@ Subsequently, We analyse recent results by
 Stutz~et~al.~\cite{stutz2024implementability}, who extensively study 
 the realisability problem, while also tracing the line of research 
 back to early contributions such as Alur~et~al.~\cite{alur2000inference} 
-and Lohrey~et~al.~\cite{lohrey2003s}.  
+and Lohrey~et~al.~\cite{lohrey2003realizability}.  
 
 Finally, We briefly review related approaches in comparable formal 
 models, such as Multiparty Session Types (MPST) and Choreography 
@@ -161,7 +161,7 @@ which are instead accepted for the definition of this thesis.
 \section{Realisability for Alur}
 In this section, we compare our framework with one of the earliest and
 most influential works on realisability, the one of 
-Alur~et~al.~\cite{alur2005s}, which also inspired part of our
+Alur~et~al.~\cite{alur2005realizability}, which also inspired part of our
 approach. Their notion of \emph{Weak Realisability} captures the idea that
 a specification of Message Sequence Charts (MSCs) should already include
 all behaviours that are consistent with the local views of processes. 
@@ -179,7 +179,7 @@ fidelity concept over the local behaviour and abstracts from any
 deadlock-related concern. In both cases, weak realisability focuses on
 the alignment between local and global behaviours rather than on safety
 properties such as deadlock-freedom. For safe realisability, we recall an
-informal definition of Alur~et~al.~\cite{alur2005s} and discuss
+informal definition of Alur~et~al.~\cite{alur2005realizability} and discuss
 the differences.
 
 Intuitively, let $L$ be a set of MSCs. Then $L$ is said to be 
@@ -206,8 +206,8 @@ remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability
 becomes undecidable. For \emph{unbounded} HMSCs, 
 safe realisability and weak realisability are undecidable
 remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
-becomes undecidable~\cite{alur2005s}. 
-Later, Lohrey~et al.~\cite{lohrey2003s} proved, with a technique
+becomes undecidable~\cite{alur2005realizability}. 
+Later, Lohrey~et al.~\cite{lohrey2003realizability} proved, with a technique
 that involves five processes, that in the general case, safe realisability 
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
 for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
@@ -228,7 +228,7 @@ A summary of the main complexity results is given in Table~\ref{tab:realisabilit
 		\textbf{Safe} & P-time & \verb|EXPSPACE|-complete & undecidable \\
 		\hline
 	\end{tabular}
-	\caption{Summary of results on realisability in~\cite{alur2005s}.}
+	\caption{Summary of results on realisability in~\cite{alur2005realizability}.}
 	\label{tab:realisability}
 \end{table}
 
@@ -420,7 +420,7 @@ propagate the choice, and how this can be automated via
 \cite{lanese2013amending}, which insert minimal extra communications 
 to guarantee knowledge of choice.  
 
-Conceptually, this problem closely resembles the \emph{sender-driven 
+Conceptually, this problem is closely related to the \emph{sender-driven 
 choice} policy highlighted before in the MPST framework, where 
 multiple senders make independent choices that must be reconciled to 
 ensure a coherent global behaviour. In both cases, the challenge lies 

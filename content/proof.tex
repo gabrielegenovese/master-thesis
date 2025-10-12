@@ -371,24 +371,6 @@ $x_{i_1}\cdots x_{i_m}$. The prefix property of RPCP guarantees that
 $M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. Establishing that 
 $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$ is non-trivial, and this 
 step is an addition to the original proof. 
-% By construction, $L^*$ weakly implies   % TODO cambia weakly implies CHIEDERE A CINZIA
-% $M_{\texttt{sol}}$, but $M_{\texttt{sol}} \notin \masc{L^*}{\synchmodel}$, since at least  
-% one tile differs. Consequently, $L^*$ is \emph{not realisable}.
-Given that the system of CFSMs $\cfsms_G$ corresponds to 
-$G_{\texttt{sol}}$, constructed from $M_{\texttt{sol}}$ as described in 
-Lemma~\ref{lem:gm}, we have that 
-$\executionsof{\cfsms_G}{\synchmodel} \neq 
-\executionsof{L^*}{\synchmodel}$.  
-Since at least one tile differs, 
-$M_{\texttt{sol}} \notin \executionsof{L^*}{\synchmodel}$, therefore 
-$L^*$ is \emph{not realisable}.
-
-% The claim is that the combined MSC $M_{\texttt{sol}}$ is 
-% made by $L^*$'s projections, therefore, it exists a CFSM $\cfsms$
-% that $M_{\texttt{sol}} \in \mscsofcfsms{\cfsms}{\synchmodel}$,
-% but the CFSM $\cfsms$ is not part of the language of execution of $L^*$ 
-% $\executionsof{\cfsms}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$. 
-
 
 With these constructions in place, we proceed to introduce the main  
 objects used in the proof. Specifically, we first show how a Global  
@@ -506,6 +488,17 @@ This global type is constructed from the family of global types % TODO: forse ca
 representing all tiles, and it forms the basis for proving the
 non-realisability result.
 
+Given the system of CFSMs $\projectionof{L^*}$ and the MSC  
+$M_{\texttt{sol}}$, we need to show that  
+$\executionsof{\projectionof{L^*}}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$.  
+By construction of $L^*$, we have  
+$M_{\texttt{sol}} \in \msclanguageof{\projectionof{L^*}}{\synchmodel}$.  
+In contrast, $M_{\texttt{sol}} \notin  
+\msclanguageof{L^*}{\synchmodel}$, since at least one tile differs.  
+This demonstrates that there exists an execution that is valid for  
+$\projectionof{L^*}$ but invalid for the Global Type $L^*$.  
+Therefore, $L^*$ is \emph{not realisable}.  
+
 
 \section{Undecidability proof}
 
@@ -530,189 +523,195 @@ to present the proof for the undecidability result.
 
 	\begin{itemize}
 		\item[$\Rightarrow$]
-		      Assume that
-		      $\Delta = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
-		      for a solution to a generic RPCP problem instance, and the bits $a_j$ and
-		      $b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into
-		      the two (left and right) long strings. Assume also synchronous communication semantic.
-			  Consider the MSCs $M_x$ and $M_y$ obtained from the concatenation of
-		      $M_x = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ 
-			  and $M_y = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
-		      The possible linearisations of both of these sequences of MSCs 
-			  must be included in the language of execution of $L^*$, by construction 
-			  of $L^*$ (Definition~\ref{def:lstar}). 
-			  This means that $M_x, M_y \in \msclanguageof{L^*}{\synchmodel}$.
-			  Additionally, $M_x,M_y\in \mscsetofmodel{\synchmodel}$
-			  because they are sequences of MSCs included in
-			  $\mscsetofmodel{\synchmodel}$ (Lemma~\ref{lemma:minsynch}).
-		      $M_x$ corresponds to the construction of the left side of the equivalence of the RPCP
-		      problem, and, instead, $M_y$ represents the construction of the right side.
-		      We then look at the projections $M_x|_{P1}$, $M_x|_{P2}$, $M_x|_{P3}$,
-		      and $M_x|_{P4}$ of $M_x$, and $M_y|_{P1}$, $M_y|_{P2}$, $M_y|_{P3}$, $M_y|_{P4}$ of $M_y$ onto the
-		      4 processes.
-			  Given that these are projection of MSCs included in $L^*$,
-			  they are possible execution of a CFSM $\cfsms$ that can execute $L^*$.
-			  Now consider the MSC $M_{\texttt{sol}}$ 
-			  formed from $M_y|_{P1}$, $M_y|_{P2}$, $M_x|_{P3}$, and $M_x|_{P4}$.
-		      This MSC represents the construction of the solution to
-		      the problem. Processes 1 and 2 construct the right part ($y_{i_1}...y_{i_m}$)
-		      and processes 3 and 4 construct the left part ($x_{i_1}...x_{i_m}$).
-			  %%% INIZIO PARTE IMPORTANTE
-		      The claim is that the combined MSC $M_{\texttt{sol}}$ is 
-		      made by $L^*$'s projections, therefore, it exists a CFSM $\cfsms$
-			  that $M_{\texttt{sol}} \in \mscsofcfsms{\cfsms}{\synchmodel}$,
-			  but the CFSM $\cfsms$ is not part of the language of execution of $L^*$ 
-			  $\executionsof{\cfsms}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$. 
-			  In other words, the language of the execution of $M_{\texttt{sol}}$ is included
-			  in the execution of the system, but it is not included in the execution of $L^*$. 
-			  By definition, the first thing to establish is that $M_{\texttt{sol}}$
-		      is indeed well-formed and synchronous MSC.
-		      The only new situation in terms of communication in $M_{\texttt{sol}}$ is the
-		      communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
-		      But the communication between $P_1$ and $P_4$ is consistent in
-		      $M_y|_{P1}$ and $M_x|_{P4}$ (i.e., the sequence of messages sent from $P_1$ to
-		      $P_4$ in $M_y|_{P1}$ is equal to the sequence of messages received in $M_x|_{P4}$),
-		      and the communication between $P_2$ and $P_3$ is consistent in
-		      $M_y|_{P2}$ and $M_x|_{P3}$ because $R$ is a solution to the RPCP.
-		      Furthermore, the acyclicity of $M_{\texttt{sol}}$ follows from the property of the
-		      solution that the string formed by the first $j$ words on processes 1
-		      and 2 is always a prefix of the string formed by the first $j$ words
-		      on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
-		      is sent before it needs to be received. 
-			  Therefore, the MSC $M_{\texttt{sol}}$ is well-formed.
+			Assume that
+			$\Delta = (i_1, a_1, b_1, i_2, a_2, b_2, \ldots, i_m, a_m, b_m)$ are the indices
+			for a solution to a generic RPCP problem instance, and the bits $a_j$ and
+			$b_j$ indicate which string ($v_{i_j}$ or $w_{i_j}$) is chosen to go into
+			the two (left and right) long strings. Assume also synchronous communication semantic.
+			Consider the MSCs $M_x$ and $M_y$ obtained from the concatenation of
+			$M_x = M^{a_1}_{i_1} \cdots M^{a_m}_{i_m}$ 
+			and $M_y = M^{b_1}_{i_1} \cdots M^{b_m}_{i_m}$.
+			The possible linearisations of both of these sequences of MSCs 
+			must be included in the language of execution of $L^*$, by construction 
+			of $L^*$ (Definition~\ref{def:lstar}). 
+			This means that $M_x, M_y \in \msclanguageof{L^*}{\synchmodel}$.
+			Additionally, $M_x,M_y\in \mscsetofmodel{\synchmodel}$
+			because they are sequences of MSCs included in
+			$\mscsetofmodel{\synchmodel}$ (Lemma~\ref{lemma:minsynch}).
+			$M_x$ corresponds to the construction of the left side of the equivalence of the RPCP
+			problem, and, instead, $M_y$ represents the construction of the right side.
+			We then look at the projections $M_x|_{P1}$, $M_x|_{P2}$, $M_x|_{P3}$,
+			and $M_x|_{P4}$ of $M_x$, and $M_y|_{P1}$, $M_y|_{P2}$, $M_y|_{P3}$, $M_y|_{P4}$ of $M_y$ onto the
+			4 processes.
+			Given that these are projection of MSCs included in $L^*$,
+			they are possible execution of a CFSM $\cfsms$ that can execute $L^*$.
+			Now consider the MSC $M_{\texttt{sol}}$ 
+			formed from $M_y|_{P1}$, $M_y|_{P2}$, $M_x|_{P3}$, and $M_x|_{P4}$.
+			This MSC represents the construction of the solution to
+			the problem. Processes 1 and 2 construct the right part ($y_{i_1}...y_{i_m}$)
+			and processes 3 and 4 construct the left part ($x_{i_1}...x_{i_m}$).
+			%%% INIZIO PARTE IMPORTANTE
+			The claim is that the combined MSC $M_{\texttt{sol}}$ is 
+			made by $L^*$'s projections, therefore, it exists a CFSM $\cfsms$
+			that $M_{\texttt{sol}} \in \mscsofcfsms{\cfsms}{\synchmodel}$,
+			but the CFSM $\cfsms$ is not part of the language of execution of $L^*$ 
+			$\executionsof{\cfsms}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$. 
+			In other words, the language of the execution of $M_{\texttt{sol}}$ is included
+			in the execution of the system, but it is not included in the execution of $L^*$. 
+			By definition, the first thing to establish is that $M_{\texttt{sol}}$
+			is indeed well-formed and synchronous MSC.
+			The only new situation in terms of communication in $M_{\texttt{sol}}$ is the
+			communication between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+			But the communication between $P_1$ and $P_4$ is consistent in
+			$M_y|_{P1}$ and $M_x|_{P4}$ (i.e., the sequence of messages sent from $P_1$ to
+			$P_4$ in $M_y|_{P1}$ is equal to the sequence of messages received in $M_x|_{P4}$),
+			and the communication between $P_2$ and $P_3$ is consistent in
+			$M_y|_{P2}$ and $M_x|_{P3}$ because $R$ is a solution to the RPCP.
+			Furthermore, the acyclicity of $M_{\texttt{sol}}$ follows from the property of the
+			solution that the string formed by the first $j$ words on processes 1
+			and 2 is always a prefix of the string formed by the first $j$ words
+			on processes 3 and 4. Consequently, each message from $P_1$ to $P_4$
+			is sent before it needs to be received. 
+			Therefore, the MSC $M_{\texttt{sol}}$ is well-formed.
 
-		      We now prove that the MSC $M_{\texttt{sol}}$ is synchronous, that is
-			  $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
-		      Assume, by contradiction, that 
-			  $M_{\texttt{sol}} \notin \mscsetofmodel{\synchmodel}$.
-		      Then, there should be a cycle of dependencies in the communication pattern.
-		      There are no communication between $P_2$ and $P_4$, and between $P_1$
-		      and $P_3$. Therefore, this cycle must involve all processes, starting
-		      for example from $P_1$ and having this dependency graph
-		      $P_1\leftrightarrow P_2\leftrightarrow P_3\leftrightarrow P_4\leftrightarrow P_1$.
-		      The only new situation that can cause a cycle are the communication
-		      between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
-		      We do not need to analyse the new communication between $P_1$ and $P_4$ because
-		      it is not feasible in any communication model, but we need to analyse the one
-		      between $P_2$ and $P_3$ because it's feasible in FIFO.
+			We now prove that the MSC $M_{\texttt{sol}}$ is synchronous, that is
+			$M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
+			Assume, by contradiction, that 
+			$M_{\texttt{sol}} \notin \mscsetofmodel{\synchmodel}$.
+			Then, there should be a cycle of dependencies in the communication pattern.
+			There are no communication between $P_2$ and $P_4$, and between $P_1$
+			and $P_3$. Therefore, this cycle must involve all processes, starting
+			for example from $P_1$ and having this dependency graph
+			$P_1\leftrightarrow P_2\leftrightarrow P_3\leftrightarrow P_4\leftrightarrow P_1$.
+			The only new situation that can cause a cycle are the communication
+			between $P_1$ and $P_4$, and between $P_2$ and $P_3$.
+			We do not need to analyse the new communication between $P_1$ and $P_4$ because
+			it is not feasible in any communication model, but we need to analyse the one
+			between $P_2$ and $P_3$ because it's feasible in FIFO.
 
-		      % For the fist comunication, the only possible cycle pattern is depicted
-		      % in Fig.~\ref{fig:cycle1}
+			% For the fist comunication, the only possible cycle pattern is depicted
+			% in Fig.~\ref{fig:cycle1}
 
-		      % \begin{figure}[!ht]
-		      %  \centering
-		      %  \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-		      %   \declinst{P1}{P1}{}
-		      %   \declinst{P2}{P2}{}
-		      %   \declinst{P3}{P3}{}
-		      %   \declinst{P4}{P4}{}
+			% \begin{figure}[!ht]
+			%  \centering
+			%  \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+			%   \declinst{P1}{P1}{}
+			%   \declinst{P2}{P2}{}
+			%   \declinst{P3}{P3}{}
+			%   \declinst{P4}{P4}{}
 
-		      %   \mess[label position=above right,pos=0.45]{$i_z$}{P1}{P4}[8]
-		      %   \nextlevel
-		      %   \nextlevel
-		      %   \nextlevel
-		      %   \syncmscmess{($i_k,n_k)$}{P1}{P2}
-		      %   \mess[label position=above,pos=0.62]{$i_k$}{P1}{P4}
-		      %   \mess{}{P4}{P1}
-		      %   \nextlevel
-		      %   \syncmscmess{$(i_k,n_j)$}{P3}{P4}
-		      %   \nextlevel
-		      %   \nextlevel
-		      %   \mess{}{P4}{P1}[-8]
-		      %  \end{msc}
-		      %  \caption{The $M_i^n$ MSC.}
-		      %  \label{fig:cycle1}
-		      % \end{figure}
+			%   \mess[label position=above right,pos=0.45]{$i_z$}{P1}{P4}[8]
+			%   \nextlevel
+			%   \nextlevel
+			%   \nextlevel
+			%   \syncmscmess{($i_k,n_k)$}{P1}{P2}
+			%   \mess[label position=above,pos=0.62]{$i_k$}{P1}{P4}
+			%   \mess{}{P4}{P1}
+			%   \nextlevel
+			%   \syncmscmess{$(i_k,n_j)$}{P3}{P4}
+			%   \nextlevel
+			%   \nextlevel
+			%   \mess{}{P4}{P1}[-8]
+			%  \end{msc}
+			%  \caption{The $M_i^n$ MSC.}
+			%  \label{fig:cycle1}
+			% \end{figure}
 
-		      % This cycle is not possible because it does not represent a
-		      % solution to the RPCP problem:
-		      % $x_1...x_{i_k}...x_{i_z}...x_m \neq y_1...y_{i_z}...y_{i_k}...y_m$.
+			% This cycle is not possible because it does not represent a
+			% solution to the RPCP problem:
+			% $x_1...x_{i_k}...x_{i_z}...x_m \neq y_1...y_{i_z}...y_{i_k}...y_m$.
 
-		      \begin{figure}[!ht]
-			      \centering
-			      \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
-				      \declinst{P1}{P1}{}
-				      \declinst{P2}{P2}{}
-				      \declinst{P3}{P3}{}
-				      \declinst{P4}{P4}{}
+			\begin{figure}[!ht]
+				\centering
+				\begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+					\declinst{P1}{P1}{}
+					\declinst{P2}{P2}{}
+					\declinst{P3}{P3}{}
+					\declinst{P4}{P4}{}
 
-				      \mess[label position=above right, pos=0.3]{$c$}{P2}{P3}[4]%
-				      \nextlevel
-				      \syncmscmess{$(i_k,n_k)$}{P1}{P2}
-				      \mess[pos=0.62]{$i_k$}{P1}{P4}%
-				      \mess{}{P4}{P1}
-				      \nextlevel
-				      \syncmscmess{$(i_k,n_j)$}{P3}{P4}
-				      \mess{}{P3}{P2}[-4]
-			      \end{msc}
-			      \caption{MSC communication that breaks synchrony.} % todo: modifica
-			      \label{fig:cycle2}
-		      \end{figure}
+					\mess[label position=above right, pos=0.3]{$c$}{P2}{P3}[4]%
+					\nextlevel
+					\syncmscmess{$(i_k,n_k)$}{P1}{P2}
+					\mess[pos=0.62]{$i_k$}{P1}{P4}%
+					\mess{}{P4}{P1}
+					\nextlevel
+					\syncmscmess{$(i_k,n_j)$}{P3}{P4}
+					\mess{}{P3}{P2}[-4]
+				\end{msc}
+				\caption{MSC communication that breaks synchrony.} % todo: modifica
+				\label{fig:cycle2}
+			\end{figure}
 
-		      For the communication between $P_2$ and $P_3$, the only possible cycle
-		      pattern is depicted in Figure~\ref{fig:cycle2} showed as an MSC.
-		      Suppose $P_2$ wants to send a character $c$, but $P_3$
-		      is not expecting any further characters. In order for
-		      $P_3$ to resume receiving, it must first receive an index
-		      from $P_4$. However, $P_4$ can only send this index
-		      after receiving it from $P_1$, which in turn must first
-		      communicate the index to $P_2$.
-		      At this point, $P_2$ needs to receive the index from
-		      $P_1$, but it cannot do so until it finishes sending
-		      character $c$. This creates a circular dependency among the
-		      processes, making the communication pattern impossible. % TODO: chiarire che non è come un caso di deadlock
-		      This cycle would break the prefix property as
-		      $x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
-		      in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
-		      assumption that $y_1...y_{k-1} \leq x_1...x_{k-1}$.
-		      Therefore, we conclude that 
-			  $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
+			For the communication between $P_2$ and $P_3$, the only possible cycle
+			pattern is depicted in Figure~\ref{fig:cycle2} showed as an MSC.
+			Suppose $P_2$ wants to send a character $c$, but $P_3$
+			is not expecting any further characters. In order for
+			$P_3$ to resume receiving, it must first receive an index
+			from $P_4$. However, $P_4$ can only send this index
+			after receiving it from $P_1$, which in turn must first
+			communicate the index to $P_2$.
+			At this point, $P_2$ needs to receive the index from
+			$P_1$, but it cannot do so until it finishes sending
+			character $c$. This creates a circular dependency among the
+			processes, making the communication pattern impossible. % TODO: chiarire che non è come un caso di deadlock
+			This cycle would break the prefix property as
+			$x_1...x_{k-1}...x_m= y_1...y_{k-1}...y_m$, but the character $c$ appears
+			in $y_1...y_{k-1}$ but not in $x_1...y_{k-1}$ contradicting the
+			assumption that $y_1...y_{k-1} \leq x_1...x_{k-1}$.
+			Therefore, we conclude that 
+			$M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$.
 
-			  We now prove the non-realisability of $L^*$, thanks to $M_{\texttt{sol}}$.
-			  Given that $M_{\texttt{sol}}$ is built using projections of MSCs 
-			  included in $L^*$, we can consider the system of CFSM $\cfsms$
-			  where $\cfsms$ is built using the projections of $M_{\texttt{sol}}$. 
-			  The CFSM $\cfsms$ is a possible implementation of $L^*$, because it 
-			  is built upon possible projection of MSCs included in its language of MSCs.
-			  We need to prove that 	
-			  $\executionsof{\cfsms}{\synchmodel} \neq \executionsof{L^*}{\synchmodel}$.
-		      Note that $\executionsof{\cfsms}{\synchmodel}$ cannot 
-			  itself be in $\executionsof{L^*}{\synchmodel}$ because there must be
-		      some index $i_j$ where $a_j \neq b_j$, and no execution of the Global 
-			  Type exists in $L^*$ where,
-		      after $P_1$ announces the index, what $P_2$ sends is not
-		      identical to what $P_3$ receives. This generally establish the
-			  non-realisability of $L^*$. Example~\ref{exm:teo} shows an instance
-			  of the construction of $M_{\texttt{sol}}$.
+			We now prove the non-realisability of $L^*$, thanks to $M_{\texttt{sol}}$.
+			Consider the system of CFSM $\projectionof{L^*}$ and a 
+			linearisation $w_{\texttt{sol}}\in \linearisationsof{M_{\texttt{sol}}}{}$. 
+			We need to prove that 	
+			$\executionsof{\projectionof{L^*}}{\synchmodel}\neq\executionsof{L^*}{\synchmodel}$.
+			Given that $M_{\texttt{sol}}$ is composed by projections of MSCs 
+			used to build $L^*$, we can establish 
+			$M_{\texttt{sol}}\in\msclanguageof{\projectionof{L^*}}{\synchmodel}$.
+			Thanks to $M_{\texttt{sol}}$, we can notice that 
+			$\executionsof{\projectionof{L^*}}{\synchmodel}$ cannot 
+			itself be in $\executionsof{L^*}{\synchmodel}$ because there must be
+			some index $i_j$ where $a_j \neq b_j$, and no execution of the Global 
+			Type exists in $L^*$ where,
+			after $P_1$ announces the index, what $P_2$ sends is not
+			identical to what $P_3$ receives.
+			$M_{\texttt{sol}}$ rapresents the possible execution 
+			that establish the inequality. More formally, 
+			$w_{\texttt{sol}} \in \executionsof{\projectionof{L^*}}{\synchmodel}$,
+			but $w_{\texttt{sol}} \notin \executionsof{L^*}{\synchmodel}$. 
+			This generally establish the
+			non-realisability of $L^*$. Example~\ref{exm:teo} shows an instance
+			of the construction of $M_{\texttt{sol}}$.
 
 		\item[$\Leftarrow$]
-		      Suppose there is some MSC $M^@$ that can be built from possible 
-			  projections of $L^*$, but is not part of $L^*$'s language
-			  of executions. 
-			  More precisely, we want to derive a solution to $\Delta$ from $M^@$.
-		      First, it is clear that the projection $M^@|_{P1}$ consists of a sequence
-		      of pairs of messages (the first of each pair acknowledged), sent from
-		      process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
-		      Likewise, in order for process 2 to receive those messages,
-		      $M^@|_{P2}$ consists of a sequence of receipts of $(i, b)$ pairs, and after
-		      each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
-		      $b = 0$ or $b = 1$, before the next index pair is received.
-		      Likewise, $M^@|_{P4}$ consists of a sequence of receipts of index $i$ from
-		      process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
-		      $M^@|_{P3}$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
-		      by receipt of $v_i$ or $w_i$, respectively.
-		      Now, since $M^@\notin \msclanguageof{L^*}{\synchmodel}$, for some index $i$ the choice of $v_i$ or
-		      $w_i$ must differ on process 2 and process 3. (Note, we are assuming that
-		      the buffers between processes are FIFO.)
-		      Furthermore, because of the precedences, the prefix formed by the first
-		      $j$ words on process 2 must precede the $(j + 1)$-th message from
-		      process 1 to process 4, which in turn precedes the $(j + 1)$-th message
-		      from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
-		      string formed by the first $j$ words on process 2 is a prefix of the string
-		      formed by the first $j$ words on process 3. Therefore, we can readily
-		      build a solution for $\Delta$ from $M^@$ by building the strings of the solution
-		      taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds 
-			  $y_{i_1}\cdots y_{i_m},$ and $P_4$ builds $x_{i_1}\cdots x_{i_m}$.
+			Suppose there is some MSC $M^@$ that can be built from possible 
+			projections of $L^*$, but is not part of $L^*$'s language
+			of executions. 
+			More precisely, we want to derive a solution to $\Delta$ from $M^@$.
+			First, it is clear that the projection $M^@|_{P1}$ consists of a sequence
+			of pairs of messages (the first of each pair acknowledged), sent from
+			process 1 to processes 2 and 4, respectively, with messages $(i, b)$ and $i$.
+			Likewise, in order for process 2 to receive those messages,
+			$M^@|_{P2}$ consists of a sequence of receipts of $(i, b)$ pairs, and after
+			each $(i, b)$, either $v_i$ or $w_i$ is sent to process 3, based on whether
+			$b = 0$ or $b = 1$, before the next index pair is received.
+			Likewise, $M^@|_{P4}$ consists of a sequence of receipts of index $i$ from
+			process 1, followed by sending of $(i, 0)$ or $(i, 1)$ to process 3, and
+			$M^@|_{P3}$ consists of a sequence of receipt of $(i, 0)$ or $(i, 1)$ followed
+			by receipt of $v_i$ or $w_i$, respectively.
+			Now, since $M^@\notin \msclanguageof{L^*}{\synchmodel}$, for some index $i$ the choice of $v_i$ or
+			$w_i$ must differ on process 2 and process 3. (Note, we are assuming that
+			the buffers between processes are FIFO.)
+			Furthermore, because of the precedences, the prefix formed by the first
+			$j$ words on process 2 must precede the $(j + 1)$-th message from
+			process 1 to process 4, which in turn precedes the $(j + 1)$-th message
+			from 4 to 3, and hence the $(j + 1)$-th word on process 3. That is, the
+			string formed by the first $j$ words on process 2 is a prefix of the string
+			formed by the first $j$ words on process 3. Therefore, we can readily
+			build a solution for $\Delta$ from $M^@$ by building the strings of the solution
+			taking the projections of $P_1$ and $P_4$. In fact, $P_1$ builds 
+			$y_{i_1}\cdots y_{i_m},$ and $P_4$ builds $x_{i_1}\cdots x_{i_m}$.
 
 	\end{itemize}
 
@@ -842,7 +841,8 @@ using valid projections included in its MSC language.
 More precisely, the language of $L^*$ contains only communications 
 of the type represented by $M_x$ and $M_y$. 
 The exchange involving the first $b$ character in Figure~\ref{fig:exmp-msol} 
-does not belong to the execution language of $L^*$. 
+does not belong to the execution language of $L^*$, but it belongs to
+$L^*$'s projections. 
 This particular communication pattern demonstrates 
 the non-realisability of $L^*$.
 

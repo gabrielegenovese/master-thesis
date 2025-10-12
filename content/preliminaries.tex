@@ -605,7 +605,21 @@ $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$, where:
 \end{figure}
 \end{example}
 
+
+The projection of a Global Type $\gt$ on a process $p$ is the CFSM  
+$\gt_p$ obtained by replacing each arrow $\marrow{q}{r}{\msg}$ in the  
+transitions of $\gt$ with the corresponding local action of $p$:  
+$\send{p}{r}{\msg}$ if $p=q$, $\recv{q}{p}{\msg}$ if $p=r$, and  
+$\varepsilon$ otherwise.  
+
 \bigskip
+
+\begin{definition}[Projected system of CFSMs]\label{def:proj}  
+The \emph{projected system of CFSMs} $\projectionof{\gt}$ associated  
+with a Global Type $\gt$ is the tuple $(\gt_p)_{p \in \Procs}$,  
+where each $\gt_p$ is the local behaviour of process $p$ obtained  
+via projection from $\gt$.  
+\end{definition}  
 
 % --------------relationship between MSCs and Global Types--------------
 

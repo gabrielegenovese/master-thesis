@@ -8,26 +8,66 @@ identifying restricted, decidable subclasses or developing practical
 verification techniques that can be effectively applied in real-world
 settings.  
 
-In this chapter, we shift our focus from undecidability to decidability.
-Our goal is to realise a fully automated verification framework capable
-of analysing multiple properties within our modular system model. To
-achieve this, we present \textsc{ReSCu}
-(first introduced 
-in~\cite{desgeorges2023rsc,di2023multiparty,guizouarn2023communicating}),
-a verification tool designed to reason about communication models and
-eventually design them. 
-Originally, \textsc{ReSCu} was born with the goal to verify
-membership in the class of synchronous systems and to check reachability
-of configurations through synchronous executions.  
-Building on this foundation, we extend the tool to assess key behavioural
-properties, specifically, \textit{deadlock-freedom} and
-\textit{progress}, which play a crucial role in the broader study of
-realisability. Analysing deadlock-freedom within this context is
-particularly valuable, as it helps narrow the range of possible
-executions and often corresponds to a \emph{decidable} verification
-problem. By incorporating these analyses, \textsc{ReSCu} serves as a
-\emph{building block} toward achieving practical, decidable
-realisability checks within our framework.
+In this chapter, we shift our focus from \emph{undecidability} to \emph{decidability}.
+As introduced in Section~\ref{sec:red}, our goal is to analyse the
+\emph{realisability problem} through a reduction approach: specifically, 
+we reduce the study of realisability in the peer-to-peer (\textit{p2p}) 
+communication model to the study of realisability under the 
+\emph{synchronous semantics}.
+This result was showed before without a formal definition, but now, 
+building upon the theoretical framework developed in 
+Chapters~\ref{sec:pre} and~\ref{sec:proof}, we can state this 
+result rigorously.
+
+\bigskip
+
+\begin{theorem}[Reduction to $\synchmodel$-implementability, Theorem~5.3 in~\cite{di2025realisability}]
+    \label{thm:main-theorem-realisability}
+    Assume $\acommunicationmodel$ is a causally closed communication model such that 
+    $\executionsofmodel{\acommunicationmodel}\supseteq\executionsofmodel{\synchmodel}$.
+    Then, a global type $\gt$ is \emph{deadlock-free realisable} in $\acommunicationmodel$
+    if and only if the following conditions hold:
+    \begin{enumerate}
+        \item $\msclanguageof{\projectionof{\gt}}{\acommunicationmodel}
+              \subseteq \prefixclosureof{\mscsetofmodel{\synchmodel}}$;
+        \item $\projectionof{\gt}$ is orphan-free in $\acommunicationmodel$;
+        \item $\mscsofcfsms{\projectionof{\acceptcompletion{\gt}}}{\acommunicationmodel}
+              \subseteq \prefixclosureof{
+                  \mscsofcfsms{\projectionof{\gt}}{\acommunicationmodel}
+              }$;
+        \item $\gt$ is deadlock-free realisable in $\synchmodel$.
+    \end{enumerate}
+\end{theorem}
+
+\bigskip
+
+In particular, the second and third conditions have already been 
+shown to be decidable.  
+Hence, the main open challenge, addressed in this thesis, concerns 
+the fourth condition, namely the decidability of 
+\emph{deadlock-free realisability} in the synchronous model.
+
+This theoretical result directly motivates the practical contribution of
+this work: the extension of the \textsc{ReSCu} tool toward fully
+automated verification within our modular framework.  
+\textsc{ReSCu} (first introduced
+in~\cite{desgeorges2023rsc,di2023multiparty,guizouarn2023communicating})
+is a verification tool for reasoning about communication models and
+protocol design.  
+Originally, it was developed to verify membership in the class of
+synchronous systems and to check reachability of configurations under
+synchronous execution.  
+Building on this foundation, we extend \textsc{ReSCu} to analyse key
+behavioural properties, specifically, \textit{deadlock-freedom} and
+\textit{progress}, which are central to the broader study of
+realisability.  
+Examining deadlock-freedom in this context is particularly valuable, as
+it restricts the space of possible executions and often yields a
+\emph{decidable} verification problem.  
+Through these extensions, \textsc{ReSCu} bridges the gap between the
+theoretical foundations of realisability and practical, automated
+analysis, serving as a \emph{building block} toward decidable
+realisability checks in distributed systems.
 
 We describe the features of \textsc{ReSCu}, the input language it adopts,
 and its implementation details, with particular emphasis on the
