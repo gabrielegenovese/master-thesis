@@ -46,7 +46,7 @@ well known communication semantics.
   % list of labels in order (from smallest to largest)
 %   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
   % loop to draw nested squares
-  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
+  \foreach [count=\i] \lab in {rsc,mb,co,p2p,asy} {
     \draw (0,0) rectangle (\i+1,\i);
     \node[anchor=north east] at (\i+1,\i) {\lab};
   }
@@ -323,11 +323,11 @@ several initiators, but it also makes the realisability problem
 undecidable in general~\cite{stutz2024implementability}.  
 
 
-\section{Realisability for MPST}
+\subsection{Realisability for MPST}
 Recent work has focused on addressing the connection between MPST 
 and automata-theoretic formalisms. Stutz and Zufferey 
 showed that realisability is decidable by encoding global types 
-into HMSCs that are globally cooperative~\cite{stutz2022comparing,stutz2023asynchronous}. 
+into HMSCs that are globally cooperative~\cite{DBLP:journals/corr/abs-2209-10328,DBLP:conf/ecoop/Stutz23}. 
 Building on this, Li et al.~\cite{li2023complete} proposed a complete 
 projection function for MPST, guaranteeing that every implementable 
 global type admits a correct distributed implementation.
@@ -417,8 +417,9 @@ correctly coordinate the branching. This issue
 is addressed, typically, by adding explicit selection messages to 
 propagate the choice, and how this can be automated via 
 \emph{amendment} or \emph{repair} algorithms 
-\cite{lanese2013amending}, which insert minimal extra communications 
-to guarantee knowledge of choice.  
+\cite{DBLP:journals/corr/LaneseMZ13, basu2016automated}, 
+which insert minimal extra 
+communications to guarantee knowledge of choice.  
 
 Conceptually, this problem is closely related to the \emph{sender-driven 
 choice} policy highlighted before in the MPST framework, where 
@@ -442,7 +443,7 @@ evidence to the hypothesis that unrestricted mixed-choice global types
 are intrinsically hard to implement in distributed systems.
 
 Another relevant contribution is by Guanciale et al.~ 
-\cite{guanciale2018realisability}, who study the 
+\cite{DBLP:journals/jlap/GuancialeT19}, who study the 
 \emph{realisability of pomsets} via communicating automata. 
 Pomsets, or partially ordered multisets, generalise MSCs by 
 capturing causal dependencies among events rather than total 
