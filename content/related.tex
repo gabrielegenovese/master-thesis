@@ -1,26 +1,23 @@
 \chapter{Related work}\label{sec:rel}
-This thesis is centred around the study of the \emph{realisability 
-problem} for \emph{global types}.
-In this chapter, We review related works addressing this problem, 
-both within the same formal framework and in comparable models.  
-
-In particular, our work uses a definition of global types that rapresents
-a set of MSCs. This thesis forms part of a broader line of research 
-originating from~\cite{di2023partial} and later expanded in 
-\cite{di2025realisability}, which aims to develop a general framework 
-for communication models. We first present and discuss the results of 
-these works, positioning my own contributions in relation to them.  
-
-Subsequently, We analyse recent results by 
-Stutz~et~al.~\cite{stutz2024implementability}, who extensively study 
-the realisability problem, while also tracing the line of research 
-back to early contributions such as Alur~et~al.~\cite{alur2000inference} 
-and Lohrey~et~al.~\cite{lohrey2003realizability}.  
-
-Finally, We briefly review related approaches in comparable formal 
-models, such as Multiparty Session Types (MPST) and Choreography 
-Automata~\cite{barbanera2020choreography}, highlighting similarities 
-and differences with respect to the problem addressed in this thesis.
+This chapter reviews related work on the \emph{realisability problem} for
+\emph{global types}, both within the same theoretical framework and in
+closely related models.  
+Our approach adopts a definition of global types that captures a set of
+MSCs, following a line of research initiated in~\cite{di2023partial} and
+extended in~\cite{di2025realisability}, which aims to establish a
+general framework for communication semantics.  
+We first discuss these foundational works to situate our own
+contributions.  
+We then examine recent advances by
+Stutz~et~al.~\cite{stutz2024implementability}, who provide a
+comprehensive automata-theoretic treatment of the realisability problem,
+and trace this line of inquiry back to early results by
+Alur~et~al.~\cite{alur2000inference} and
+Lohrey~et~al.~\cite{lohrey2003realizability}.  
+Finally, we consider related formalisms such as Multiparty Session Types
+(MPST) and Choreography Automata~\cite{barbanera2020choreography},
+highlighting conceptual connections and key differences with the
+approach developed in this thesis.
 
 \section{Hierarchy of communication model's semantics}\label{sec:hier}
 We defined early some communication semantics of out interest, informally, 
@@ -158,7 +155,7 @@ some differences. For example, it does not accept \emph{orphan messages},
 which are instead accepted for the definition of this thesis.
 
 
-\section{Realisability for Alur}
+\section{Realisability of MSCs and HMSCs}
 In this section, we compare our framework with one of the earliest and
 most influential works on realisability, the one of 
 Alur~et~al.~\cite{alur2005realizability}, which also inspired part of our
@@ -207,10 +204,13 @@ becomes undecidable. For \emph{unbounded} HMSCs,
 safe realisability and weak realisability are undecidable
 remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
 becomes undecidable~\cite{alur2005realizability}. 
-Later, Lohrey~et al.~\cite{lohrey2003realizability} proved, with a technique
-that involves five processes, that in the general case, safe realisability 
+Later, Lohrey~et al.~\cite{lohrey2003realizability} proved in the general case, 
+with a technique that involves five processes, that safe realisability 
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
-for a specific kind of HMSCs, called globally cooperative. % TODO: capire cos'è globally cooperative
+for a specific kind of HMSCs, called globally-cooperative HMSCs, introducted 
+in \cite{morin2002recognizable}.
+Lohrey~et al.~\cite{lohrey2003realizability} also considered another subclass of HMSC,
+called $\mathcal{I}$-closed HMSC, whose checking safe-realisability is \verb|PSPACE|-complete.
 Most positive results assume bounded channels, but \cite{bollig2025high} introduces 
 a new class of HMSCs that allows unbounded channels while maintaining realisability.
 A summary of the main complexity results is given in Table~\ref{tab:realisability}.
@@ -299,75 +299,74 @@ parts of the framework.
 % realisability in the MSC setting.  
 
 \subsection{Projectability}
-A central notion in MPST is \emph{projectability}, which asks whether 
-a global type can be faithfully projected into local specifications for 
-each participant. If projection succeeds, the resulting local types 
-interact without mismatches or unintended behaviours, effectively 
-bridging global specifications and distributed implementations~\cite{honda2008multiparty}.  
-Projectability is, therefore, comparable to the realisability
-problem as they have the same aim.
-Projection algorithms, however, often reject natural protocols that 
-fail to meet restrictive syntactic conditions. This difference between 
-expressivity and safety has motivated extensions of the theory, with 
-\cite{castagna2012global} being the only algorithm aiming for full 
-completeness.
+A central notion in Multiparty Session Types (MPST) is \emph{projectability}, which
+asks whether a global type can be faithfully projected into local specifications for
+each participant. If projection succeeds, the resulting local types interact without
+mismatches or unintended behaviours, effectively bridging global specifications and
+distributed implementations~\cite{honda2008multiparty}.  
+Projectability, therefore, addresses the same question as \emph{realisability} in
+automata-based frameworks: whether a global specification admits a correct distributed
+implementation.
 
-% \subsubsection{Mixed and Sender driven choice}
-A key restriction in the definition of MPST appears in branching. 
-In the original framework \cite{honda2008multiparty,carbone2012structured}, 
-choice is \textbf{sender-driven}: the first sender dictates the branch, 
-ensuring safety but excluding many common patterns where multiple 
-participants influence the decision~\cite{carbone2012structured}.  
-Allowing \textbf{mixed choice} increases expressivity by permitting 
-several initiators, but it also makes the realisability problem 
-undecidable in general~\cite{stutz2024implementability}.  
+However, classical projection algorithms often reject many natural protocols due to
+syntactic restrictions designed to ensure safety. This expressivity gap between
+projectable and implementable specifications has motivated the search for more general
+conditions. Notably, the algorithm of Castagna et al.~\cite{castagna2012global} was the
+first to aim for full completeness.
 
+A key syntactic restriction in MPST lies in how choices are handled. In the original
+frameworks~\cite{honda2008multiparty,carbone2012structured}, branching is
+\textbf{sender-driven}, a single participant initiates the choice and all others follow.
+While this ensures determinism and safety, it excludes scenarios in which several
+participants may concurrently influence the choice. Allowing \textbf{mixed choice}, where
+multiple senders can decide between branches, increases expressivity but sacrifices
+decidability: as shown by Stutz~\cite{stutz2024implementability}, implementability with
+mixed choice is \emph{undecidable} in general.  
 
-\subsection{Realisability for MPST}
-Recent work has focused on addressing the connection between MPST 
-and automata-theoretic formalisms. Stutz and Zufferey 
-showed that realisability is decidable by encoding global types 
-into HMSCs that are globally cooperative~\cite{DBLP:journals/corr/abs-2209-10328,DBLP:conf/ecoop/Stutz23}. 
-Building on this, Li et al.~\cite{li2023complete} proposed a complete 
-projection function for MPST, guaranteeing that every implementable 
-global type admits a correct distributed implementation.
+\subsubsection{Realisability and Restrictions in MPST}
+Recent work connects MPST and automata-theoretic models such as High-level Message
+Sequence Charts (HMSCs). Stutz and Zufferey demonstrated that realisability is
+decidable for global types encoded as \emph{globally cooperative} HMSCs, which are
+structurally restricted to preserve causal order~\cite{DBLP:journals/corr/abs-2209-10328,DBLP:conf/ecoop/Stutz23}. 
+Li et al.~\cite{li2023complete} later introduced a complete projection operator that
+guarantees correctness for all implementable global types.
 
-Stutz’s thesis~\cite{stutz2024implementability} connects MPST to 
-High-level MSCs (HMSCs), introducing a generalized projection operator 
-for sender-driven choice where a sender may branch towards different 
-receivers. This captures patterns beyond classical MPST projection.  
-He also proves that while syntactic projection is incomplete, 
-an automata-theoretic encoding into HMSCs yields decidability for 
-sender-driven choice, with realisability shown to be in 
-\verb|PSPACE|-the first precise complexity bound for this fragment.
+In his thesis, Stutz~\cite{stutz2024implementability} systematically classifies these
+restrictions by analysing their impact on expressivity and decidability.  
+He generalises the classical notion of sender-driven choice to permit senders that may
+branch towards \emph{different receivers}, enabling common distributed patterns such as
+load balancing or delegation. Under this restriction, the implementability problem
+becomes \textbf{decidable} and complete projection is achievable. He proves that global
+types with sender-driven choice can be encoded as HMSCs and that their
+implementability problem lies in \verb|PSPACE|, the first tight complexity bound for
+this class.
 
-We recall the definition of the \emph{Realisability Problem} as 
-introduced by Stutz et al.~\cite{stutz2024implementability}.  
+By contrast, Stutz shows that lifting this restriction to allow mixed choice destroys
+decidability entirely. Using an encoding of Turing Machines into \emph{sink-final}
+mixed-choice protocol state machines (PSMs), he proves that implementability and even
+\emph{soft implementability} are undecidable in general (Theorem~9.2 and Corollary~9.3
+in~\cite{stutz2024implementability}). Moreover, he demonstrates that weaker notions of
+\emph{sender-driven non-determinism}, where branches share senders but overlap in
+receiver-message pairs, still yield mixed choice upon determinisation and thus remain
+undecidable.
 
-\bigskip
-
-\begin{definition}[Implementability Problem~\cite{stutz2024implementability}]
-A language $L \subseteq \Gamma^\omega$ is said to be 
-\emph{implementable} if there exists a CSM 
-$\{A_p\}_{p \in \mathbb{P}}$ such that
+\subsubsection{Comparative Perspective}
+The distinction between \textbf{directed}, \textbf{sender-driven}, and
+\textbf{mixed} choice summarises the current landscape:
 \begin{itemize}
-    \item \textbf{deadlock freedom:} 
-    $\{A_p\}_{p \in \mathbb{P}}$ is deadlock-free, and
-    \item \textbf{protocol fidelity:} 
-    $L$ is the language of $\{A_p\}_{p \in \mathbb{P}}$.
+    \item \emph{Directed choice} (one sender–receiver pair per branch) yields safe but
+    incomplete projections~\cite{honda2008multiparty}.
+    \item \emph{Sender-driven choice} (one sender per branch, multiple receivers) allows
+    richer interaction patterns while preserving decidability, with complexity in
+    \verb|PSPACE|~\cite{stutz2024implementability}.
+    \item \emph{Mixed choice} (multiple senders may decide concurrently) leads to
+    undecidability of implementability and soft implementability~\cite{stutz2024implementability}.
 \end{itemize}
-\end{definition}
 
-where the definition of deadlock freedom is:
-
-\bigskip
-
-\begin{definition}[Deadlock freedom~\cite{stutz2024implementability}]
-A configuration for an automaton is a deadlock if it is not final and  
-has no outgoing transitions while it is reachable if it occurs on some 
-run of A. A CSM is deadlock-free if no reachable configuration is a
-deadlock. We say a CSM is sink-final if all its state machines are.
-\end{definition}
+These results mark a significant milestone: they precisely delineate the boundary
+between expressivity and decidability in MPST. Stutz’s framework provides the first
+complete algorithmic account of implementability under sender-driven choice, and
+proves that no such complete algorithm can exist once mixed choice is admitted.
 
 \section{Choreographies}
 Choreographies \cite{montesi2014choreographic} are another formalism to describe  
@@ -430,17 +429,29 @@ the same branch, preserving consistency across local projections.
 
 
 \section{Other works}
-Stutz et al.~\cite{stutz2025automata} introduce \emph{Protocol State  
-Machines} (PSMs), an automata-based formalism that generalises both  
-MPST and HMSC. Their approach bears resemblance to choreography-automata  
-models, specifying interactions via state machines over communication  
-labels. Crucially, they investigate the computational complexity of  
-type checking and realisability: when restricted to choice-free or  
-single-choice fragments, checking realisability or well-formedness is  
-decidable (often in PTIME), but once \emph{mixed choice} is permitted,  
-the realisability problem becomes undecidable. This result lends further  
-evidence to the hypothesis that unrestricted mixed-choice global types  
-are intrinsically hard to implement in distributed systems.
+Stutz further investigate which syntactic and semantic
+restrictions in global types are \emph{non-restrictive}, that is, those that
+do not compromise expressivity while preserving decidability.  
+In his thesis~\cite{stutz2024implementability}, Stutz introduces
+\emph{Protocol State Machines} (PSMs), a unifying automata-theoretic
+formalism that strictly generalises both Global Types and HMSCs.  
+This model captures interaction protocols as communicating state
+machines over message-passing labels, bridging automata theory and MPST.
+His results show that every sink-final $\Sigma 1$-PSM can be represented
+as a non-deterministic Global Type that preserves sender-driven or
+mixed-choice behaviour~\cite[Thm.~8.14]{stutz2024implementability}.  
+Later, Stutz et~al.~\cite{stutz2025automata} extended this line of work,
+formalising PSMs and analysing the computational complexity of type
+checking and realisability. They demonstrate that, for choice-free or
+single-choice fragments, both problems remain decidable (often in
+\verb|PTIME|), whereas the introduction of \emph{mixed choice} renders
+realisability \emph{undecidable}.  
+Together, these results reinforce the view that structural constraints
+such as single recursion points or explicit termination are
+\emph{expressively harmless}, while the distinction between
+\emph{sender-driven} and \emph{mixed} choice constitutes the true
+boundary between decidability and undecidability in distributed protocol
+implementations.
 
 Another relevant contribution is by Guanciale et al.~ 
 \cite{DBLP:journals/jlap/GuancialeT19}, who study the 
@@ -464,3 +475,37 @@ supporting participants with internal concurrency.
 % towards mixed choice inevitably leads to undecidability. Automata-based 
 % techniques such as HMSCs and PSMs provide the most powerful tools for 
 % extending the theory while preserving decidability in restricted cases.
+
+% \begin{table}[!ht]
+% \centering
+% \label{tab:realisability-summary}
+% \renewcommand{\arraystretch}{1.3}
+% \begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+% \hline
+% \textbf{Formal Model} & \textbf{Weak Realisability} & \textbf{Safe Realisability} \\ 
+% \hline
+% \textbf{HMSCs (general)} & Undecidable~\cite{dummy1} & Undecidable~\cite{dummy2} \\ 
+% \hline
+% \textbf{Bounded HMSCs} & Undecidable~\cite{dummy3} & EXPSPACE-complete~\cite{dummy4} \\ 
+% \hline
+% \textbf{Regular HMSCs} & Undecidable~\cite{dummy5} & EXPSPACE-complete~\cite{dummy6} \\ 
+% \hline
+% \textbf{Globally-Cooperative HMSCs} & -- & EXPSPACE-complete~\cite{dummy7} \\ 
+% \hline
+% \textbf{I-Closed HMSCs} & -- & PSPACE-complete~\cite{dummy8} \\ 
+% \hline
+% \textbf{Communicating State Machines (CSMs)} & Undecidable~\cite{dummy9} & Decidable under restrictions (e.g., half-duplex, $B$-bounded)~\cite{dummy10} \\ 
+% \hline
+% \textbf{MPST (directed choice)} & Decidable~\cite{dummy11} & Decidable~\cite{dummy11} \\ 
+% \hline
+% \textbf{MPST (sender-driven choice)} & PSPACE-complete~\cite{dummy12} & PSPACE-complete~\cite{dummy12} \\ 
+% \hline
+% \textbf{MPST (mixed choice)} & Undecidable~\cite{dummy13} & Undecidable~\cite{dummy13} \\ 
+% \hline
+% \textbf{Protocol State Machines (PSMs)} & Decidable for restricted fragments~\cite{dummy14} & Undecidable in general~\cite{dummy14} \\ 
+% \hline
+% \textbf{Choreographic Programming} & Decidable (subset projection)~\cite{dummy15} & Decidable~\cite{dummy15} \\ 
+% \hline
+% \end{tabular}
+% \caption{Summary of Weak and Safe Realisability across Formal Models}
+% \end{table}
