@@ -1,14 +1,26 @@
-\chapter{Weak-Realisability is Undecidable for Synch Global Types}\label{sec:proof}
+\chapter{Weak-Realisability is Undecidable for Synchronous Global Types}
+\label{sec:proof}
 
-The first contribution is Theorem~\ref{thm:main}, 
-which establishes that \emph{Weak-realisability is undecidable for 
-synchronous global types}. To prepare for this result, we have introduced 
-in Chapter~\ref{sec:pre} the basic notions of MSCs, Global Types, and 
-Weak-realisability.  
-We now present the main objects used in the proof of 
-Theorem~\ref{thm:main}, which we adapt from 
-Alur et~al.~\cite{alur2005realizability}, and we highlight along the way 
-the key differences with the original construction.
+This chapter presents the first main contribution of this thesis, formalised in
+Theorem~\ref{thm:main}, which establishes that 
+\emph{Weak-realisability is undecidable for synchronous global types}.  
+This result complements the broader reduction theorem introduced in
+Section~\ref{sec:red}, where we showed how the realisability problem for
+peer-to-peer systems can be reduced to the study of realisability under
+synchronous semantics.  
+Here, we focus exclusively on this synchronous setting, proving that even in such
+a constrained communication model, weak realisability remains undecidable.
+
+To support this proof, Chapter~\ref{sec:pre} introduced the necessary background on
+Message Sequence Charts (MSCs), Global Types, and Weak-realisability.  
+In this chapter, we build upon those foundations by formally defining the
+core constructions used in the proof of Theorem~\ref{thm:main}.  
+The proof itself is inspired by the classical reduction of 
+Alur et~al.~\cite{alur2005realizability}, which we extend and adapt to the
+framework of synchronous global types.  
+Along the way, we emphasise the main conceptual and technical differences
+between our approach and the original construction, clarifying how these 
+adaptations enable the result to hold in the synchronous semantic setting.
 
 \section{Definitions}
 The proof is a \emph{reduction} from the
@@ -88,9 +100,8 @@ We now check the RPCP conditions:
 
 We have now identified the main problem to which our proof reduces.  
 The next step is to encode an RPCP instance into the formal model.
-% TODO: chiedere perché non va bene
-% In the original proof, MSCs are used, but, in our case, we need to give
-% an encoding using Global Types. We will give both definition.
+In the original proof, MSCs are used, but, in our case, we also need to give
+an encoding using Global Types. We will first give the MSC one.
 
 \bigskip
 
@@ -372,9 +383,9 @@ $M_{\texttt{sol}}$ is acyclic and \emph{synchronous}. Establishing that
 $M_{\texttt{sol}} \in \mscsetofmodel{\synchmodel}$ is non-trivial, and this 
 step is an addition to the original proof. 
 
-With these constructions in place, we proceed to introduce the main  
-objects used in the proof. Specifically, we first show how a Global  
-Type can represent a single \verb|synch| MSC.
+% With these constructions in place, we proceed to introduce the main  
+% objects used in the proof. Specifically, we first show how a Global  
+% Type can represent a single \verb|synch| MSC.
 
 % \bigskip
 

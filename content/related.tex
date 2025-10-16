@@ -352,6 +352,10 @@ problem \textbf{decidable} in \verb|PSPACE|.
 This establishes the first tight complexity bound for the class of 
 sender-driven global types and confirms that they can be faithfully 
 represented as HMSCs.  
+Note that Stutz~et~al.\ interpret \emph{deadlocks} in the sense of our
+\emph{progress} property, and additionally define \emph{soft deadlocks}
+for its model.
+The latter gives rise to the \emph{soft implementability} problem.
 
 A key syntactic dimension in MPST is how \emph{choice} is handled 
 when a branch of the protocol is encountered, as this 
@@ -367,7 +371,7 @@ The three main variants are:
     \item \emph{Sender-driven choice}: each branch has a single sender, 
     but receivers may differ across branches.  
     This generalisation captures richer interaction schemes while retaining 
-    decidability; implementability for this fragment lies in 
+    decidability; as mentioned, implementability for this fragment lies in 
     \verb|PSPACE|~\cite{stutz2024implementability}.  
 
     \item \emph{Mixed choice}: multiple senders may initiate branches 

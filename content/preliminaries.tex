@@ -507,6 +507,12 @@ no reachable configuration represents a permanent waiting state, every
 intermediate behaviour can eventually lead to a valid full execution.  
 In other words, the system’s communication and synchronisation structure 
 guarantees continuous potential for progress.  
+This definition of deadlock-freedom may differ from many other definitions used in 
+other works, because for different application domains there are distinct 
+interpretations of deadlock-freedom.  
+In some system, it is crucial that all participants eventually reach a final state and terminate.
+Instead, in other systems, it may be acceptable for a server to remain 
+indefinitely receptive to incoming requests, i.e. distributed computing.
 For a detailed discussion of this property and its verification within 
 our framework, refer to Chapter~\ref{sec:rescu}.
 
@@ -624,8 +630,8 @@ via projection from $\gt$.
 % --------------relationship between MSCs and Global Types--------------
 
 We can now formally define the relationship between MSCs and Global Types. 
-Intuitively, Global Types represent a set of MSCs, allowing us to reason 
-about multiple message sequence scenarios. 
+Intuitively, the semantics of a Global Type is rapresented by a set of MSCs, 
+allowing us to reason about multiple message sequence scenarios. 
 
 A Global Type defines a language of MSCs in two different ways, one
 existential and one universal. Let $\labellanguageof{\gt}$ be the set of

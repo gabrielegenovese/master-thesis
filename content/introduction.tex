@@ -281,19 +281,30 @@ the reduction techniques explored in this work:
 simplifying the study of realisability
 by reducing richer semantics to the synchronous case.
 
-\section{Reduction to synchronous semantic}\label{sec:red}
-Theorem~\cite[Theorem 5.3]{di2025realisability} suggests that reasoning
-about realisability could become more tractable under \emph{synchronous}
-semantics for automata-based solutions. In
-synchronous communication, send and receive actions are tightly coupled,
-effectively eliminating the nondeterminism introduced by asynchronous
-message buffering. The theorem is formally stated in Chapter~\ref{sec:rescu}.
+\section{Reduction to Synchronous Semantics}
+\label{sec:red}
 
-Formally, the theorem shows that if a global type is realisable under
-synchronous semantics, then, under certain conditions, it is also
-realisable in more general models, such as peer-to-peer semantics. This
-reduction requires constraints such as \emph{orphan-freedom} (no message 
-sent is left unmatched) and \emph{deadlock-freedom}.  
+A central starting point for this thesis is the reduction theorem introduced in 
+\cite[Theorem~5.3]{di2025realisability}, which establishes a fundamental connection 
+between \emph{peer-to-peer} and \emph{synchronous} models of communication.  
+This result serves as the conceptual input of the present work, motivating both the 
+theoretical analysis and the tool-based developments presented in the following chapters.
+
+Intuitively, the theorem suggests that reasoning about \emph{realisability} can be 
+made more tractable under \emph{synchronous semantics}, particularly within 
+automata-based frameworks.  
+In synchronous communication, send and receive actions are tightly coupled, 
+eliminating the nondeterminism caused by message buffering in asynchronous systems 
+and allowing a more direct correspondence between specification and implementation.
+
+Formally, the theorem, stated in full in Chapter~\ref{sec:rescu} as 
+Theorem~\ref{thm:main-theorem-realisability}, shows that if a global type is 
+realisable under synchronous semantics, then, under suitable conditions, it is 
+also realisable in more general communication models such as 
+peer-to-peer semantics.  
+This reduction relies on specific constraints, including 
+\emph{orphan-freedom} (ensuring that no message remains unmatched) and 
+\emph{deadlock-freedom} (guaranteeing global progress).
 
 We present the theorem here informally, using the standard meanings of
 terms that have already been introduced:
