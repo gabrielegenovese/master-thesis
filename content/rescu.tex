@@ -105,8 +105,6 @@ to the bad configuration, while the same option used with \verb|-isrsc| outputs 
 violation execution if the system is not RSC. Additional features include 
 a progress display to estimate remaining runtime during long computations, and 
 \verb|-to_dot|, which exports the system to DOT format for visualization.
-One of the most similar tools is \textsc{McScm} \cite{heussner2012mcscm}, that
-uses a framework with different verification techniques. 
 Symbolic Communicating Machines (SCM), defined and used in \cite[Definition 5.1]{le2008abstract}
 serve as the input format of the tool. SCMs are Communicating 
 Finite-State Machines (CFSM, Definition~\ref{def:cfsm}) 
@@ -117,6 +115,7 @@ particular, transition guards have been made optional (with a default value
 \verb|: when true|), and a new \verb|final| keyword has been introduced to
 explicitly specify final states. The updated grammar is shown in
 Listing~\ref{lst:scm-grammar}. 
+For a brief overview of releted tools, refer to Section~\ref{sec:reltool}.
 
 % \bigskip
 % \begin{definition}[SCM]\label{def:scm}

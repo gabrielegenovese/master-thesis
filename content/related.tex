@@ -20,10 +20,10 @@ highlighting conceptual connections and key differences with the
 approach developed in this thesis.
 
 \section{Hierarchy of communication model's semantics}\label{sec:hier}
-We defined early some communication semantics of out interest, informally, 
-in Chapter~\ref{chap:intro} and, formally, the $\synchmodel$ 
-in Definition~\ref{def:synchronous}.
-Furthermore, \cite{di2023partial} show some other interesting 
+We first defined some communication semantics of our interest in an informal way 
+in Chapter~\ref{chap:intro}, and then we defined formally the $\synchmodel$
+communication model in Definition~\ref{def:synchronous}.
+Furthermore, \cite{di2023partial} shows some other interesting 
 semantics. It also introduces a hierarchy of communication
 semantics, illustrated in Figure~\ref{fig:coms}. The main objective of
 this work was to establish a hierarchy that preserves \emph{monotonic}
@@ -31,9 +31,11 @@ properties: if a property holds for a given communication semantic, it
 should also hold for all semantics contained within it. However, it was
 shown that this monotonicity only applies to specific properties, such
 as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
-extend to the realisability problem, that is why we focused in particular
-on certain semantics. We define subsequently some other useful and
-well known communication semantics.
+extend to the realisability problem, that is why we focused
+on specific semantics, i.e. peer-to-peer and synchronous communication. 
+We define subsequently some other useful and
+well known communication semantics. The reader can verify the membership
+using~\cite{MSCTool}.
 
 \bigskip
 
@@ -43,7 +45,7 @@ well known communication semantics.
   % list of labels in order (from smallest to largest)
 %   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
   % loop to draw nested squares
-  \foreach [count=\i] \lab in {rsc,mb,co,p2p,asy} {
+  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
     \draw (0,0) rectangle (\i+1,\i);
     \node[anchor=north east] at (\i+1,\i) {\lab};
   }
@@ -51,16 +53,6 @@ well known communication semantics.
 \caption{Hierarchy of communication model semantics.}
 \label{fig:coms}
 \end{figure}
-
-% A p2p-MSC is an MSC $M = (E,\to, \lhd, \lambda)$ where, for any two send events $s$ 
-% and $s'$ such that $\lambda(s) \in \text{send}(p, q, \_), \lambda(s') in \text{send}(p, q, \_)$, 
-% and $s \to^+ s'$, one of the following holds:
-% - either $s, s' \in \text{matched}(M)$ with $s \lhd r$ and $s' \lhd r'$ and 
-% $r \to^+ r'$,
-% - or $s' \in \text{unmatched}(M)$.
-% Note that we cannot have two messages $m 1$ and $m 2$, both sent by $p$ to $q$, 
-% in that order, such that $m 1$ is unmatched and $m 2$ is matched; unmatched 
-% message $m 1$ excludes the reception of any later message.
 
 \paragraph{Causally ordered}
 In the causally ordered (\verb|co|) communication model, messages are delivered 
@@ -71,24 +63,7 @@ before $m_2$. This notion of causal ordering was first introduced by Lamport und
 name ``happened-before'' relation. In Figure~\ref{fig:p2p}, this 
 causality is violated: $m_1$ should be received before $m_3$. Causal delivery 
 is commonly implemented using Lamport's logical clock algorithm \cite{lamport2019time}.
-
-% An MSC $M = (E, \to, \lhd, \lambda)$ is causally ordered if, for any two send $s$ and 
-% $s'$, such that $\lambda(s) \in \text{send}(\_, q, \_), \lambda(s') \in \text{send}(\_, q, \_)$, and 
-% $s \leq_{\text{hb}} s'$:
-% - either $s, s' \in \text{matched}(M)$ and $r \to^* r'$, with $r$ and $r'$ receive 
-% events such that $s \lhd r$ and $s' \lhd r'$.
-% - or $s' \in \text{unmatched}(M)$.
-
-% Note that in a \verb|co|-MSC we cannot have two send events $s$ and $s'$ addressed 
-% to the same process, such that $s$ is unmatched, $s'$ is matched, and 
-% $s \leq_{\text{hb}} s'$.
-
-\paragraph{Mailbox}
-In this model, any two messages sent to the same process, regardless of the sender, 
-must be received in the same order as they are sent. If a process receives $m_1$ 
-before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
-the senders of a single receiver. This model is also called FIFO $n-1$.
-In Figure~\ref{fig:mailbox}, an example for this communication model is shown.
+Figure~\ref{fig:causalorder}, instead, respects the causal order of messages.
 
 \begin{figure}[!ht]
 	\centering
@@ -108,45 +83,56 @@ In Figure~\ref{fig:mailbox}, an example for this communication model is shown.
 		\nextlevel
 		\mess[pos=0.8]{$m_3$}{r}{s}
 	\end{msc}
-	\caption{An example of mailbox semantic.}
-	\label{fig:mailbox}
+	\caption{An example of causal order semantic, that breaks mailbox order.}
+	\label{fig:causalorder}
 \end{figure}
 
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|mb|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(\_,q,\_), \lambda (s') \in \text{send}(\_,q,\_)$, and 
-% $s \rightsquigarrow s'$
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, where 
-% $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
+\paragraph{Mailbox}
+In this model, any two messages sent to the same process, regardless of the sender, 
+must be received in the same order as they are sent. If a process receives $m_1$ 
+before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
+the senders of a single receiver. This model is also called FIFO $n\!-\!1$.
+However, the execution in Figure~\ref{fig:causalorder} does not respect mailbox semantics.  
+In this example, the messages create a dependency cycle among the send events:  
+$!m_4 \rightarrow !m_3 \rightarrow !m_2 \rightarrow !m_1 \rightarrow !m_4$.  
+Such a cycle violates the order required by the mailbox model, since each 
+send indirectly depends on its own completion. This circular dependency prevents 
+the existence of any consistent ordering of message transmissions and receptions, 
+breaking the communication model.
 
-% \paragraph{FIFO 1-n}
-% This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
-% receivers. Any two messages sent by a process must be received in the same 
-% order as they are sent. These two messages might be received by different 
-% processes and the two receive events might be concurrent.
+\paragraph{FIFO 1-n}
+This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
+receivers. Any two messages sent by a process must be received in the same 
+order as they are sent. These two messages might be received by different 
+processes and the two receive events might be concurrent.
 
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|onen|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $\lambda (s) \in \text{send}(p,\_,\_), \lambda (s') \in \text{send}(p,\_,\_)$ and 
-% $s \to^+ s'$ (which implies $s \rightsquigarrow s'$)
-% - either $s,s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with 
-% $r$ and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
+\paragraph{FIFO n-n}
+In this model (\verb|nn|), messages are globally ordered and delivered according to 
+their emission order. Any two messages must be received in the same order 
+as they are sent. These two messages might be sent or receives by any process 
+and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
+coordinates all the senders with all the receivers. Figure~\ref{fig:finonn}
+shows an example of this communication semantic.
 
-% \paragraph{FIFO n-n}
-% In this model (\verb|nn|), messages are globally ordered and delivered according to 
-% their emission order. Any two messages must be received in the same order 
-% as they are sent. These two messages might be sent or receives by any process 
-% and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-% coordinates all the senders with all the receivers.
+\begin{figure}[!ht]
+	\centering
+	\begin{msc}[draw frame=none, draw head=none, msc keyword=, 
+				head height=0px, label distance=0.5ex, 
+				foot height=0px, foot distance=0px]{}
+		\declinst{p}{p}{}
+		\declinst{q}{q}{}
+		\declinst{r}{r}{}
 
-% An MSC $M = (E, \to, \lhd, \lambda)$ is a \verb|nn|-MSC if it has a linearization 
-% $\rightsquigarrow$ where, for any two send events $s$ and $s'$, such 
-% that $s \rightsquigarrow s'$
-% - either $s, s' \in \text{matched}(M)$ and $r \rightsquigarrow r'$, with $r$ 
-% and $r'$ receive events such that $s \lhd r$ and $s' \lhd r'$,
-% - or $s' \in \text{unmatched}(M)$.
+		\mess[pos=0.1]{$m_3$}{p}{r}[3]
+		\nextlevel
+		\mess[pos=0.8]{$m_1$}{p}{q}
+		\nextlevel
+		\mess[pos=0.2]{$m_2$}{r}{q}
+	\end{msc}
+	\caption{An example of FIFO n-n semantic.}
+	\label{fig:finonn}
+\end{figure}
+
 \paragraph{RSC}
 Figure~\ref{fig:coms} shows \verb|rsc| as the last block of the hierarchy.
 \verb|rsc| stands for \emph{Realisable in Synchronous Communication}, therefore, 
@@ -192,47 +178,34 @@ Hence, a system is deadlock-free if no such state is reachable from its
 initial configuration. This notion captures the safety aspect of 
 realisability by ensuring that the system never reaches a globally 
 stalled state during execution. This definition of safe realisability 
-correspond to ours in $\ppmodel$ or $\synchmodel$.
+corresponds to ours in $\ppmodel$ or $\synchmodel$.
 
-The work of Alur~et~al. went on further, defining specific complexity classes 
-for different kind of assumptions. For finite sets of MSCs,
+The work of Alur~et~al.~went on further, defining specific complexity classes 
+for different kinds of assumptions. For finite sets of MSCs,
 weakly realisability is shown to be \verb|coNP|-complete and safe 
 realisability is shown to be decidable in \verb|P|-time. The problem
 was subsequently studied for HMSCs. For \emph{bounded} HMSCs, safe realisability 
-remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+remains decidable, and it is \verb|EXPSPACE|-complete, but weak realisability 
 becomes undecidable. For \emph{unbounded} HMSCs, 
-safe realisability and weak realisability are undecidable
-remains decidable, and it is \verb|EXPSPACE|-cpmplete, but weak realisability 
+safe realisability remains decidable, and it is \verb|EXPSPACE|-complete, but weak realisability 
 becomes undecidable~\cite{alur2005realizability}. 
 Later, Lohrey~et al.~\cite{lohrey2003realizability} proved in the general case, 
 with a technique that involves five processes, that safe realisability 
 is undecidable, though it is decidable (and \verb|EXPSPACE|-complete) 
 for a specific kind of HMSCs, called globally-cooperative HMSCs, introducted 
 in \cite{morin2002recognizable}.
+Furthermore, in the context of weak realisability,
+Genest et~al.~\cite{genest2006infinite} introduced the notion of
+\emph{locally-cooperative} HMSCs, for which implementability can be
+checked in linear time.
+Since every globally-cooperative HMSC is also locally-cooperative,
+verifying implementability for this broader class remains at least
+\textbf{EXPSPACE}-hard, if it is decidable at all.
 Lohrey~et al.~\cite{lohrey2003realizability} also considered another subclass of HMSC,
-called $\mathcal{I}$-closed HMSC, whose checking safe-realisability is \verb|PSPACE|-complete.
-Most positive results assume other struttural restriction, like bounded channels, 
+called $\mathcal{I}$-closed HMSC, whose checking safe realisability is \verb|PSPACE|-complete.
+Most positive results assume other struttural restrictions, like bounded channels, 
 but \cite{bollig2025high} introduces 
 a new class of HMSCs that allows unbounded channels while maintaining realisability.
-% A summary of the main complexity results is given in Table~\ref{tab:realisability}.
-
-% \bigskip
-
-% \begin{table}[!ht]
-% 	\centering
-% 	\begin{tabular}{|l|c|c|c|}
-% 		\hline
-% 		& \textbf{Finite set} & \textbf{Bounded graphs} & \textbf{Unbounded} \\
-% 		\hline
-% 		\textbf{Weak} & \verb|coNp|-complete & undecidable & undecidable \\
-% 		\hline
-% 		\textbf{Safe} & P-time & \verb|EXPSPACE|-complete & undecidable \\
-% 		\hline
-% 	\end{tabular}
-% 	\caption{Summary of results on realisability in~\cite{alur2005realizability}.}
-% 	\label{tab:realisability}
-% \end{table}
-
 
 \section{Session Types}
 Session Types provide a type-theoretic framework for specifying and verifying 
@@ -365,13 +338,13 @@ The three main variants are:
     \item \emph{Directed choice}: every branch shares the same 
     sender–receiver pair, yielding a single decision point.  
     This ensures safety and straightforward projection but severely limits 
-    expressivity, as many distributed coordination patterns are excluded 
-    as unsafe~\cite{honda2008multiparty}.  
+    expressivity, as many distributed coordination patterns are 
+    excluded~\cite{honda2008multiparty}.  
 
     \item \emph{Sender-driven choice}: each branch has a single sender, 
     but receivers may differ across branches.  
     This generalisation captures richer interaction schemes while retaining 
-    decidability; as mentioned, implementability for this fragment lies in 
+    decidability; as mentioned, safe realisability for this fragment lies in 
     \verb|PSPACE|~\cite{stutz2024implementability}.  
 
     \item \emph{Mixed choice}: multiple senders may initiate branches 
@@ -392,7 +365,7 @@ complete algorithm can exist once mixed choice is permitted.
 \section{Choreographies}
 Choreographies \cite{ws-cdl-2005} and Choreographic 
 Programming~\cite{montesi2014choreographic, giallorenzo2024choral, cruz2022functional} 
-are another formalisms to describe  
+are other formalisms to describe  
 distributed communication protocols. Choreographies emphasize the 
 global specification of interactions as a high-level description of the 
 intended message exchanges. Similarly to MPST, their goal is to ensure that
@@ -448,7 +421,7 @@ choice} policy highlighted before in the MPST framework, where
 multiple senders make independent choices that must be reconciled to 
 ensure a coherent global behaviour. In both cases, the challenge lies 
 in ensuring that all participants have sufficient knowledge to follow 
-the same branch, preserving consistency across local projections.  
+the same branch, preserving consistency across local projections. 
 
 
 \section{Other works}
@@ -456,7 +429,7 @@ In his thesis~\cite{stutz2024implementability},
 Stutz further investigate which syntactic and semantic
 restrictions in global types are \emph{non-restrictive}, that is, those that
 do not compromise expressivity while preserving decidability.  
-Stutz et al. introduce
+Stutz et al.~introduce
 \emph{Protocol State Machines} (PSMs)~\cite{stutz2025automata}, 
 a unifying automata-theoretic
 formalism that strictly generalises both Global Types and HMSCs.  
@@ -486,43 +459,115 @@ capturing causal dependencies among events rather than total
 orders. Their work defines realisability conditions ensuring 
 both communication correctness and termination soundness, 
 supporting participants with internal concurrency.
-% Table~\ref{tab:realisability-summary} summarises the 
-% main results analised in this chapter.
+Table~\ref{tab:realisability-summary} summarises the 
+main results analised in the last sections. To our knowledge, 
+empty cells are to be considered open problems, like
+the safe realisability problem for sender-driven HMSCs
+and PSMs.
 
-% \bigskip
+\bigskip
 
-% \begin{table}[!ht]
-% \centering
-% \renewcommand{\arraystretch}{1.3}
-% \begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
-% \hline
-% \textbf{Formal Model} & \textbf{Weak Realisability} & \textbf{Safe Realisability} \\ 
-% \hline
-% \textbf{Finite MSCs set} & coNP-complete~\cite{alur2005realizability} & P-time~\cite{alur2005realizability} \\ 
-% \hline
-% \textbf{HMSCs (general)} & Undecidable~\cite{lohrey2003realizability} & Undecidable~\cite{lohrey2003realizability} \\ 
-% \hline
-% \textbf{Bounded HMSCs} & Undecidable~\cite{alur2005realizability} & EXPSPACE-complete~\cite{lohrey2003realizability} \\ 
-% \hline
-% \textbf{Regular HMSCs} & Undecidable~\cite{lohrey2003realizability} & EXPSPACE-complete~\cite{lohrey2003realizability} \\ 
-% \hline
-% \textbf{Globally-Cooperative HMSCs} & -- & EXPSPACE-complete~\cite{morin2002recognizable} \\ 
-% \hline
-% \textbf{$\mathcal{I}$-Closed HMSCs} & -- & PSPACE-complete~\cite{lohrey2003realizability} \\ 
-% \hline
-% \textbf{Loop-connected HMSCs} & -- & Decidable~\cite{bollig2025high} \\ 
-% \hline
-% \textbf{MPST (directed choice)} & -- & Decidable~\cite{honda2008multiparty} \\ 
-% \hline
-% \textbf{MPST (sender-driven choice)} & PSPACE-complete~\cite{stutz2024implementability} & PSPACE-complete~\cite{stutz2024implementability} \\ 
-% \hline
-% \textbf{MPST (mixed choice)} & Undecidable~\cite{stutz2024implementability} & Undecidable~\cite{stutz2024implementability} \\ 
-% \hline
-% \textbf{Protocol State Machines (PSMs)} & Decidable for restricted fragments~\cite{stutz2025automata} & Undecidable in general~\cite{stutz2025automata} \\ 
-% \hline
-% \textbf{Choreographic Programming} & Decidable (subset projection)~\cite{barbanera2020choreography} & Decidable~\cite{barbanera2020choreography} \\ 
-% \hline
-% \end{tabular}
-% \caption{Summary of known complexity results for weak and safe realisability across formal models.}
-% \label{tab:realisability-summary}
-% \end{table}
+\begin{table}[!ht]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{4.3cm}|p{4.3cm}|p{4.3cm}|}
+\hline
+\textbf{Formal Model} & \textbf{Weak Realisability} & \textbf{Safe Realisability} \\ 
+\hline
+\textbf{Finite sets of MSCs} 
+& coNP-complete~\cite{alur2005realizability} 
+& P-time~\cite{alur2005realizability} \\ 
+\hline
+\textbf{Unbounded HMSCs} 
+& Undecidable~\cite{lohrey2003realizability} 
+& Undecidable~\cite{lohrey2003realizability} \\ 
+\hline
+\textbf{Bounded HMSCs (FIFO)} 
+& Undecidable~\cite{alur2005realizability} 
+& EXPSPACE-complete~\cite{lohrey2003realizability} \\ 
+\hline
+\textbf{Bounded HMSCs (non-FIFO)} 
+& Decidable~\cite{morin2002recognizable} 
+& EXPSPACE-complete~\cite{lohrey2003realizability} \\ 
+\hline
+\textbf{Globally-Cooperative HMSCs} 
+& -- 
+& EXPSPACE-complete~\cite{morin2002recognizable} \\ 
+\hline
+\textbf{Locally-Cooperative HMSCs} 
+& Linear time~\cite{genest2006infinite}
+& At most EXPSPACE-complete~\cite{morin2002recognizable}  \\ 
+\hline
+\textbf{$\mathcal{I}$-Closed HMSCs} 
+& -- 
+& PSPACE-complete~\cite{lohrey2003realizability} \\ 
+\hline
+\textbf{Loop-connected HMSCs (unbounded channels)} 
+& -- 
+& Decidable~\cite{bollig2025high} \\ 
+\hline
+\textbf{MPST (directed choice)} 
+& --
+& Decidable, but incomplete~\cite{honda2008multiparty} \\ 
+\hline
+\textbf{MPST (sender-driven choice)} 
+& --
+& PSPACE-complete~\cite{stutz2024implementability} \\ 
+\hline
+\textbf{MPST (mixed choice)} 
+& Undecidable~\cite{stutz2024implementability} 
+& Undecidable~\cite{stutz2024implementability} \\ 
+\hline
+\textbf{General PSMs} 
+& --
+& Undecidable~\cite{stutz2025automata} \\ 
+\hline
+\textbf{Choreographic Programming} 
+& --
+& Decidable~\cite{barbanera2020choreography} \\ 
+\hline
+\end{tabular}
+\caption{Summary of computational complexity for weak and safe realisability across formal models.}
+\label{tab:realisability-summary}
+\end{table}
+
+\section{Related Tools}\label{sec:reltool}
+Several verification tools have been developed to analyse communicating 
+automata and distributed systems under asynchronous or bounded communication 
+semantics. 
+
+\textsc{McScM}~\cite{heussner2012mcscm} is the tool most closely related 
+to \textsc{ReSCu}. It takes as input a system description and a set of 
+\emph{bad configurations} (expressed using Queue Decision Diagrams, QDDs, 
+from~\cite{boigelot1996symbolic}) and checks their reachability. 
+The tool implements multiple model-checking strategies based on abstract 
+interpretation~\cite{cousot1977abstract} and supports general classes of communicating systems.  
+In contrast to \textsc{ReSCu}, most approaches in \textsc{McScM} are 
+\emph{semi-algorithms}, requiring user-defined timeouts to terminate.  
+However, its strength lies in providing a diverse set of verification 
+engines, which increases the likelihood of obtaining conclusive verification 
+results.  
+Notably, \textsc{ReSCu} reuses the same input description language as 
+\textsc{McScM}, ensuring compatibility and easing system specification.
+
+\textsc{KMC}~\cite{lange2019verifying} (for \emph{k-Multiparty 
+Compatibility}) was introduced by Lange and Yoshida to verify whether a 
+system could have been derived from a \emph{Multiparty Session Type} (MPST).  
+If a system satisfies $k$-MC, several safety properties, such as freedom from 
+deadlock and orphan messages, are guaranteed automatically.  
+Unlike \textsc{ReSCu} and \textsc{McScM}, \textsc{KMC} does not require the 
+explicit specification of safety conditions but relies on the theoretical 
+guarantees of MPST projection.
+
+The \textsc{STaB-C} tool~\cite{akroun2018automated,akroun2016automated} 
+implements semi-algorithms for checking \emph{k-stability}, a property that 
+guarantees behavioural equivalence across different communication bounds.  
+A system is $k$-stable if, for any larger bound $k' > k$, its behaviour 
+remains equivalent (under various notions of trace or observational 
+equivalence).  
+While \textsc{STaB-C} focuses on detecting stability rather than verifying 
+safety or liveness, it provides important insight into boundedness and 
+behavioural robustness of FIFO systems.  
+Unlike \textsc{ReSCu}, which verifies multiple semantic properties such as 
+deadlock-freedom and progress, \textsc{STaB-C} focuses exclusively on 
+membership in the class of $k$-stable systems.
