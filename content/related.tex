@@ -204,8 +204,8 @@ verifying implementability for this broader class remains at least
 Lohrey~et al.~\cite{lohrey2003realizability} also considered another subclass of HMSC,
 called $\mathcal{I}$-closed HMSC, whose checking safe realisability is \verb|PSPACE|-complete.
 Most positive results assume other struttural restrictions, like bounded channels, 
-but \cite{bollig2025high} introduces 
-a new class of HMSCs that allows unbounded channels while maintaining realisability.
+but \cite{bollig2025high} introduces a new class of loop-connected HMSCs
+that allows unbounded channels while maintaining realisability.
 
 \section{Session Types}
 Session Types provide a type-theoretic framework for specifying and verifying 
@@ -310,8 +310,7 @@ and expressiveness.
 Recent work connects MPST with automata-theoretic models such as High-level 
 Message Sequence Charts (HMSCs). Stutz and Zufferey demonstrated that 
 realisability is \textbf{decidable} for global types encoded as 
-\emph{globally cooperative} HMSCs, a subclass preserving causal order through 
-specific structural constraints~\cite{DBLP:journals/corr/abs-2209-10328,DBLP:conf/ecoop/Stutz23}.  
+\emph{globally cooperative} HMSCs~\cite{DBLP:journals/corr/abs-2209-10328,DBLP:conf/ecoop/Stutz23}.  
 Li et al.~\cite{li2023complete} later introduced a complete projection operator 
 ensuring correctness for all implementable global types.  
 
@@ -503,8 +502,8 @@ and PSMs.
 & PSPACE-complete~\cite{lohrey2003realizability} \\ 
 \hline
 \textbf{Loop-connected HMSCs (unbounded channels)} 
-& -- 
-& Decidable~\cite{bollig2025high} \\ 
+& Decidable~\cite{bollig2025high}
+& -- \\ 
 \hline
 \textbf{MPST (directed choice)} 
 & --
