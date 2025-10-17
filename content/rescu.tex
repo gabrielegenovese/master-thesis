@@ -532,7 +532,19 @@ with $P = \mathrm{prod}_s(\cfsms)$,
 \end{itemize}
 \end{definition}
 
-Intuitively, progress ensures that the system never reaches a state
+\textbf{Remark.} 
+As with deadlock, several distinct notions of \emph{progress} exist in the literature, 
+each capturing a different aspect of liveness in communicating systems.  
+For instance, Coppo et~al.~\cite{coppo2015gentle} define progress as the guarantee 
+that every message sent is eventually received and that every process waiting for a 
+message eventually obtains it.  
+Other formulations of progress may focus on ensuring that no participant 
+remains indefinitely blocked, or that communication actions can always 
+be extended to form a complete execution.  
+In general, these notions aim to ensure that systems do not reach 
+states of permanent inactivity, even if they are not formally deadlocked.
+
+Intuitively, our definition of progress ensures that the system never reaches a state
 where it is permanently stuck, except in the case of successful termination.
 This is weaker than deadlock-freedom, since infinite executions are allowed
 as long as they can always perform a new step. In particular, livelocks

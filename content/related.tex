@@ -221,10 +221,11 @@ The framework later evolved naturally into
 \emph{Multiparty Session Types (MPST)}~\cite{honda2008multiparty}, 
 extending the theory to interactions among multiple participants.  
 Over the years, session types have been integrated into several programming 
-languages~\cite{ancona2016behavioral}, including 
+languages~\cite{DBLP:journals/ftpl/AnconaBB0CDGGGH16}, including 
 Rust~\cite{jespersen2015session,chen2020ferrite}, 
-Haskell~\cite{lindley2016embedding}, and 
-Erlang~\cite{mostrous2011session}, 
+Haskell~\cite{lindley2016embedding}, 
+Erlang~\cite{mostrous2011session}, and
+Ocaml~\cite{padovani2017simple}
 broadening their practical relevance beyond purely theoretical models.  
 They have also found applications across diverse domains such as 
 operating systems~\cite{fahndrich2006language}, 
@@ -407,8 +408,8 @@ then \(B\) must receive a signal (a ``selection'') that lets it
 synchronize on the correct continuation.  
 
 If the choreography lacks such a mechanism, it becomes 
-\emph{unprojectable}: EPP cannot generate local behaviours that 
-correctly coordinate the branching. This issue 
+\emph{unprojectable}: EPP is not allowed to generate local behaviours 
+that coordinate the branching uncorrectly. This issue 
 is addressed, typically, by adding explicit selection messages to 
 propagate the choice, and how this can be automated via 
 \emph{amendment} or \emph{repair} algorithms 
