@@ -59,10 +59,11 @@ In the causally ordered (\verb|co|) communication model, messages are delivered
 to a process in accordance with the causal dependencies of their emissions. 
 In other words, if there are two messages $m_1$ and $m_2$ with the same recipient, 
 such that there exists a causal path from $m_1$ to $m_2$, then $m_1$ must be received 
-before $m_2$. This notion of causal ordering was first introduced by Lamport under the 
+before $m_2$. This notion of causal ordering was first introduced by 
+Lamport~\cite{lamport2019time} under the 
 name ``happened-before'' relation. In Figure~\ref{fig:p2p}, this 
 causality is violated: $m_1$ should be received before $m_3$. Causal delivery 
-is commonly implemented using Lamport's logical clock algorithm \cite{lamport2019time}.
+is commonly implemented using Lamport's logical clock algorithm~\cite{lamport2019time}.
 Figure~\ref{fig:causalorder}, instead, respects the causal order of messages.
 
 \begin{figure}[!ht]
@@ -202,7 +203,7 @@ Since every globally-cooperative HMSC is also locally-cooperative,
 verifying implementability for this broader class remains at least
 \textbf{EXPSPACE}-hard, if it is decidable at all.
 Lohrey~et al.~\cite{lohrey2003realizability} also considered another subclass of HMSC,
-called $\mathcal{I}$-closed HMSC, whose checking safe realisability is \verb|PSPACE|-complete.
+called $\mathcal{I}$-closed HMSC, whose checking of safe realisability is \verb|PSPACE|-complete.
 Most positive results assume other struttural restrictions, like bounded channels, 
 but \cite{bollig2025high} introduces a new class of loop-connected HMSCs
 that allows unbounded channels while maintaining realisability.
