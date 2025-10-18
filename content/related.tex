@@ -1,41 +1,42 @@
 \chapter{Related work}\label{sec:rel}
-This chapter reviews related work on the \emph{realisability problem} for
-\emph{global types}, both within the same theoretical framework and in
-closely related models.  
-Our approach adopts a definition of global types that captures a set of
-MSCs, following a line of research initiated in~\cite{di2023partial} and
-extended in~\cite{di2025realisability}, which aims to establish a
+This chapter reviews related work on the \emph{realisability problem} 
+for \emph{global types}, both within the same theoretical framework 
+and in closely related models.  
+The idea of using communicating automata for global types is already 
+well established and adopted in various frameworks. Our approach 
+adopts an automata-based definition of global types, which captures a 
+set of MSCs parameterised by the desired communication semantics.  
+This follows the line of research initiated in~\cite{di2023partial} 
+and extended in~\cite{di2025realisability}, which aims to establish a 
 general framework for communication semantics.  
-We first discuss these foundational works to situate our own
-contributions.  
-We then examine recent advances by
-Stutz~et~al.~\cite{stutz2024implementability}, who provide a
-comprehensive automata-theoretic treatment of the realisability problem,
-and trace this line of inquiry back to early results by
-Alur~et~al.~\cite{alur2000inference} and
-Lohrey~et~al.~\cite{lohrey2003realizability}.  
-Finally, we consider related formalisms such as Multiparty Session Types
-(MPST) and Choreography Automata~\cite{barbanera2020choreography},
-highlighting conceptual connections and key differences with the
-approach developed in this thesis.
 
-\section{Hierarchy of communication model's semantics}\label{sec:hier}
-We first defined some communication semantics of our interest in an informal way 
-in Chapter~\ref{chap:intro}, and then we defined formally the $\synchmodel$
-communication model in Definition~\ref{def:synchronous}.
-Furthermore, \cite{di2023partial} shows some other interesting 
-semantics. It also introduces a hierarchy of communication
-semantics, illustrated in Figure~\ref{fig:coms}. The main objective of
-this work was to establish a hierarchy that preserves \emph{monotonic}
-properties: if a property holds for a given communication semantic, it
-should also hold for all semantics contained within it. However, it was
-shown that this monotonicity only applies to specific properties, such
-as \emph{weak-$k$-synchronizability}. In contrast, it does not generally
-extend to the realisability problem, that is why we focused
-on specific semantics, i.e. peer-to-peer and synchronous communication. 
-We define subsequently some other useful and
-well known communication semantics. The reader can verify the membership
-using~\cite{MSCTool}.
+We have already presented in this thesis the asynchronous 
+(\verb|asy|), peer-to-peer (\verb|p2p|), and synchronous 
+(\verb|sync|) communication semantics.  
+Furthermore, \cite{di2023partial} discusses additional semantics, 
+among which the causal order (\verb|co|) and mailbox (\verb|mb|) 
+semantics are particularly relevant.
+In the causal order model, messages are delivered according 
+to their causal dependencies: if $m_1$ causally precedes $m_2$, then 
+$m_1$ must be received first~\cite{lamport2019time}.  
+Causality, formalised by Lamport’s ``happened-before'' relation, ensures 
+consistent delivery order and can be implemented using logical clocks.  
+In the mailbox model, all messages sent to the same process, 
+regardless of sender, must be received in the order they were sent, 
+effectively enforcing FIFO delivery per receiver.  
+
+\cite{di2023partial} also introduces a hierarchy of communication 
+semantics, illustrated in a slightly modified form in 
+Figure~\ref{fig:coms}.  
+The main objective of this work was to establish a hierarchy that 
+preserves \emph{monotonic} properties: if a property holds for a given 
+communication semantic, it should also hold for all semantics 
+contained within it.  
+However, it was shown that this monotonicity applies only to specific 
+properties, such as \emph{weakly-$k$-synchronisability}~\cite{di2023partial}.  
+In contrast, it does not generally extend to the realisability 
+problem, which is why we focused on the problem for specific semantics, 
+namely peer-to-peer and synchronous communication.
 
 \bigskip
 
@@ -45,7 +46,7 @@ using~\cite{MSCTool}.
   % list of labels in order (from smallest to largest)
 %   \def\labels{{rsc,nn,onen,mb,co,p2p,asy}}
   % loop to draw nested squares
-  \foreach [count=\i] \lab in {rsc,nn,onen,mb,co,p2p,asy} {
+  \foreach [count=\i] \lab in {sync,mb,co,p2p,asy} {
     \draw (0,0) rectangle (\i+1,\i);
     \node[anchor=north east] at (\i+1,\i) {\lab};
   }
@@ -54,93 +55,16 @@ using~\cite{MSCTool}.
 \label{fig:coms}
 \end{figure}
 
-\paragraph{Causally ordered}
-In the causally ordered (\verb|co|) communication model, messages are delivered 
-to a process in accordance with the causal dependencies of their emissions. 
-In other words, if there are two messages $m_1$ and $m_2$ with the same recipient, 
-such that there exists a causal path from $m_1$ to $m_2$, then $m_1$ must be received 
-before $m_2$. This notion of causal ordering was first introduced by 
-Lamport~\cite{lamport2019time} under the 
-name ``happened-before'' relation. In Figure~\ref{fig:p2p}, this 
-causality is violated: $m_1$ should be received before $m_3$. Causal delivery 
-is commonly implemented using Lamport's logical clock algorithm~\cite{lamport2019time}.
-Figure~\ref{fig:causalorder}, instead, respects the causal order of messages.
-
-\begin{figure}[!ht]
-	\centering
-	\begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-				head height=0px, label distance=0.5ex, 
-				foot height=0px, foot distance=0px]{}
-		\declinst{p}{p}{}
-		\declinst{q}{q}{}
-		\declinst{r}{r}{}
-		\declinst{s}{s}{}
-
-		\mess[pos=0.1]{$m_4$}{p}{s}[4]
-		\nextlevel
-		\mess[pos=0.8]{$m_1$}{p}{q}
-		\nextlevel
-		\mess[pos=0.2]{$m_2$}{r}{q}
-		\nextlevel
-		\mess[pos=0.8]{$m_3$}{r}{s}
-	\end{msc}
-	\caption{An example of causal order semantic, that breaks mailbox order.}
-	\label{fig:causalorder}
-\end{figure}
-
-\paragraph{Mailbox}
-In this model, any two messages sent to the same process, regardless of the sender, 
-must be received in the same order as they are sent. If a process receives $m_1$ 
-before $m_2$, then $m_1$ must have been sent before $m_2$. \verb|mb| coordinates all 
-the senders of a single receiver. This model is also called FIFO $n\!-\!1$.
-However, the execution in Figure~\ref{fig:causalorder} does not respect mailbox semantics.  
-In this example, the messages create a dependency cycle among the send events:  
-$!m_4 \rightarrow !m_3 \rightarrow !m_2 \rightarrow !m_1 \rightarrow !m_4$.  
-Such a cycle violates the order required by the mailbox model, since each 
-send indirectly depends on its own completion. This circular dependency prevents 
-the existence of any consistent ordering of message transmissions and receptions, 
-breaking the communication model.
-
-\paragraph{FIFO 1-n}
-This model (\verb|onen|) is the dual of \verb|mb|, it coordinates a sender with all the 
-receivers. Any two messages sent by a process must be received in the same 
-order as they are sent. These two messages might be received by different 
-processes and the two receive events might be concurrent.
-
-\paragraph{FIFO n-n}
-In this model (\verb|nn|), messages are globally ordered and delivered according to 
-their emission order. Any two messages must be received in the same order 
-as they are sent. These two messages might be sent or receives by any process 
-and the two send or receive events might be concurrent. The FIFO \verb|n-n| 
-coordinates all the senders with all the receivers. Figure~\ref{fig:finonn}
-shows an example of this communication semantic.
-
-\begin{figure}[!ht]
-	\centering
-	\begin{msc}[draw frame=none, draw head=none, msc keyword=, 
-				head height=0px, label distance=0.5ex, 
-				foot height=0px, foot distance=0px]{}
-		\declinst{p}{p}{}
-		\declinst{q}{q}{}
-		\declinst{r}{r}{}
-
-		\mess[pos=0.1]{$m_3$}{p}{r}[3]
-		\nextlevel
-		\mess[pos=0.8]{$m_1$}{p}{q}
-		\nextlevel
-		\mess[pos=0.2]{$m_2$}{r}{q}
-	\end{msc}
-	\caption{An example of FIFO n-n semantic.}
-	\label{fig:finonn}
-\end{figure}
-
-\paragraph{RSC}
-Figure~\ref{fig:coms} shows \verb|rsc| as the last block of the hierarchy.
-\verb|rsc| stands for \emph{Realisable in Synchronous Communication}, therefore, 
-is comparable to our definition of $\synchmodel$ model, but there are 
-some differences. For example, it does not accept \emph{orphan messages}, 
-which are instead accepted for the definition of this thesis.
-
+We then examine recent advances by
+Stutz~et~al.~\cite{stutz2024implementability}, who provide a
+comprehensive automata-theoretic treatment of the realisability problem,
+and trace this line of inquiry back to early results by
+Alur~et~al.~\cite{alur2000inference} and
+Lohrey~et~al.~\cite{lohrey2003realizability}.  
+Finally, we consider formalisms related to Multiparty Session Types
+(MPST), such as Choreography Automata~\cite{barbanera2020choreography},
+highlighting conceptual connections and key differences with the
+approach developed in this thesis.
 
 \section{Realisability of MSCs and HMSCs}
 In this section, we compare our framework with one of the earliest and
@@ -167,7 +91,7 @@ informal definition of Alur~et~al.~\cite{alur2005realizability} and discuss
 the differences.
 
 Intuitively, let $L$ be a set of MSCs. Then $L$ is said to be 
-\emph{safely realisable} if there exists a family of concurrent automata 
+\emph{safely realisable} if there exists a family of communication automata 
 $\langle A_i \mid 1 \leq i \leq n \rangle$ such that $L = L(\prod_i A_i)$ 
 and the product automaton $\prod_i A_i$ is \emph{deadlock-free}. 
 In this setting, a \emph{deadlock state} is a configuration of the global 
@@ -201,12 +125,13 @@ Genest et~al.~\cite{genest2006infinite} introduced the notion of
 checked in linear time.
 Since every globally-cooperative HMSC is also locally-cooperative,
 verifying implementability for this broader class remains at least
-\textbf{EXPSPACE}-hard, if it is decidable at all.
+\verb|EXPSPACE|-hard, if it is decidable at all.
 Lohrey~et al.~\cite{lohrey2003realizability} also considered another subclass of HMSC,
 called $\mathcal{I}$-closed HMSC, whose checking of safe realisability is \verb|PSPACE|-complete.
 Most positive results assume other struttural restrictions, like bounded channels, 
 but \cite{bollig2025high} introduces a new class of loop-connected HMSCs
 that allows unbounded channels while maintaining realisability.
+Table~\ref{tab:realisability-summary} summarises the results presented in this section.
 
 \section{Session Types}
 Session Types provide a type-theoretic framework for specifying and verifying 
@@ -217,7 +142,7 @@ and unspecified receptions.
 Session types were first formalised as 
 \emph{Binary Session Types}~\cite{honda1993types}, 
 which capture structured communication between two peers.  
-The framework later evolved naturally into 
+The framework later evolved into 
 \emph{Multiparty Session Types (MPST)}~\cite{honda2008multiparty}, 
 extending the theory to interactions among multiple participants.  
 Over the years, session types have been integrated into several programming 
@@ -233,19 +158,19 @@ web services~\cite{yoshida2013scribble},
 distributed algorithms~\cite{kouzapas2024session}, 
 and smart contracts~\cite{das2021resource}.  
 
-A \textbf{global type} defines the overall protocol, from which one 
-derives the \textbf{local types} of each participant via a 
-\emph{projection} operation.  
+To sum up, the typical use of MPST involves defining a protocol through 
+a \textbf{global type}, from which the \textbf{local types} of each 
+participant are derived via a \emph{projection operation}.  
 The system implementation, composed of communicating processes, is 
 then verified against these local specifications using a 
-\emph{typing system} and corresponding \emph{type-checking rules}, 
-ensuring well-formed and safe behaviour.  
-A key component of classical MPST is the \emph{merge operator}, 
-which resolves non-determinism when projecting away interactions 
-irrelevant to a participant.  
-Since merging is only partially defined, it determines whether local 
-states can be safely combined; when projection succeeds, it guarantees 
-both deadlock freedom and protocol fidelity.  
+\emph{typing system}, ensuring safe behaviour and additional properties 
+such as deadlock-freedom.
+% A key component of classical MPST is the \emph{merge operator}, 
+% which resolves non-determinism when projecting away interactions 
+% irrelevant to a participant.  
+% Since merging is only partially defined, it determines whether local 
+% states can be safely combined; when projection succeeds, it guarantees 
+% both deadlock freedom and protocol fidelity.  
 Figure~\ref{fig:mpstschema} summarises the main elements of this framework.
 
 
@@ -295,14 +220,14 @@ Figure~\ref{fig:mpstschema} summarises the main elements of this framework.
 projected into local specifications for each participant so that the 
 resulting local types interact without mismatches or unintended 
 behaviours.  
-It therefore mirrors the \emph{realisability} problem studied in 
+It corresponds to the \emph{realisability} problem studied in 
 automata-theoretic settings, both concern whether a global specification 
 admits a correct distributed implementation.
 
 However, classical projection algorithms often reject natural yet safe 
 protocols because of strong syntactic constraints designed to ensure 
 safety.  
-This gap between expressivity and implementability has motivated the 
+This gap between expressiveness and implementability has motivated the 
 search for more permissive definitions.  
 Notably, the algorithm of Castagna et al.~\cite{castagna2012global} 
 was the first to aim for \emph{full completeness}, balancing safety 
@@ -318,10 +243,10 @@ ensuring correctness for all implementable global types.
 
 In his thesis, Stutz~\cite{stutz2024implementability} provides a comprehensive 
 classification of the \textbf{syntactic restrictions} that govern both 
-\emph{expressivity} and \emph{decidability} in MPST.  
+\emph{expressiveness} and \emph{decidability} in MPST.  
 He generalises the traditional notion of sender-driven choice to allow a sender 
 to branch towards different receivers, capturing common distributed patterns 
-such as delegation or load balancing, while keeping the implementability 
+such as load balancing, while keeping the implementability 
 problem \textbf{decidable} in \verb|PSPACE|.  
 This establishes the first tight complexity bound for the class of 
 sender-driven global types and confirms that they can be faithfully 
@@ -333,13 +258,13 @@ The latter gives rise to the \emph{soft implementability} problem.
 
 A key syntactic dimension in MPST is how \emph{choice} is handled 
 when a branch of the protocol is encountered, as this 
-determines whether projection and realisability remain decidable.  
+determines whether projection remains decidable.  
 The three main variants are:
 \begin{itemize}
     \item \emph{Directed choice}: every branch shares the same 
     sender–receiver pair, yielding a single decision point.  
     This ensures safety and straightforward projection but severely limits 
-    expressivity, as many distributed coordination patterns are 
+    expressiveness, as many distributed coordination patterns are 
     excluded~\cite{honda2008multiparty}.  
 
     \item \emph{Sender-driven choice}: each branch has a single sender, 
@@ -350,13 +275,13 @@ The three main variants are:
 
     \item \emph{Mixed choice}: multiple senders may initiate branches 
     concurrently, removing a unique decision-maker.  
-    While this maximises expressivity, it introduces intrinsic 
+    While this maximises expressiveness, it introduces intrinsic 
     nondeterminism in control flow, making implementability and its 
     weaker variants (e.g., soft or weak realisability) \textbf{undecidable} 
     in general~\cite{stutz2024implementability}.  
 \end{itemize}
 
-These results precisely delineate the boundary between expressivity and 
+These results precisely delineate the boundary between expressiveness and 
 decidability in MPST.  
 Stutz’s framework provides the first complete algorithmic account of 
 implementability for sender-driven global types and proves that no 
@@ -429,7 +354,7 @@ the same branch, preserving consistency across local projections.
 In his thesis~\cite{stutz2024implementability}, 
 Stutz further investigate which syntactic and semantic
 restrictions in global types are \emph{non-restrictive}, that is, those that
-do not compromise expressivity while preserving decidability.  
+do not compromise expressiveness while preserving decidability.  
 Stutz et al.~introduce
 \emph{Protocol State Machines} (PSMs)~\cite{stutz2025automata}, 
 a unifying automata-theoretic
