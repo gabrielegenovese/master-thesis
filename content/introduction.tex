@@ -19,7 +19,7 @@ set of challanges that computer scientists need to
 address, for example, ensuring reliability in the presence of failures
 in critical systems, and maintaining data consistency.
 Distributed systems are 
-widely adopted in domains such as \textit{cloud computing}, critical 
+widely adopted in domains such as cloud computing, critical 
 infrastructures, and telecommunication-oriented applications (i.e.\ 
 autonomous cars, aerospace systems, etc.). Given their ubiquity, it is 
 crucial to study every aspect of their \textbf{design}, \textbf{execution}, 
@@ -50,7 +50,7 @@ through the design process itself, preventing errors from being introduced.
 Among the many aspects of distributed systems, communication is particularly 
 prone to subtle errors and inconsistencies. To reason formally about 
 communication protocols, several models have been proposed, including the 
-Calculus of Communicating Systems (CCS), the $\pi$-calculus, and choreographies. 
+Calculus of Communicating Systems (CCS), the $\pi$-calculus, and choreographies~\cite{montesi2014choreographic}. 
 In this context, \textit{Multiparty Session Types} (MPST)~\cite{honda2008multiparty} 
 stand out as a powerful framework. MPST are designed specifically to formalize 
 and verify structured communication among multiple participants, providing 
@@ -65,12 +65,12 @@ deadlock-freedom and protocol compliance at compile time, making them an
 especially appealing tool for designing robust communication protocols.
 
 \section{Goal}
-The goal of this work is to investigate the \textbf{realisability
+The goal of this thesis is to investigate the \textbf{realisability
 problem} for MPST, which asks whether a global specification can be
 faithfully realised by a collection of \textit{local processes} in a
 distributed system. This question naturally arises in top-down
 development methodologies, such as MPST or choreographic
-frameworks~\cite{montesi2014choreographic}, where the design begins
+frameworks, where the design begins
 from a \emph{global perspective} and the local behaviour of each
 participant is derived afterwards.
 
@@ -123,7 +123,7 @@ perspective to provide a more formal and precise understanding of the
 fundamental limits that exist and why syntactical constraints of certain
 models work.  
 
-Unlike the standard approach to \textit{Global Types} in MPST, which often
+Unlike the standard approach to global types in MPST, which often
 relies on a purely syntactic representation, in this work we adopt a more
 \textit{semantic approach}. Specifically, we represent global types as
 \textit{automata}. This automata-based
@@ -137,8 +137,8 @@ Message Sequence Charts (MSCs). It is therefore useful to recall related
 questions that have been studied in the context of 
 MSCs~\cite{alur2000inference,alur2003inference}. 
 These formalisms provide both historical context and technical insights, 
-and several known results from this line of work will be directly leveraged 
-in the present study.
+and several known results from this line of work will be directly used 
+in this thesis.
 
 Message Sequence Charts (MSCs) are a standardised graphical formalism,
 introduced in 1992 \cite{MSCStandard}, used to describe trace languages 
@@ -187,12 +187,13 @@ goal of their study was to establish a hierarchy that preserves
 \emph{monotonic} properties: if a property holds for a given communication
 semantics, it should also hold for all semantics contained within it.
 However, they showed that this monotonicity only applies to certain
-properties. In this work, we continue the study within the same framework,
-focusing on the realisability property.  
+properties. In this thesis, we continue the study within the same framework,
+focusing on the realisability property, as it is not monotonic
+over different communication semantics.
 
 In the following paragraphs, we describe some of these communication
 semantics informally, using examples to highlight the differences between
-them. In particular, we will later formally define \verb|synch| in
+them. Particularly, we will later formally define \verb|synch| in
 Definition~\ref{def:synchronous}, as this communication semantics is used
 in the main contribution of this thesis. Chapter~\ref{sec:rel} continues
 the discussion by presenting additional communication semantics and
@@ -256,7 +257,7 @@ The synchronous (\verb|synch|) communication model imposes
 the existence of a scheduling such that any send event is 
 immediately followed by its corresponding receive event. 
 An example for this communication model is shown in 
-Figure~\ref{fig:sync}.c. A formal definition is given later 
+Figure~\ref{fig:sync}. A formal definition is given later 
 for this semantic (Definition~\ref{def:synchronous}).
 
 \begin{figure}[!ht]
@@ -280,6 +281,7 @@ The definition of these models will become central in
 the reduction techniques explored in this work: 
 simplifying the study of realisability
 by reducing richer semantics to the synchronous case.
+
 
 \section{Reduction to Synchronous Semantics}
 \label{sec:red}
@@ -313,13 +315,13 @@ the following four conditions hold
 \begin{itemize}
   \item the language generated by $G$'s local type has synchronous semantics;
   \item all $G$'s projections are orphan-free;
-  \item the projections of $G$ are deadlock-free in \verb|p2p|;
+  \item the projections of $G$ are deadlock-free in \verb|p2p| semantics;
   \item $G$ is \emph{deadlock-free realisable} in synchronous semantics.
 \end{itemize}
 
-The second and third conditions are already known to be decidable and 
+The first and second conditions are already known to be decidable and 
 can be automatically verified. The focus of this thesis is instead on 
-the fourth condition, namely checking whether a global type is 
+the third and fourth condition, namely checking whether a global type is 
 realisable in synchronous semantics. The undecidability result 
 presented in Chapter~\ref{sec:proof} shows that this condition cannot 
 be verified in general. Consequently, the theorem above must be refined 
@@ -334,17 +336,17 @@ restricted subclasses of synchronous systems that admit decidable
 realisability checks, complementing the undecidability findings of 
 the theoretical contribution.
 
-Given the context, the developments presented in this thesis can be 
-grouped into two main
-contributions, one theoretical and one practical, both closely
-connected.
+
 
 \section{Contributions}
-The main contributions of this work are: 
+The developments presented in this thesis can be 
+grouped into two main
+contributions, one theoretical and one practical, both closely
+connected:
 \begin{itemize}
     \item a proof of the \textbf{undecidability} of the 
     \textit{weak realisability} problem under the synchronous 
-    semantics of our framework;
+    semantics of our framework (Theorem~\ref{thm:main});
     \item an extension and improvement of the model-checking tool 
     \textsc{ReSCu}~\cite{rescurepo}, enabling the verification of 
     \textit{deadlock-freedom} and \textit{progress} for synchronous 

@@ -164,7 +164,7 @@ is a set $\executionsofmodel{\acommunicationmodel}$ of executions.
 \end{definition}
 
 In the \emph{synchronous model} $\synchmodel$,  
-every send is immediately followed by its matching receive:  
+every send is immediately followed by its matching receive.
 
 \bigskip
 
@@ -175,7 +175,7 @@ $s \in \sendeventsof{e}$, the event $s+1$ is a receive event
 with $\source(s+1) = s$.  
 \end{definition}
  
-Furthermore, the \emph{source function} $\source_e$ is defined as follows.  
+Furthermore, the \emph{source function} $\source$ is defined as follows.  
 
 \bigskip
 
@@ -547,13 +547,13 @@ This serves as an acknowledgment message for $p$, ensuring that both
 directions of communication are explicitly represented in the model.
 
 \textbf{Remark.}
-In our setting, Global Types are viewed as automata that generate a 
+In our setting, global types are viewed as automata that generate a 
 language of MSCs (Definition~\ref{def:gt} and~\ref{def:langexist}), 
 following the line of work by 
-Di~Giusto~et~al.~\cite{di2025realisability}. 
-It is important to note that this notion of Global Types differs 
+Di Giusto et al.~\cite{di2025realisability}. 
+It is important to note that this notion of global types differs 
 significantly from the one commonly adopted in the Multiparty Session 
-Types (MPST) literature, where Global Types are usually defined as 
+Types (MPST) literature, where global types are usually defined as 
 structured syntactic descriptions of communication protocols. 
 Here, the automata-based interpretation aligns with other lines of work that 
 study of the \emph{realisability problem}, providing a formal foundation for 
@@ -564,7 +564,7 @@ with other formalisms, refer to Chapter~\ref{sec:rel}.
 \bigskip
 
 \begin{example}
-An example of a Global Type expressed as an automaton is the following.
+An example of a global type expressed as an automaton is the following.
 Consider the not-realisable specification stated in 
 Listing~\ref{lst:not-impl-exm}. 
 The specification automaton depicted in Figure~\ref{fig:gt-exm} is a DFA
@@ -612,7 +612,7 @@ $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$, where:
 \end{example}
 
 
-The projection of a Global Type $\gt$ on a process $p$ is the CFSM  
+The projection of a global type $\gt$ on a process $p$ is the CFSM  
 $\gt_p$ obtained by replacing each arrow $\marrow{q}{r}{\msg}$ in the  
 transitions of $\gt$ with the corresponding local action of $p$:  
 $\send{p}{r}{\msg}$ if $p=q$, $\recv{q}{p}{\msg}$ if $p=r$, and  
@@ -622,24 +622,24 @@ $\varepsilon$ otherwise.
 
 \begin{definition}[Projected system of CFSMs]\label{def:proj}  
 The \emph{projected system of CFSMs} $\projectionof{\gt}$ associated  
-with a Global Type $\gt$ is the tuple $(\gt_p)_{p \in \Procs}$,  
+with a global type $\gt$ is the tuple $(\gt_p)_{p \in \Procs}$,  
 where each $\gt_p$ is the local behaviour of process $p$ obtained  
 via projection from $\gt$.  
 \end{definition}  
 
 % --------------relationship between MSCs and Global Types--------------
 
-We can now formally define the relationship between MSCs and Global Types. 
-Intuitively, the semantics of a Global Type is rapresented by a set of MSCs, 
+We can now formally define the relationship between MSCs and global types. 
+Intuitively, the semantics of a global type is rapresented by a set of MSCs, 
 allowing us to reason about multiple message sequence scenarios. 
 
-A Global Type defines a language of MSCs in two different ways, one
+A global type defines a language of MSCs in two different ways, one
 existential and one universal. Let $\labellanguageof{\gt}$ be the set of
 sequences of arrows $w$ accepted by $\gt$.
 Informally, the existential MSC language $\existentialmsclanguageof{\gt}{}$ of a 
-Global Type $\gt$ is the set of MSCs that admit at least one representation as a
+global type $\gt$ is the set of MSCs that admit at least one representation as a
 sequence of arrows in $\labellanguageof{\gt}$, and the universal MSC
-language $\universalmsclanguageof{\gt}$ of a Global Type $\gt$ is the set of
+language $\universalmsclanguageof{\gt}$ of a global type $\gt$ is the set of
 MSCs whose representations as sequences of arrows are all in
 $\labellanguageof{\gt}$. We will just give the formal definition of
 $\existentialmsclanguageof{\gt}{}$:
@@ -655,7 +655,7 @@ $\existentialmsclanguageof{\gt}{}$:
 
 % TODO: dare più contesto ed esempio
 
-When a Global Type is implemented in a concrete system,
+When a global type is implemented in a concrete system,
 its semantics depends on the chosen communication model.
 
 \bigskip
@@ -667,7 +667,7 @@ its semantics depends on the chosen communication model.
     \bigcup\{\linearizationsof{M}{\acommunicationmodel}\mid M\in\existentialmsclanguageof{\gt}\}$.
 \end{definition}
 
-We now give the definitions of \emph{weak} and \emph{safe} realisability.
+We can now finally give the definitions of \emph{weak} and \emph{safe} realisability.
 
 \bigskip
 
@@ -701,5 +701,4 @@ our notion of safe realisability coincides with the notion of
 \emph{safe realisability} introduced in~\cite{alur2005realizability}.
 This equivalence does not extend to more general communication models, 
 such as the mailbox model~\cite{di2025realisability}.
-% TODO: come dare supporto a queste affermazioni?
 We are now ready to present the main contributions of this work.
