@@ -1,6 +1,7 @@
 \documentclass{beamer}
 % \usetheme{metropolis}
 
+\usepackage{../macros}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{caption}
@@ -11,10 +12,13 @@
 \usepackage{listings}
 \usepackage{pgfpages}
 \usepackage{msc}
+\usepackage[utf8]{inputenc}
+\usepackage[british]{babel}
+\usepackage{amsmath}
 % \setbeameroption{show notes on second screen=right}
 
-\usetikzlibrary{automata,positioning,shapes,snakes}
-\usetikzlibrary{calc,matrix,arrows,automata,decorations.pathmorphing}
+\usetikzlibrary{automata,arrows,positioning,shapes,snakes}
+\usetikzlibrary{calc,matrix,decorations.pathmorphing}
 \usetikzlibrary{shapes.geometric,arrows.meta}
 \pgfmathtruncatemacro\distance{1}
 
@@ -80,8 +84,8 @@
 	\begin{tikzpicture}[
 		node distance=1cm,
 		every node/.style={font=\sffamily},
-		rect/.style={rectangle, draw=black, minimum width=1cm, minimum height=1cm},
-		circ/.style={circle, draw=black, minimum size=1cm},
+		rect/.style={rectangle, draw=black, minimum width=0.9cm, minimum height=0.9cm},
+		circ/.style={circle, draw=black, minimum size=0.9cm},
 		arrow/.style={-{Stealth}, thick}, scale=0.1
 	]
 
@@ -120,8 +124,8 @@
 text width=7.5em, text centered, minimum height=2em]
 
 
-\newcommand{\marrow}[3]{#1\xrightarrow{#3}#2}
-\newcommand{\gtlabel}[3]{\marrow{#1}{#2}{#3}}
+% \newcommand{\marrow}[3]{#1\xrightarrow{#3}#2}
+% \newcommand{\gtlabel}[3]{\marrow{#1}{#2}{#3}}
 \begin{frame}{Global Types}
 	\begin{itemize}
 		\item Description of a \textbf{global} behavior of a system.
@@ -151,13 +155,13 @@ text width=7.5em, text centered, minimum height=2em]
 	\begin{itemize}
 		\item Point of view of a participant
 		\item Obtained via \textit{projection} operation
-		\item Behavior can be different under different communication semantics (p2p, sync) 
+		\item Behavior can differ for different communication semantics (p2p, sync) 
 	\end{itemize}
 
 	\bigskip
 
-	Realisability problem: Does the implementation of a system \textbf{respects}
-	the behavior described?
+	\textbf{Realisability} problem: Does the implementation of a system 
+  \textbf{respects} the behavior described?
 
 	\bigskip
 
@@ -205,7 +209,7 @@ text width=7.5em, text centered, minimum height=2em]
 
 
 \begin{frame}{The example is not realisable}
-	This global type is {\color{red}\textbf{not}} realisable 
+	This example is {\color{red}\textbf{not}} realisable 
 	because $C$ doesn't know what $A$ sent.
 	\begin{center}
 		\begin{tikzpicture}[node distance=1.5cm, auto]
@@ -278,51 +282,58 @@ text width=7.5em, text centered, minimum height=2em]
 	
 	\vspace{1.5cm}
 
-	\small [1] Di Giusto...
-\end{frame}
-
-% i primi 3 punti sono decidibili
-\begin{frame}{Reduction to sync}
-	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
-	\begin{enumerate}
-		\item $L_{\text{p2p}}(proj(G))$ is sync;
-		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
-		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free 
-		\item $G$ is deadlock-free realisable in sync \hspace{4mm} \scalebox{1.5}{{\color{red}$\longleftarrow$}}
-	\end{enumerate}
-\end{frame}
-
-\begin{frame}[fragile]{First contribution}
-	\begin{itemize}
-		\item 
-	Realisability for sync global types is
-	\textbf{undecidable}. \\ Proof: by reduction to the PCP problem.
-	\item PCP:
-	Given a set of tiles, find an ordering such that the
-	strings formed by the top and bottom halves are equal.
-	\item  
-	Proof adaptated from Alur et al. [2]
-	\end{itemize}
-
-	\begin{center}
-		\includegraphics[width=0.7\textwidth]{../img/pcp.jpg}
-	\end{center}
-
-	[2] Alur...
+	\small{[1] Di Giusto, Cinzia, Etienne Lozes, and Pascal Urso. "Realisability and Complementability of Multiparty Session Types." (2025).}
 \end{frame}
 
 \begin{frame}{Reduction to sync [1]}
+	\vspace{1.5cm}
 	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
 	\begin{enumerate}
 		\item $L_{\text{p2p}}(proj(G))$ is sync;
 		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
 		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free
-		\item $G$ is deadlock-free realisable in sync
+		\item $G$ is weak realisable in sync \hspace{4mm} \scalebox{1.5}{{\color{red}$\longleftarrow$}}
+		\item $G$ is deadlock-free in sync 
 	\end{enumerate}
 	
-	\vspace{3cm}
+	\vspace{1.5cm}
 
-	\small [1] Di Giusto...
+	\small{[1] Di Giusto, Cinzia, Etienne Lozes, and Pascal Urso. "Realisability and Complementability of Multiparty Session Types." (2025).}
+\end{frame}
+
+\begin{frame}[fragile]{First contribution}
+
+	\vspace{1em}
+
+	\begin{itemize}
+		\item Realisability for sync global types is
+    \textbf{undecidable}. \\ Proof: by reduction to the PCP problem.
+    \item PCP:Given a set of tiles, find an ordering such that the
+    strings formed by the top and bottom halves are equal.
+    \item Proof adaptated from Alur et al.~[2]
+	\end{itemize}
+
+	\begin{center}
+		\includegraphics[width=0.6\textwidth]{../img/pcp.jpg}
+	\end{center}
+
+	\small{[2] Alur, Rajeev, Kousha Etessami, and Mihalis Yannakakis. "Realizability and verification of MSC graphs." Theoretical Computer Science 331.1 (2005): 97-114.}
+\end{frame}
+
+\begin{frame}{Reduction to sync [1]}
+	\vspace{1.5cm}
+	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
+	\begin{enumerate}
+		\item $L_{\text{p2p}}(proj(G))$ is sync;
+		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
+		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free
+		\item $G$ is weak realisable in sync
+		\item $G$ is deadlock-free in sync \hspace{4mm} \scalebox{1.5}{{\color{red}$\longleftarrow$}}
+	\end{enumerate}
+	
+	\vspace{1.5cm}
+
+	\small{[1] Di Giusto, Cinzia, Etienne Lozes, and Pascal Urso. "Realisability and Complementability of Multiparty Session Types." (2025).}
 \end{frame}
 
 \begin{frame}[fragile]{Second contribution}
@@ -637,12 +648,101 @@ Deadlock: Id=11 Configuration={F0:4; F1:3; P1:2; P2:2}
 	\end{center}
 \end{frame}
 
-\begin{frame}
-	weak vs safe
+\begin{frame}{Weak and Safe realisability}
+  \begin{itemize}
+    \item 
+    Weak realisability: the global type $G$ is \emph{weak} realisable in sync if 
+    there exist a CFSM system that can implement the global type.
+
+    \bigskip
+
+    \item 
+    Weak realisability: the global type $G$ is \emph{safe} realisable in sync if 
+    it is \emph{weak realisable} and the CFSM system is \textbf{deadlock free}.
+
+  \end{itemize}
 \end{frame}
 
-\begin{frame}
-	dettagli prova
+\begin{frame}{The MSC $M_i^n$}
+	\begin{center}
+    \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
+			\declinst{P1}{P1}{}
+			\declinst{P2}{P2}{}
+			\declinst{P3}{P3}{}
+			\declinst{P4}{P4}{}
+
+			\syncmscmess{$(i,n)$}{P1}{P2}
+			\syncmscmess{$i$}{P1}{P4}
+			\syncmscmess{$(i,n)$}{P4}{P3}
+			\syncmscmess{$x_i^1$}{P2}{P3}
+			\syncmscmess{...}{P2}{P3}
+			\syncmscmess{$x_i^c$}{P2}{P3}
+		\end{msc}
+  \end{center}
+\end{frame}
+
+\begin{frame}{The global type $G_i^n$}
+\begin{center}
+\begin{tikzpicture}[->, node distance=33mm, on grid, auto]
+  \node[state] (q0) {$q_0$};
+  \node[state] (q1) [right=of q0] {$q_1$};
+  \node[state] (q2) [right=of q1] {$q_2$};
+  \node[state] (q3) [below left=of q0] {$q_3$};
+  \node[state] (q4) [right=of q3] {$q_4$};
+  \node[state] (q5) [right=of q4] {$\cdots$};
+  \node[state,accepting] (q6) [right=of q5] {$q_x$};
+
+  \path (q0) edge[] node[above] {$P_1\to P_2:(i,n)$} (q1);
+  \path (q1) edge[] node[above] {$P_1\to P_4:i$} (q2);
+  \path (q2) edge[] node[above left] {$P_4\to P_3:(i,n)$} (q3.60);
+  \path (q3) edge[] node[above] {$P_2\to P_3:x_i^1$} (q4);
+  \path (q4) edge[] node[above] {$P_2\to P_3:...$} (q5);
+  \path (q5) edge[] node[above] {$P_2\to P_3:x_i^c$} (q6);
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{The global type $L^*$}
+  \vspace{-1cm}
+  \begin{center}
+  \begin{tikzpicture}[->, node distance=24mm,on grid,auto,scale=0.7]
+		\node[state] (vI) {$v_I$};
+		\node[state] (qI2) [right=of vI] {$\cdots$};
+		\node[state] (qI1) [above=of qI2] {$q_0^{G^1}$};
+		\node[state] (qI3) [below=of qI2] {$q_0^{G^n}$};
+		\node[state] (qM1) [right=of qI1] {$\cdots$};
+		\node[state] (qM2) [right=of qI2] {$\cdots$};
+		\node[state] (qM3) [right=of qI3] {$\cdots$};
+		\node[state] (qF1) [right=of qM1] {$q_f^{G^1}$};
+		\node[state] (qF2) [right=of qM2] {$\cdots$};
+		\node[state] (qF3) [right=of qM3] {$q_f^{G^n}$};
+		\node[state,accepting] (vT) [right=of qF2] {$v_T$};
+
+		\path (vI) edge[] node[above] {$\epsilon$} (qI1);
+		\path (vI) edge[] node[above] {$\epsilon$} (qI2);
+		\path (vI) edge[] node[above] {$\epsilon$} (qI3);
+		\path (qI1) edge[] node[above] {...} (qM1);
+		\path (qI2) edge[] node[above] {} (qM2);
+		\path (qI3) edge[] node[above] {...} (qM3);
+		\path (qM1) edge[] node[above] {...} (qF1);
+		\path (qM2) edge[] node[above] {} (qF2);
+		\path (qM3) edge[] node[above] {..} (qF3);
+		\path (qF1) edge[] node[above] {$\epsilon$} (vT);
+		\path (qF2) edge[] node[above] {$\epsilon$} (vT);
+		\path (qF3) edge[] node[above] {$\epsilon$} (vT);
+		
+		\draw (qF1.135) to [bend right=30] node[above] {$\epsilon$} (qI1.45);
+		\draw (qF2.135) to [bend right=30] node[above] {$\epsilon$} (qI2.45);
+		\draw (qF3.135) to [bend right=30] node[above] {$\epsilon$} (qI3.45);
+
+		\draw (qF1.225) to node[above] {$\epsilon$} (qI2.60);
+		\draw (qF3.120) to node[above] {$\epsilon$} (qI2.315);
+		
+		\draw (qF3) .. controls +(8,10) and +(1,3) .. node[midway,above] {$\epsilon$} (qI1);
+		\draw (qF1) ..  controls +(8,-10) and +(1,-3) .. node[midway,above] {$\epsilon$} (qI3);
+	\end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \end{document}
