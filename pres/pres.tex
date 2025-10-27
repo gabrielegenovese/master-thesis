@@ -155,7 +155,7 @@ text width=7.5em, text centered, minimum height=2em]
 	\begin{itemize}
 		\item Point of view of a participant
 		\item Obtained via \textit{projection} operation
-		\item Behavior can differ for different communication semantics (p2p, sync) 
+		\item Behavior can differ for different communication semantics (FIFO, sync) 
 	\end{itemize}
 
 	\bigskip
@@ -165,7 +165,7 @@ text width=7.5em, text centered, minimum height=2em]
 
 	\bigskip
 
-	$L(G) = L(\text{proj}(G))$
+	$L(G) = L_{\text{com}}(\text{proj}(G))$ where com is FIFO or sync.
 
 	% \begin{center}
 	% 	\begin{tikzpicture}[node distance=3cm, auto]
@@ -265,17 +265,17 @@ text width=7.5em, text centered, minimum height=2em]
 % \end{frame}
 
 % \begin{frame}{Communication models}
-% 	More interesting: async, p2p, mb (mailbox), rsc (sync).
+% 	More interesting: async, FIFO, mb (mailbox), rsc (sync).
 
 % \end{frame}
 
 \begin{frame}{Reduction to sync [1]}
 	\vspace{1.5cm}
-	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
+	A global type $G$ is deadlock-free realisable in \textbf{FIFO} iff:
 	\begin{enumerate}
-		\item $L_{\text{p2p}}(proj(G))$ is sync;
-		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
-		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free
+		\item $L_{\text{FIFO}}(proj(G))$ is sync;
+		\item $proj(G)$ is orphan-free in FIFO; % (no message is sent but not received)
+		\item $L_{\text{FIFO}}(proj(G))$ is deadlock-free
 		\item $G$ is weak realisable in sync
 		\item $G$ is deadlock-free in sync
 	\end{enumerate}
@@ -287,11 +287,11 @@ text width=7.5em, text centered, minimum height=2em]
 
 \begin{frame}{Reduction to sync [1]}
 	\vspace{1.5cm}
-	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
+	A global type $G$ is deadlock-free realisable in \textbf{FIFO} iff:
 	\begin{enumerate}
-		\item $L_{\text{p2p}}(proj(G))$ is sync;
-		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
-		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free
+		\item $L_{\text{FIFO}}(proj(G))$ is sync;
+		\item $proj(G)$ is orphan-free in FIFO; % (no message is sent but not received)
+		\item $L_{\text{FIFO}}(proj(G))$ is deadlock-free
 		\item $G$ is weak realisable in sync \hspace{4mm} \scalebox{1.5}{{\color{red}$\longleftarrow$}}
 		\item $G$ is deadlock-free in sync 
 	\end{enumerate}
@@ -322,11 +322,11 @@ text width=7.5em, text centered, minimum height=2em]
 
 \begin{frame}{Reduction to sync [1]}
 	\vspace{1.5cm}
-	A global type $G$ is deadlock-free realisable in \textbf{p2p} iff:
+	A global type $G$ is deadlock-free realisable in \textbf{FIFO} iff:
 	\begin{enumerate}
-		\item $L_{\text{p2p}}(proj(G))$ is sync;
-		\item $proj(G)$ is orphan-free in p2p; % (no message is sent but not received)
-		\item $L_{\text{p2p}}(proj(G))$ is deadlock-free
+		\item $L_{\text{FIFO}}(proj(G))$ is sync;
+		\item $proj(G)$ is orphan-free in FIFO; % (no message is sent but not received)
+		\item $L_{\text{FIFO}}(proj(G))$ is deadlock-free
 		\item $G$ is weak realisable in sync
 		\item $G$ is deadlock-free in sync \hspace{4mm} \scalebox{1.5}{{\color{red}$\longleftarrow$}}
 	\end{enumerate}
@@ -429,7 +429,7 @@ Deadlock: Id=11 Configuration={F0:4; F1:3; P1:2; P2:2}
 % 		\item \textbf{Aim}: Extend existing results and generalize to
 % 		      different communication models
 % 		      % \begin{itemize}
-% 		      %  \item \verb|p2p|
+% 		      %  \item \verb|FIFO|
 % 		      %  \item \verb|mailbox|
 % 		      %  \item \verb|sync|
 % 		      % \end{itemize}
@@ -469,10 +469,19 @@ Deadlock: Id=11 Configuration={F0:4; F1:3; P1:2; P2:2}
     \bigskip
 
     \item 
-    Weak realisability: the global type $G$ is \emph{safe} realisable in sync if 
+    Safe realisability: the global type $G$ is \emph{safe} realisable in sync if 
     it is \emph{weak realisable} and the CFSM system is \textbf{deadlock free}.
 
   \end{itemize}
+
+  \bigskip
+
+  \bigskip
+
+  To prove:
+  \begin{center}
+		$\Delta \in \text{RPCP}$ iff the global type $L^*$ is not weak realisable.
+	\end{center}
 \end{frame}
 
 \begin{frame}{The MSC $M_i^n$}
