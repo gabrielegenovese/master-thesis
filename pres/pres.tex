@@ -484,6 +484,18 @@ Deadlock: Id=11 Configuration={F0:4; F1:3; P1:2; P2:2}
 	\end{center}
 \end{frame}
 
+\begin{frame}{Relaxed Post Correspondence Problem (RPCP)}
+Given a set of tiles $\{(v_1, w_1), (v_2, w_2), ..., (v_r, w_r)\}$, 
+determining whether there exist indices $i_1, ..., i_m$ such that
+$$x_{i_1}\cdots x_{i_m} = y_{i_1}\cdots y_{i_m},$$
+where $x_{i_j}, y_{i_j} \in \{v_{i_j}, w_{i_j}\}$, such that:
+\begin{itemize}
+  \item there exists at least one index $i_\ell$ for which $x_{i_\ell}\neq y_{i_\ell}$, and
+  \item for all $j \leq m$, $y_{i_1}\cdots y_{i_j}$ is a strict or 
+  not-strict prefix of $x_{i_1}\cdots x_{i_j}$.
+\end{itemize}  
+\end{frame}
+
 \begin{frame}{The MSC $M_i^n$}
 	\begin{center}
     \begin{msc}[draw frame=none, draw head=none, msc keyword=, head height=0px, label distance=0.5ex, foot height=0px, foot distance=0px]{}
